@@ -5,6 +5,9 @@ cache: yarn
 notifications:
   email: false
 
+script:
+  - yarn run test && codecov
+
 before_deploy: yarn build
 
 deploy:
