@@ -9,9 +9,9 @@ document.body.appendChild(container);
 window.maze = new Maze({
   skinId: 'farmer',
   skin: {
-    pegmanWidth: 50,
-    pegmanHeight: 50,
-    pegmanYOffset: 0,
+    pegmanHeight: 52,
+    pegmanWidth: 49,
+    pegmanYOffset: -8,
     tiles,
     avatar
   },
