@@ -1,4 +1,4 @@
-import utils from './utils';
+import { mod } from './utils';
 
 /**
  * Constants for cardinal directions.  Subsequent code assumes these are
@@ -44,7 +44,7 @@ export const directionToDxDy = function (direction) {
 };
 
 export const directionToFrame = function (direction4) {
-  return utils.mod(direction4 * 4, 16);
+  return mod(direction4 * 4, 16);
 };
 
 /**
@@ -53,5 +53,5 @@ export const directionToFrame = function (direction4) {
  * @return {number} Legal direction value.
  */
 export const constrainDirection4 = function (d) {
-  return utils.mod(d, 4);
+  return mod(d, 4);
 };
