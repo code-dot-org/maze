@@ -107,4 +107,5 @@ maze.init({
   },
 });
 
-window.maze.render('container');
+maze.render('container');
+maze.animatedMove(0, 1000);
