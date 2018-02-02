@@ -5,11 +5,13 @@ import MazeMap from './mazeMap';
 import Visualization from './Visualization';
 import drawMap, { displayPegman } from './drawMap';
 import { getSubtypeForSkin, rotate2DArray, range } from './utils';
-import { directionToDxDy, directionToFrame } from './tiles';
+import { directionToDxDy, directionToFrame, constrainDirection4 } from './tiles';
 
 export default class Maze {
 
   init(config) {
+    this.stepSpeed = 100;
+
     this.scale = {
       snapRadius: 1,
       stepSpeed: 5
@@ -85,6 +87,31 @@ export default class Maze {
 
   createAnimations(svg) {
     // TODO
+  }
+
+  animatedTurn(turnDirection) {
+    const newDirection = this.pegmanD + turnDirection;
+    this.scheduleTurn(newDirection);
+    this.pegmanD = constrainDirection4(newDirection);
+  }
+
+  /**
+   * Schedule the animations for a turn from the current direction
+   * @param {number} endDirection The direction we're turning to
+   */
+  scheduleTurn(endDirection) {
+    var numFrames = 4;
+    var startDirection = this.pegmanD;
+    var deltaDirection = endDirection - startDirection;
+    range(1, numFrames).forEach((frame) => {
+      //timeoutList.setTimeout(function () {
+      setTimeout(() => {
+        this.displayPegman(
+          this.pegmanX,
+          this.pegmanY,
+          directionToFrame(startDirection + deltaDirection * frame / numFrames));
+      }, this.stepSpeed * (frame - 1));
+    });
   }
 
   animatedMove(direction, timeForMove) {
