@@ -10,8 +10,7 @@
  */
 
 import Cell from './cell';
-import tiles from './tiles';
-const SquareType = tiles.SquareType;
+import { SquareType } from './tiles';
 
 export default class BeeCell extends Cell {
   constructor(tileType, featureType, value, cloudType, flowerColor, range) {

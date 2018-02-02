@@ -3,8 +3,7 @@
  */
 
 import Cell from './cell';
-import tiles from './tiles';
-const SquareType = tiles.SquareType;
+import { SquareType } from './tiles';
 
 const FeatureType = {
   NONE: 0,

@@ -1,8 +1,6 @@
-import {SVG_NS} from './constants';
-import tiles from './tiles';
-import {createUuid} from './utils';
-
-const SquareType = tiles.SquareType;
+import { SVG_NS } from './constants';
+import { SquareType, directionToFrame } from './tiles';
+import { createUuid } from './utils';
 
 // Height and width of the goal and obstacles.
 const MARKER_HEIGHT = 43;
@@ -88,7 +86,7 @@ export default function drawMap(svg, skin, subtype, map, squareSize = 50) {
     svg.appendChild(pegmanIcon);
 
     displayPegman(skin, pegmanIcon, clipRect, subtype.start.x, subtype.start.y,
-      tiles.directionToFrame(subtype.startDirection));
+      directionToFrame(subtype.startDirection));
 
     var pegmanFadeoutAnimation = document.createElementNS(SVG_NS, 'animate');
     pegmanFadeoutAnimation.setAttribute('id', 'pegmanFadeoutAnimation');

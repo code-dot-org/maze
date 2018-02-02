@@ -1,5 +1,5 @@
 import HarvesterCell from '../../src/harvesterCell';
-import tiles from '../../src/tiles';
+import { SquareType } from '../../src/tiles';
 
 describe("HarvesterCell", () => {
   it("has reasonable defaults", () => {
@@ -14,7 +14,7 @@ describe("HarvesterCell", () => {
 
   it("can vary on type", () => {
     const variableFeatureCell = HarvesterCell.deserialize({
-      tileType: tiles.SquareType.OPEN,
+      tileType: SquareType.OPEN,
       value: 1,
       possibleFeatures: [HarvesterCell.FeatureType.CORN, HarvesterCell.FeatureType.PUMPKIN]
     });
@@ -23,14 +23,14 @@ describe("HarvesterCell", () => {
 
     expect(variableFeatures.length).toEqual(2);
     expect(variableFeatures[0].serialize()).toEqual({
-      tileType: tiles.SquareType.OPEN,
+      tileType: SquareType.OPEN,
       value: 1,
       range: 1,
       possibleFeatures: [HarvesterCell.FeatureType.CORN],
       startsHidden: true
     });
     expect(variableFeatures[1].serialize()).toEqual({
-      tileType: tiles.SquareType.OPEN,
+      tileType: SquareType.OPEN,
       value: 1,
       range: 1,
       possibleFeatures: [HarvesterCell.FeatureType.PUMPKIN],
@@ -40,7 +40,7 @@ describe("HarvesterCell", () => {
 
   it("can vary on quantitiy", () => {
     const variableRangeCell = HarvesterCell.deserialize({
-      tileType: tiles.SquareType.OPEN,
+      tileType: SquareType.OPEN,
       value: 1,
       range: 2,
       possibleFeatures: [HarvesterCell.FeatureType.CORN]
@@ -50,14 +50,14 @@ describe("HarvesterCell", () => {
 
     expect(variableRanges.length).toEqual(2);
     expect(variableRanges[0].serialize()).toEqual({
-      tileType: tiles.SquareType.OPEN,
+      tileType: SquareType.OPEN,
       value: 1,
       range: 1,
       possibleFeatures: [HarvesterCell.FeatureType.CORN],
       startsHidden: false
     });
     expect(variableRanges[1].serialize()).toEqual({
-      tileType: tiles.SquareType.OPEN,
+      tileType: SquareType.OPEN,
       value: 2,
       range: 2,
       possibleFeatures: [HarvesterCell.FeatureType.CORN],

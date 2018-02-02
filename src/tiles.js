@@ -1,13 +1,11 @@
-var utils = require('./utils');
-
-var Tiles = module.exports;
+import utils from './utils';
 
 /**
  * Constants for cardinal directions.  Subsequent code assumes these are
  * in the range 0..3 and that opposites have an absolute difference of 2.
  * @enum {number}
  */
-Tiles.Direction = {
+export const Direction = {
   NORTH: 0,
   EAST: 1,
   SOUTH: 2,
@@ -19,7 +17,7 @@ Tiles.Direction = {
  * as a 2D array of SquareType values.
  * @enum {number}
  */
-Tiles.SquareType = {
+export const SquareType = {
   WALL: 0,
   OPEN: 1,
   START: 2,
@@ -28,24 +26,24 @@ Tiles.SquareType = {
   STARTANDFINISH: 5
 };
 
-Tiles.TurnDirection = { LEFT: -1, RIGHT: 1};
-Tiles.MoveDirection = { FORWARD: 0, RIGHT: 1, BACKWARD: 2, LEFT: 3};
+export const TurnDirection = { LEFT: -1, RIGHT: 1};
+export const MoveDirection = { FORWARD: 0, RIGHT: 1, BACKWARD: 2, LEFT: 3};
 
-Tiles.directionToDxDy = function (direction) {
+export const directionToDxDy = function (direction) {
   switch (direction) {
-    case Tiles.Direction.NORTH:
+    case Direction.NORTH:
       return {dx: 0, dy: -1};
-    case Tiles.Direction.EAST:
+    case Direction.EAST:
       return {dx: 1, dy: 0};
-    case Tiles.Direction.SOUTH:
+    case Direction.SOUTH:
       return {dx: 0, dy: 1};
-    case Tiles.Direction.WEST:
+    case Direction.WEST:
       return {dx: -1, dy: 0};
   }
   throw new Error('Invalid direction value' + direction);
 };
 
-Tiles.directionToFrame = function (direction4) {
+export const directionToFrame = function (direction4) {
   return utils.mod(direction4 * 4, 16);
 };
 
@@ -54,6 +52,6 @@ Tiles.directionToFrame = function (direction4) {
  * @param {number} d Potentially out-of-bounds direction value.
  * @return {number} Legal direction value.
  */
-Tiles.constrainDirection4 = function (d) {
+export const constrainDirection4 = function (d) {
   return utils.mod(d, 4);
 };
