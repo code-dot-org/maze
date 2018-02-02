@@ -1,8 +1,5 @@
 import Maze from '../../src/maze';
-import MazeMap from '../../src/mazeMap';
 import DirtDrawer from '../../src/dirtDrawer';
-import Cell from '../../src/cell';
-import Farmer from '../../src/farmer';
 
 describe("Maze", function () {
   var dirtMap = [
@@ -20,24 +17,23 @@ describe("Maze", function () {
   let maze;
 
   beforeEach(() => {
-    maze = new Maze();
+    document.body.innerHTML = '<div id="svgMaze"><div class="pegman-location"></div></div>';
+    maze = new Maze({
+      skinId: 'farmer',
+      skin: {
+        dirt: 'dirt.png'
+      },
+      level: {
+        serializedMaze: dirtMap
+      }
+    });
+    maze.subtype.createDrawer(document.getElementById('svgMaze'));
+
+    maze.pegmanX = 0;
+    maze.pegmanY = 0;
   });
 
   describe("scheduleDirtChange", function () {
-    beforeEach(function () {
-      document.body.innerHTML = '<div id="svgMaze"><div class="pegman-location"></div></div>';
-      maze.map = MazeMap.deserialize(dirtMap, Cell);
-      maze.subtype = new Farmer(maze, {}, {
-        skin: {
-          dirt: 'dirt.png'
-        },
-        level: {},
-      });
-      maze.subtype.createDrawer(document.getElementById('svgMaze'));
-      maze.pegmanX = 0;
-      maze.pegmanY = 0;
-    });
-
     it("can cycle through all types", function () {
       var dirtId = DirtDrawer.cellId('', maze.pegmanX, maze.pegmanY);
       var image;

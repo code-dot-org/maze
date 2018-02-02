@@ -105,6 +105,7 @@ function validateImages(setup, defaultFlower) {
     } catch (exc) {
       // output which item is failing
       if (exc.message) {
+        // eslint-disable-next-line no-console
         console.log(exc.message + ' for index #' + col);
       }
       throw exc;

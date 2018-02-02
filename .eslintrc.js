@@ -24,4 +24,8 @@ module.exports = {
     "es6": true,
     "jest": true
   },
+
+  "rules": {
+    "no-unused-vars": ['error', {"args": 'none'}],
+  }
 };

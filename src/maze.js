@@ -13,16 +13,22 @@ export default class Maze {
     this.level = config.level;
     const Type = getSubtypeForSkin(config.skinId);
     this.subtype = new Type(this, config.studioApp, config);
-
     this.loadLevel();
+
+    this.onMount = this.onMount.bind(this);
+  }
+
+  render(containerId) {
     ReactDOM.render(
       <Visualization
         onMount={this.onMount}
       />,
-      document.getElementById(config.containerId)
+      document.getElementById(containerId)
     );
   }
 
+  // TODO figure out how to make eslint okay with class properties
+  // eslint-disable-next-line no-undef
   onMount = () => {
     const svg = document.getElementById('svgMaze');
     this.map.resetDirt();

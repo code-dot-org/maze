@@ -1,3 +1,4 @@
+/* eslint-disable */
 var maze_locale = {lc:{"ar":function(n){
   if (n === 0) {
     return 'zero';

@@ -103,5 +103,6 @@ window.maze = new Maze({
   studioApp: function() {
     return {};
   },
-  containerId: 'container',
 });
+
+window.maze.render('container');
