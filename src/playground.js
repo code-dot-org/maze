@@ -1,12 +1,14 @@
-const Maze = require('./maze.js');
-const tiles = require('../assets/tiles.png');
-const avatar = require('../assets/avatar.png');
+import Maze from './maze';
+import tiles from '../assets/tiles.png';
+import avatar from '../assets/avatar.png';
 
 const container = document.createElement('div');
 container.id = 'container';
 document.body.appendChild(container);
 
-window.maze = new Maze({
+const maze = window.maze = new Maze()
+
+maze.init({
   skinId: 'farmer',
   skin: {
     pegmanHeight: 52,

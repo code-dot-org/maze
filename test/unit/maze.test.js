@@ -4,7 +4,7 @@ import DirtDrawer from '../../src/dirtDrawer';
 describe("Maze", function () {
   var dirtMap = [
     [{
-      "tileType": 1
+      "tileType": 2
     }, {
       "tileType": 1,
       "value": 1
@@ -17,8 +17,9 @@ describe("Maze", function () {
   let maze;
 
   beforeEach(() => {
-    document.body.innerHTML = '<div id="svgMaze"><div class="pegman-location"></div></div>';
-    maze = new Maze({
+    document.body.innerHTML = '<div id="container" />';
+    maze = new Maze()
+    maze.init({
       skinId: 'farmer',
       skin: {
         dirt: 'dirt.png'
@@ -27,10 +28,8 @@ describe("Maze", function () {
         serializedMaze: dirtMap
       }
     });
-    maze.subtype.createDrawer(document.getElementById('svgMaze'));
 
-    maze.pegmanX = 0;
-    maze.pegmanY = 0;
+    maze.render("container");
   });
 
   describe("scheduleDirtChange", function () {

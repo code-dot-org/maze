@@ -3,19 +3,53 @@ import ReactDOM from 'react-dom';
 
 import MazeMap from './mazeMap';
 import Visualization from './Visualization';
-import drawMap from './drawMap';
-import { getSubtypeForSkin } from './utils';
+import drawMap, { displayPegman } from './drawMap';
+import { getSubtypeForSkin, rotate2DArray, range } from './utils';
+import { directionToDxDy, directionToFrame } from './tiles';
 
 export default class Maze {
 
-  constructor(config) {
+  init(config) {
+    this.scale = {
+      snapRadius: 1,
+      stepSpeed: 5
+    };
+
     this.skin = config.skin;
     this.level = config.level;
+
+    if (this.level.map && this.level.shapeShift) {
+      for (let i = 1, max = Math.random() * 4; i < max; i++) {
+        this.level.map = rotate2DArray(this.level.map);
+        this.level.startDirection = (this.level.startDirection + 3) % 4;
+      }
+    }
+
     const Type = getSubtypeForSkin(config.skinId);
     this.subtype = new Type(this, config.studioApp, config);
-    this.loadLevel();
 
-    this.onMount = this.onMount.bind(this);
+    // load level
+    this.map = MazeMap.deserialize(this.level.serializedMaze, this.subtype.getCellClass());
+
+    this.startDirection = this.level.startDirection;
+
+    this.animating_ = false;
+
+    // Override scalars.
+    for (var key in this.level.scale) {
+      this.scale[key] = this.level.scale[key];
+    }
+
+    // Pixel height and width of each maze square (i.e. tile).
+    this.SQUARE_SIZE = 50;
+    this.PEGMAN_HEIGHT = this.skin.pegmanHeight || this.SQUARE_SIZE;
+    this.PEGMAN_WIDTH = this.skin.pegmanWidth || this.SQUARE_SIZE;
+    this.PEGMAN_X_OFFSET = this.skin.pegmanXOffset || 0;
+    this.PEGMAN_Y_OFFSET = this.skin.pegmanYOffset || 0;
+
+    this.MAZE_WIDTH = this.SQUARE_SIZE * this.map.COLS;
+    this.MAZE_HEIGHT = this.SQUARE_SIZE * this.map.ROWS;
+    this.PATH_WIDTH = this.SQUARE_SIZE / 3;
   }
 
   render(containerId) {
@@ -37,6 +71,9 @@ export default class Maze {
     this.subtype.createDrawer(svg);
     this.subtype.initWallMap();
 
+    this.pegmanX = this.subtype.start.x;
+    this.pegmanY = this.subtype.start.y;
+    this.pegmanD = this.startDirection;
 
     // Adjust outer element size.
     svg.setAttribute('width', this.MAZE_WIDTH);

@@ -17,6 +17,25 @@ export function randomValue(values) {
 }
 
 /**
+ * Rotate the given 2d array
+ * @param {Array[]} data
+ */
+export function rotate2DArray(data) {
+  return data[0].map((x, i) => data.map(x => x[data.length - i - 1]));
+}
+
+/**
+ * Generates an array of integers from start to end inclusive
+ */
+export function range(start, end) {
+  var ints = [];
+  for (var i = start; i <= end; i++) {
+    ints.push(i);
+  }
+  return ints;
+}
+
+/**
  * Generate a random identifier in a format matching the RFC-4122 specification.
  *
  * Taken from
