@@ -1,6 +1,6 @@
 {
   "name": "@code-dot-org/maze",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "standalone project for the Maze app type",
   "main": "build/bundle.js",
   "scripts": {
