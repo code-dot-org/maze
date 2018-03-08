@@ -207,7 +207,7 @@ module.exports = class BeeCell extends Cell {
       tileType = parseInt(mapCell);
     }
     return new BeeCell(tileType, featureType, value, cloudType, flowerColor);
-  };
+  }
 }
 
 module.exports.FeatureType = FeatureType;
