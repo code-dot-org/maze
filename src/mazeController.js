@@ -42,7 +42,6 @@ module.exports = class MazeController {
     this.subtype = null;
     this.map = null;
     this.animationsController = null;
-    this.store = null;
 
     this.pegmanD = null;
     this.pegmanX = null;
@@ -56,10 +55,6 @@ module.exports = class MazeController {
     this.PEGMAN_X_OFFSET = null;
     this.PEGMAN_Y_OFFSET = null;
     this.SQUARE_SIZE = null;
-
-    if (options.reduxStore) {
-      this.addReduxStore(options.reduxStore);
-    }
 
     if (options.methods) {
       this.rebindMethods(options.methods);
@@ -83,10 +78,6 @@ module.exports = class MazeController {
     this.playAudioOnFailure = methods.playAudioOnFailure || this.playAudioOnFailure;
     this.loadAudio = methods.loadAudio || this.loadAudio;
     this.getTestResults = methods.getTestResults || this.getTestResults;
-  }
-
-  addReduxStore(store) {
-    this.store = store;
   }
 
   initWithSvg(svg) {
