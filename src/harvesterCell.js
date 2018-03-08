@@ -144,15 +144,19 @@ module.exports = class HarvesterCell extends Cell {
       startsHidden: this.startsHidden_
     });
   }
+
+  /**
+   * @override
+   */
+  static deserialize(serialized) {
+    return new HarvesterCell(
+      serialized.tileType,
+      serialized.value,
+      serialized.range,
+      serialized.possibleFeatures,
+      serialized.startsHidden
+    );
+  }
 }
 
-HarvesterCell.deserialize = serialized => new HarvesterCell(
-  serialized.tileType,
-  serialized.value,
-  serialized.range,
-  serialized.possibleFeatures,
-  serialized.startsHidden
-);
-
-
-HarvesterCell.FeatureType = FeatureType;
+module.exports.FeatureType = FeatureType;

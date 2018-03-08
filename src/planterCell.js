@@ -71,11 +71,16 @@ module.exports = class PlanterCell extends Cell {
       featureType: this.originalFeatureType_,
     });
   }
+
+  /**
+   * @override
+   */
+  static deserialize(serialized) {
+    return new PlanterCell(
+      serialized.tileType,
+      serialized.featureType
+    );
+  }
 }
 
-PlanterCell.deserialize = serialized => new PlanterCell(
-  serialized.tileType,
-  serialized.featureType
-);
-
-PlanterCell.FeatureType = FeatureType;
+module.exports.FeatureType = FeatureType;
