@@ -1,8 +1,8 @@
-import Subtype from './subtype';
-import PlanterCell from './planterCell';
-import PlanterDrawer from './planterDrawer';
+const Subtype = require('./subtype')
+const PlanterCell = require('./planterCell')
+const PlanterDrawer = require('./planterDrawer')
 
-export default class Planter extends Subtype {
+module.exports = class Planter extends Subtype {
 
   reset() {
     this.maze_.map.forEachCell(cell => {

@@ -9,10 +9,10 @@
  */
 
 
-import Subtype from './subtype';
-import CollectorDrawer from './collectorDrawer';
+const Subtype = require('./subtype')
+const CollectorDrawer = require('./collectorDrawer')
 
-export default class Collector extends Subtype {
+module.exports = class Collector extends Subtype {
   /**
    * @fires collected
    */

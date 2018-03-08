@@ -1,6 +1,6 @@
-import Subtype from './subtype';
+const Subtype = require('./subtype')
 
-export default class Farmer extends Subtype {
+module.exports = class Farmer extends Subtype {
 
   /**
    * @override

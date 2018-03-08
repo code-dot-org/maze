@@ -1,10 +1,10 @@
-import Gatherer from './gatherer';
-import HarvesterCell from './harvesterCell';
-import HarvesterDrawer from './harvesterDrawer';
+const Gatherer = require('./gatherer')
+const HarvesterCell = require('./harvesterCell')
+const HarvesterDrawer = require('./harvesterDrawer')
 
 const HARVEST_SOUND = 'harvest';
 
-export default class Harvester extends Gatherer {
+module.exports = class Harvester extends Gatherer {
 
   /**
    * @override

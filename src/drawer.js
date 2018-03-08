@@ -4,15 +4,15 @@
  * skin-specific functionality.
  */
 
-export const SQUARE_SIZE = 50;
-export const SVG_NS = 'http://www.w3.org/2000/svg';
+const SQUARE_SIZE = 50;
+const SVG_NS = 'http://www.w3.org/2000/svg';
 
 /**
  * @param {MaseMap} map The map from the maze, which shows the current
  *        state of the dirt, flowers/honey, or treasure.
  * @param {string} asset the asset url to draw
  */
-export default class Drawer {
+module.exports = class Drawer {
   constructor(map, asset, svg) {
     this.map_ = map;
     this.asset_ = asset;
@@ -218,3 +218,6 @@ export default class Drawer {
     tileElement.appendChild(tileAnimation);
   }
 }
+
+module.exports.SQUARE_SIZE = SQUARE_SIZE;
+module.exports.SVG_NS = SVG_NS;

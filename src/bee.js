@@ -1,7 +1,7 @@
-import { randomValue } from '../utils';
-import Gatherer from './gatherer';
-import BeeCell from './beeCell';
-import BeeItemDrawer from './beeItemDrawer';
+const randomValue = require('./utils').randomValue;
+const Gatherer = require('./gatherer')
+const BeeCell = require('./beeCell')
+const BeeItemDrawer = require('./beeItemDrawer')
 
 const UNLIMITED_HONEY = -99;
 const UNLIMITED_NECTAR = 99;
@@ -12,7 +12,7 @@ const EMPTY_NECTAR = 98; // flower with 0 honey
 const HONEY_SOUND = 'honey';
 const NECTAR_SOUND = 'nectar';
 
-export default class Bee extends Gatherer {
+module.exports = class Bee extends Gatherer {
   constructor(maze, config) {
     super(maze, config);
 

@@ -1,6 +1,6 @@
-import Drawer from './drawer';
+const Drawer = require('./drawer')
 
-export default class PlanterDrawer extends Drawer {
+module.exports = class PlanterDrawer extends Drawer {
   constructor(map, skin, svg, subtype) {
     super(map, '', svg);
     this.skin_ = skin;

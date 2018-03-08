@@ -7,7 +7,7 @@ const timeoutList = [];
  * @param {number} delay in milliseconds
  * @return {number} timeout key
  */
-export function setTimeout(fn, delay) {
+module.exports.setTimeout = function setTimeout(fn, delay) {
   const key = window.setTimeout.apply(window, arguments);
   timeoutList.push(key);
   return key;
@@ -16,7 +16,7 @@ export function setTimeout(fn, delay) {
 /**
  * Clears all timeouts in our timeoutList and resets the timeoutList
  */
-export function clearTimeouts() {
+module.exports.clearTimeouts = function clearTimeouts() {
   timeoutList.forEach(window.clearTimeout, window);
   timeoutList.length = 0;
 }
@@ -25,7 +25,7 @@ export function clearTimeouts() {
  * Clears a timeout and removes the item from the timeoutList
  * @param {number} key
  */
-export function clearTimeout(key) {
+module.exports.clearTimeout = function clearTimeout(key) {
   window.clearTimeout(key);
   // List removal requires IE9+
   const index = timeoutList.indexOf(key);
@@ -42,7 +42,7 @@ const intervalList = [];
  * @param {number} intervalTime in milliseconds
  * @return {number} interval key
  */
-export function setInterval(fn, intervalTime) {
+module.exports.setInterval = function setInterval(fn, intervalTime) {
   const key = window.setInterval.apply(window, arguments);
   intervalList.push(key);
   return key;
@@ -51,7 +51,7 @@ export function setInterval(fn, intervalTime) {
 /**
  * Clears all interval timeouts in our intervalList and resets the intervalList
  */
-export function clearIntervals() {
+module.exports.clearIntervals = function clearIntervals() {
   intervalList.forEach(window.clearInterval, window);
   intervalList.length = 0;
 }
@@ -60,7 +60,7 @@ export function clearIntervals() {
  * Clears a timeout and removes the item from the intervalList
  * @param {number} key
  */
-export function clearInterval(key) {
+module.exports.clearInterval = function clearInterval(key) {
   window.clearInterval(key);
   // List removal requires IE9+
   const timedLoopIndex = timedLoopList.indexOf(key);
@@ -83,7 +83,7 @@ const timedLoopList = [];
  * @param {function} fn
  * @return {number} interval key
  */
-export function timedLoop(interval, fn) {
+module.exports.timedLoop = function timedLoop(interval, fn) {
   const key = setInterval(fn, interval);
   timedLoopList.push(key);
   return key;
@@ -95,7 +95,7 @@ export function timedLoop(interval, fn) {
  * with timedLoop.
  * @param {number} [key]
  */
-export function stopTimedLoop(key) {
+module.exports.stopTimedLoop = function stopTimedLoop(key) {
   if (key === undefined) {
     timedLoopList.slice().forEach(k => exports.clearInterval(k));
   } else {

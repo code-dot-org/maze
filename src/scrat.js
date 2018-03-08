@@ -1,7 +1,7 @@
-import { SquareType } from './tiles';
-import { randomValue } from '../utils';
+const SquareType = require('./tiles').SquareType;
+const randomValue = require('./utils').randomValue;
 
-import Subtype from './subtype';
+const Subtype = require('./subtype')
 
 const TILE_SHAPES = {
   'log':             [0, 0],
@@ -24,7 +24,7 @@ const TILE_SHAPES = {
   'empty': [0, 4]
 };
 
-export default class Scrat extends Subtype {
+module.exports = class Scrat extends Subtype {
 
   /**
    * @override

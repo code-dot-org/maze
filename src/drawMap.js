@@ -1,6 +1,6 @@
-import {SVG_NS} from '../constants';
-import tiles from './tiles';
-import {createUuid} from '../utils';
+const SVG_NS = require('./constants').SVG_NS;
+const tiles = require('./tiles')
+const createUuid = require('./utils').createUuid;
 
 const SquareType = tiles.SquareType;
 
@@ -11,12 +11,12 @@ const MARKER_WIDTH = 50;
 /**
  * Calculate the y coordinates for pegman sprite.
  */
-export function getPegmanYForRow(skin, mazeRow, squareSize = 50) {
+function getPegmanYForRow(skin, mazeRow, squareSize = 50) {
   return Math.floor(squareSize * (mazeRow + 0.5) - skin.pegmanHeight / 2 +
     skin.pegmanYOffset);
 }
 
-export function displayPegman(skin, pegmanIcon, clipRect, x, y, frame, squareSize = 50) {
+function displayPegman(skin, pegmanIcon, clipRect, x, y, frame, squareSize = 50) {
   const xOffset = skin.pegmanXOffset || 0;
   pegmanIcon.setAttribute('x',
     x * squareSize - frame * skin.pegmanWidth + 1 + xOffset);
@@ -26,7 +26,7 @@ export function displayPegman(skin, pegmanIcon, clipRect, x, y, frame, squareSiz
   clipRect.setAttribute('y', pegmanIcon.getAttribute('y'));
 }
 
-export default function drawMap(svg, skin, subtype, map, squareSize = 50) {
+module.exports.default = function drawMap(svg, skin, subtype, map, squareSize = 50) {
   const MAZE_WIDTH = map.COLS * squareSize;
   const MAZE_HEIGHT = map.ROWS * squareSize;
 
@@ -145,4 +145,7 @@ export default function drawMap(svg, skin, subtype, map, squareSize = 50) {
       }
     }
   }
-}
+};
+
+module.exports.getPegmanYForRow = getPegmanYForRow;
+module.exports.displayPegman = displayPegman;

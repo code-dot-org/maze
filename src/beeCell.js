@@ -9,11 +9,11 @@
  * not static but can in fact be randomized between runs.
  */
 
-import Cell from './cell';
-import tiles from './tiles';
+const Cell = require('./cell');
+const tiles = require('./tiles');
 const SquareType = tiles.SquareType;
 
-export default class BeeCell extends Cell {
+module.exports = class BeeCell extends Cell {
   constructor(tileType, featureType, value, cloudType, flowerColor, range) {
 
     // BeeCells require features to have values

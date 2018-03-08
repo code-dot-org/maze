@@ -22,12 +22,12 @@
  * @author fraser@google.com (Neil Fraser)
  */
 
-const timeoutList = require('../lib/util/timeoutList');
+const timeoutList = require('./timeoutList');
 
 const AnimationsController = require('./animationsController');
 const MazeMap = require('./mazeMap');
 const drawMap = require('./drawMap');
-const getSubtypeForSkin = require('./mazeUtils').getSubtypeForSkin;
+const getSubtypeForSkin = require('./utils').getSubtypeForSkin;
 const tiles = require('./tiles');
 
 module.exports = class MazeController {
