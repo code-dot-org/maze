@@ -2,7 +2,7 @@
   "name": "@code-dot-org/maze",
   "version": "0.0.1",
   "description": "standalone project for the Maze app type",
-  "main": "maze.js",
+  "main": "build/bundle.js",
   "scripts": {
     "build": "webpack --progress --colors",
     "lint": "eslint --ext .js src/ test",
@@ -17,12 +17,6 @@
   },
   "author": "Code.org Contributors",
   "license": "SEE LICENSE IN LICENSE",
-  "dependencies": {
-    "prop-types": "^15.6.0",
-    "react": "~15.4.0",
-    "react-dom": "~15.4.0",
-    "redux": "^3.7.2"
-  },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.3",
@@ -41,6 +35,10 @@
     "file-loader": "^1.1.6",
     "html-webpack-plugin": "^2.30.1",
     "jest": "^22.1.3",
+    "prop-types": "^15.6.0",
+    "react": "~15.4.0",
+    "react-dom": "~15.4.0",
+    "redux": "^3.7.2",
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.5"
   },
