@@ -1,7 +1,6 @@
-import Subtype from './subtype';
-import { TestResults } from './constants.js';
+const Subtype = require('./subtype')
 
-export default class Gatherer extends Subtype {
+module.exports = class Gatherer extends Subtype {
 
   reset() {
     this.maze_.map.resetDirt();
@@ -25,12 +24,5 @@ export default class Gatherer extends Subtype {
    */
   succeeded() {
     return this.collectedEverything();
-  }
-
-  /**
-   * @override
-   */
-  hasMessage(testResults) {
-    return testResults === TestResults.APP_SPECIFIC_FAIL;
   }
 }

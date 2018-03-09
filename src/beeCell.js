@@ -9,10 +9,33 @@
  * not static but can in fact be randomized between runs.
  */
 
-import Cell from './cell';
-import { SquareType } from './tiles';
+const Cell = require('./cell');
+const tiles = require('./tiles');
+const SquareType = tiles.SquareType;
 
-export default class BeeCell extends Cell {
+const FeatureType = {
+  NONE: undefined,
+  HIVE: 0,
+  FLOWER: 1,
+  VARIABLE: 2
+};
+
+const CloudType = {
+  NONE: undefined,
+  STATIC: 0,
+  HIVE_OR_FLOWER: 1,
+  FLOWER_OR_NOTHING: 2,
+  HIVE_OR_NOTHING: 3,
+  ANY: 4
+};
+
+const FlowerColor = {
+  DEFAULT: undefined,
+  RED: 0,
+  PURPLE: 1
+};
+
+module.exports = class BeeCell extends Cell {
   constructor(tileType, featureType, value, cloudType, flowerColor, range) {
 
     // BeeCells require features to have values
@@ -144,65 +167,49 @@ export default class BeeCell extends Cell {
       flowerColor: this.flowerColor_,
     });
   }
+
+  /**
+   * Creates a new BeeCell from serialized JSON
+   * @param {Object}
+   * @return {BeeCell}
+   * @override
+   */
+  static deserialize(serialized) {
+    return new BeeCell(
+      serialized.tileType,
+      serialized.featureType,
+      serialized.value,
+      serialized.cloudType,
+      serialized.flowerColor,
+      serialized.range
+    );
+  }
+
+  /**
+   * @param {String|Number} mapCell
+   * @param {String|Number} initialDirtCell
+   * @return {BeeCell}
+   * @override
+   * @see Cell.parseFromOldValues
+   */
+  static parseFromOldValues(mapCell, initialDirtCell) {
+    mapCell = mapCell.toString();
+    initialDirtCell = parseInt(initialDirtCell);
+    let tileType, featureType, value, cloudType, flowerColor;
+
+    if (!isNaN(initialDirtCell) && mapCell.match(/[1|R|P|FC]/) && initialDirtCell !== 0) {
+      tileType = SquareType.OPEN;
+      featureType = initialDirtCell > 0 ? FeatureType.FLOWER : FeatureType.HIVE;
+      value = Math.abs(initialDirtCell);
+      cloudType = (mapCell === 'FC') ? CloudType.STATIC : CloudType.NONE;
+      flowerColor = (mapCell === 'R') ? FlowerColor.RED : (mapCell === 'P') ? FlowerColor.PURPLE : FlowerColor.DEFAULT;
+    } else {
+      tileType = parseInt(mapCell);
+    }
+    return new BeeCell(tileType, featureType, value, cloudType, flowerColor);
+  }
 }
 
-const FeatureType = BeeCell.FeatureType = {
-  NONE: undefined,
-  HIVE: 0,
-  FLOWER: 1,
-  VARIABLE: 2
-};
-
-const CloudType = BeeCell.CloudType = {
-  NONE: undefined,
-  STATIC: 0,
-  HIVE_OR_FLOWER: 1,
-  FLOWER_OR_NOTHING: 2,
-  HIVE_OR_NOTHING: 3,
-  ANY: 4
-};
-
-const FlowerColor = BeeCell.FlowerColor = {
-  DEFAULT: undefined,
-  RED: 0,
-  PURPLE: 1
-};
-
-/**
- * Creates a new BeeCell from serialized JSON
- * @param {Object}
- * @return {BeeCell}
- * @override
- */
-BeeCell.deserialize = serialized => new BeeCell(
-  serialized.tileType,
-  serialized.featureType,
-  serialized.value,
-  serialized.cloudType,
-  serialized.flowerColor,
-  serialized.range
-);
-
-/**
- * @param {String|Number} mapCell
- * @param {String|Number} initialDirtCell
- * @return {BeeCell}
- * @override
- * @see Cell.parseFromOldValues
- */
-BeeCell.parseFromOldValues = (mapCell, initialDirtCell) => {
-  mapCell = mapCell.toString();
-  initialDirtCell = parseInt(initialDirtCell);
-  let tileType, featureType, value, cloudType, flowerColor;
-
-  if (!isNaN(initialDirtCell) && mapCell.match(/[1|R|P|FC]/) && initialDirtCell !== 0) {
-    tileType = SquareType.OPEN;
-    featureType = initialDirtCell > 0 ? FeatureType.FLOWER : FeatureType.HIVE;
-    value = Math.abs(initialDirtCell);
-    cloudType = (mapCell === 'FC') ? CloudType.STATIC : CloudType.NONE;
-    flowerColor = (mapCell === 'R') ? FlowerColor.RED : (mapCell === 'P') ? FlowerColor.PURPLE : FlowerColor.DEFAULT;
-  } else {
-    tileType = parseInt(mapCell);
-  }
-  return new BeeCell(tileType, featureType, value, cloudType, flowerColor);
-};
+module.exports.FeatureType = FeatureType;
+module.exports.CloudType = CloudType;
+module.exports.FlowerColor = FlowerColor;

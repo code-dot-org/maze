@@ -1,5 +1,5 @@
-import Maze from '../../src/maze';
 import DirtDrawer from '../../src/dirtDrawer';
+import MazeController from '../../src/mazeController';
 
 describe("Maze", function () {
   var dirtMap = [
@@ -14,51 +14,52 @@ describe("Maze", function () {
     }],
   ];
 
-  let maze;
+  describe("scheduleDirtChange", function () {
+    let mazeController;
 
-  beforeEach(() => {
-    document.body.innerHTML = '<div id="container" />';
-    maze = new Maze()
-    maze.init({
-      skinId: 'farmer',
-      skin: {
-        dirt: 'dirt.png'
-      },
-      level: {
+    beforeEach(function () {
+      document.body.innerHTML = '<div id="svgMaze"><div class="pegman-location"></div></div>';
+      mazeController = new MazeController({
         serializedMaze: dirtMap
-      }
+      }, {
+      }, {
+        skinId: 'farmer',
+        level: {},
+        skin: {
+          dirt: 'dirt.png'
+        }
+      });
+      mazeController.subtype.createDrawer(document.getElementById('svgMaze'));
+      mazeController.pegmanX = 0;
+      mazeController.pegmanY = 0;
     });
 
-    maze.render("container");
-  });
-
-  describe("scheduleDirtChange", function () {
     it("can cycle through all types", function () {
-      var dirtId = DirtDrawer.cellId('', maze.pegmanX, maze.pegmanY);
+      var dirtId = DirtDrawer.cellId('', mazeController.pegmanX, mazeController.pegmanY);
       var image;
 
       // image starts out nonexistant
       expect(document.getElementById(dirtId)).toBeNull();
 
-      maze.scheduleFill();
+      mazeController.scheduleFill();
       image = document.getElementById(dirtId);
       // image now exists and is dirt
       expect(image).not.toBeNull()
       expect(image.getAttribute('x')).toEqual("-550")
 
-      maze.scheduleDig();
+      mazeController.scheduleDig();
       image = document.getElementById(dirtId);
       // tile is flat, image is therefore hidden
       expect(image).not.toBeNull()
       expect(image.getAttribute('visibility')).toEqual('hidden');
 
-      maze.scheduleDig();
+      mazeController.scheduleDig();
       image = document.getElementById(dirtId);
       // image is a holde
       expect(image).not.toBeNull()
       expect(image.getAttribute('x')).toEqual("-500")
 
-      maze.scheduleFill();
+      mazeController.scheduleFill();
       image = document.getElementById(dirtId);
       // tile is flat, image is therefore hidden
       expect(image).not.toBeNull()

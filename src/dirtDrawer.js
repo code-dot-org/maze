@@ -1,4 +1,5 @@
-import Drawer, { SQUARE_SIZE } from './drawer';
+const Drawer = require('./drawer')
+const SQUARE_SIZE = Drawer.SQUARE_SIZE;
 
 // The number line is [-inf, min, min+1, ... no zero ..., max-1, max, +inf]
 const DIRT_MAX = 10;
@@ -8,7 +9,7 @@ const ASSET_UNCLIPPED_WIDTH = SQUARE_SIZE * DIRT_COUNT;
 /**
  * Extends Drawer to draw dirt piles for Farmer.
  */
-export default class DirtDrawer extends Drawer {
+module.exports = class DirtDrawer extends Drawer {
   constructor(map, dirtAsset, svg) {
     super(map, dirtAsset, svg);
   }
