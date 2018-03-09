@@ -12,12 +12,10 @@ module.exports = {
   },
 
   "plugins": [
-    "react",
     "babel",
   ],
   "extends": [
     "eslint:recommended",
-    "plugin:react/recommended"
   ],
 
   "env": {
