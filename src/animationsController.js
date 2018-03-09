@@ -1,9 +1,9 @@
-const SVG_NS = require('../constants').SVG_NS;
+const SVG_NS = require('./constants').SVG_NS;
 const drawMap = require('./drawMap');
 const displayPegman = drawMap.displayPegman;
 const getPegmanYForRow = drawMap.getPegmanYForRow;
-const timeoutList = require('../lib/util/timeoutList');
-const utils = require('../utils');
+const timeoutList = require('./timeoutList');
+const utils = require('./utils');
 const tiles = require('./tiles');
 
 module.exports = class AnimationsController {

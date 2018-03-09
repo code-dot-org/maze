@@ -2,8 +2,8 @@
  * @overview HarvesterCell represents the contets of the grid elements for Harvester.
  */
 
-import Cell from './cell';
-import tiles from './tiles';
+const Cell = require('./cell');
+const tiles = require('./tiles');
 const SquareType = tiles.SquareType;
 
 const FeatureType = {
@@ -13,7 +13,7 @@ const FeatureType = {
   LETTUCE: 3,
 };
 
-export default class HarvesterCell extends Cell {
+module.exports = class HarvesterCell extends Cell {
   constructor(tileType, value, range, possibleFeatures, startsHidden) {
 
     // possible features should default to an array containing
@@ -144,15 +144,19 @@ export default class HarvesterCell extends Cell {
       startsHidden: this.startsHidden_
     });
   }
+
+  /**
+   * @override
+   */
+  static deserialize(serialized) {
+    return new HarvesterCell(
+      serialized.tileType,
+      serialized.value,
+      serialized.range,
+      serialized.possibleFeatures,
+      serialized.startsHidden
+    );
+  }
 }
 
-HarvesterCell.deserialize = serialized => new HarvesterCell(
-  serialized.tileType,
-  serialized.value,
-  serialized.range,
-  serialized.possibleFeatures,
-  serialized.startsHidden
-);
-
-
-HarvesterCell.FeatureType = FeatureType;
+module.exports.FeatureType = FeatureType;

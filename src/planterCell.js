@@ -4,14 +4,14 @@
  * changed by the user from soil to sprout.
  */
 
-import Cell from './cell';
+const Cell = require('./cell');
 const FeatureType = {
   NONE: 0,
   SOIL: 1,
   SPROUT: 2,
 };
 
-export default class PlanterCell extends Cell {
+module.exports = class PlanterCell extends Cell {
   constructor(tileType, featureType) {
     if (featureType === undefined) {
       featureType = FeatureType.NONE;
@@ -71,11 +71,16 @@ export default class PlanterCell extends Cell {
       featureType: this.originalFeatureType_,
     });
   }
+
+  /**
+   * @override
+   */
+  static deserialize(serialized) {
+    return new PlanterCell(
+      serialized.tileType,
+      serialized.featureType
+    );
+  }
 }
 
-PlanterCell.deserialize = serialized => new PlanterCell(
-  serialized.tileType,
-  serialized.featureType
-);
-
-PlanterCell.FeatureType = FeatureType;
+module.exports.FeatureType = FeatureType;

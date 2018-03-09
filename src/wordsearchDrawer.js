@@ -3,7 +3,9 @@
  * Farmer, Collector). Intended to be inherited from to provide
  * skin-specific functionality.
  */
-import Drawer, { SQUARE_SIZE, SVG_NS } from './drawer';
+const Drawer = require('./drawer')
+const SQUARE_SIZE = Drawer.SQUARE_SIZE;
+const SVG_NS = Drawer.SVG_NS;
 
 const color = {
   black: "#000",
@@ -15,7 +17,7 @@ const color = {
  *        state of the dirt, flowers/honey, or treasure.
  * @param {string} asset the asset url to draw
  */
-export default class WordSearchDrawer extends Drawer {
+module.exports = class WordSearchDrawer extends Drawer {
 
   /**
    * @override

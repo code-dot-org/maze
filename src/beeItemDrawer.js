@@ -1,4 +1,6 @@
-import Drawer, { SQUARE_SIZE, SVG_NS } from './drawer';
+const Drawer = require('./drawer')
+const SQUARE_SIZE = Drawer.SQUARE_SIZE;
+const SVG_NS = Drawer.SVG_NS;
 
 /**
  * Extends Drawer to draw flowers/honeycomb for bee.
@@ -6,7 +8,7 @@ import Drawer, { SQUARE_SIZE, SVG_NS } from './drawer';
  * @param {Object} skin The app's skin, used to get URLs for our images
  * @param {Bee} bee The maze's Bee object.
  */
-export default class BeeItemDrawer extends Drawer {
+module.exports = class BeeItemDrawer extends Drawer {
   constructor(map, skin, svg, bee) {
     super(map, '', svg);
     this.skin_ = skin;

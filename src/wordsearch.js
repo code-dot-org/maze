@@ -1,12 +1,12 @@
-import Subtype from './subtype';
-import WordSearchDrawer from './wordsearchDrawer';
-import { SquareType } from './tiles';
-import { randomValue } from '../utils';
+const Subtype = require('./subtype')
+const WordSearchDrawer = require('./wordsearchDrawer')
+const SquareType = require('./tiles').SquareType;
+const randomValue = require('./utils').randomValue;
 
 /**
  * Create a new WordSearch.
  */
-export default class WordSearch extends Subtype {
+class WordSearch extends Subtype {
   constructor(maze, config) {
     super(maze, config);
     this.goal_ = config.level.searchWord;
@@ -181,3 +181,5 @@ WordSearch.randomLetter = function (restrictions) {
 
   return randomValue(letterPool);
 };
+
+module.exports = WordSearch;

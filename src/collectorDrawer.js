@@ -1,9 +1,9 @@
-import Drawer from './drawer';
+const Drawer = require('./drawer')
 
 /**
  * Extends Drawer to draw collectibles for Collector
  */
-export default class CollectorDrawer extends Drawer {
+module.exports = class CollectorDrawer extends Drawer {
 
   /**
    * @override

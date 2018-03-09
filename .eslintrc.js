@@ -12,18 +12,17 @@ module.exports = {
   },
 
   "plugins": [
-    "react",
     "babel",
   ],
   "extends": [
     "eslint:recommended",
-    "plugin:react/recommended"
   ],
 
   "env": {
     "browser": true,
     "es6": true,
-    "jest": true
+    "jest": true,
+    "node": true,
   },
 
   "rules": {

@@ -1,6 +1,6 @@
-import Subtype from './subtype';
+const Subtype = require('./subtype')
 
-export default class Gatherer extends Subtype {
+module.exports = class Gatherer extends Subtype {
 
   reset() {
     this.maze_.map.resetDirt();
