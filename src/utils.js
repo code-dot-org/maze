@@ -4,8 +4,8 @@
  * @param number
  * @param mod
  */
-module.exports.mod = function mod(number, mod) {
-  return ((number % mod) + mod) % mod;
+module.exports.mod = function mod(number, modulus) {
+  return ((number % modulus) + modulus) % modulus;
 }
 
 /**
