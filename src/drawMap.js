@@ -26,7 +26,7 @@ function displayPegman(skin, pegmanIcon, clipRect, x, y, frame, squareSize = 50)
   clipRect.setAttribute('y', pegmanIcon.getAttribute('y'));
 }
 
-module.exports.default = function drawMap(svg, skin, subtype, map, squareSize = 50) {
+module.exports = function drawMap(svg, skin, subtype, map, squareSize = 50) {
   const MAZE_WIDTH = map.COLS * squareSize;
   const MAZE_HEIGHT = map.ROWS * squareSize;
 
