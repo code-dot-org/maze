@@ -85,7 +85,7 @@ module.exports = class MazeController {
     svg.setAttribute('width', this.MAZE_WIDTH);
     svg.setAttribute('height', this.MAZE_HEIGHT);
 
-    drawMap.default(svg, this.skin, this.subtype, this.map, this.SQUARE_SIZE);
+    drawMap(svg, this.skin, this.subtype, this.map, this.SQUARE_SIZE);
     this.animationsController = new AnimationsController(this, svg);
   }
 
