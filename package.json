@@ -2,18 +2,14 @@
   "name": "@code-dot-org/maze",
   "version": "1.0.0",
   "description": "standalone project for the Maze app type",
-  "files": [
-    "lib/maze.js"
-  ],
-  "main": "lib/maze.js",
+  "main": "dist/main.js",
   "scripts": {
     "build": "webpack -p",
-    "build:dev": "webpack --progress --colors",
+    "build:dev": "webpack --progress --colors --mode=development",
     "lint": "eslint --ext .js src/ test",
     "test": "npm run lint && npm run test:unit",
     "test:unit": "jest",
-    "test:unit:watch": "npm run test:unit -- --watch",
-    "watch": "webpack-dev-server --progress --colors"
+    "test:unit:watch": "npm run test:unit -- --watch"
   },
   "repository": {
     "type": "git",
