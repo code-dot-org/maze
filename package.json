@@ -10,9 +10,12 @@
     "build": "webpack -p",
     "build:dev": "webpack --progress --colors",
     "lint": "eslint --ext .js src/ test",
+    "postversion": "git push && git push --tags && npm publish",
+    "preversion": "npm run test",
     "test": "npm run lint && npm run test:unit",
     "test:unit": "jest",
     "test:unit:watch": "npm run test:unit -- --watch",
+    "version": "npm run build",
     "watch": "webpack-dev-server --progress --colors"
   },
   "repository": {
