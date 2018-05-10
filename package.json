@@ -1,6 +1,6 @@
 {
   "name": "@code-dot-org/maze",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "standalone project for the Maze app type",
   "files": [
     "lib/maze.js"
