@@ -9,6 +9,7 @@
   "scripts": {
     "build": "webpack -p",
     "build:dev": "webpack --progress --colors",
+    "build:demo": "webpack --config demo/webpack.config.js",
     "lint": "eslint --ext .js src/ test",
     "postversion": "git push && git push --tags && npm publish",
     "preversion": "npm run test",
