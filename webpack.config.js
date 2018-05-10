@@ -1,26 +1,24 @@
 const path = require("path");
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const name = "maze";
 
 module.exports = {
-  entry: "./demo/playground.js",
+  entry: './src/index.js',
   output: {
-    path: path.resolve(__dirname, "build"),
-    filename: "bundle.js",
+    path: path.resolve(__dirname, "lib"),
+    filename: name + ".js",
+    library: name,
+    libraryTarget: 'umd',
+    umdNamedDefine: true
   },
+  target: 'node',
   module: {
     rules: [{
-      test: /\.jsx?$/,
+      test: /\.js$/,
       loader: "babel-loader",
-    }, {
-      test: /\.png$/,
-      loader: 'file-loader',
     }]
   },
-  plugins: [
-    new HtmlWebpackPlugin()
-  ],
   resolve: {
-    extensions: [".js", ".jsx"],
+    extensions: [".js"],
   },
   stats: {
     colors: true
