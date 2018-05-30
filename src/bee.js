@@ -81,10 +81,6 @@ module.exports = class Bee extends Gatherer {
         };
       }
     }
-    if (this.drawer) {
-      this.drawer.updateNectarCounter(this.nectars_);
-      this.drawer.updateHoneyCounter(this.honey_);
-    }
     super.reset();
   }
 
@@ -373,7 +369,6 @@ module.exports = class Bee extends Gatherer {
     this.gotNectarAt(row, col);
 
     this.drawer.updateItemImage(row, col, true);
-    this.drawer.updateNectarCounter(this.nectars_);
   }
 
   /**
@@ -398,7 +393,6 @@ module.exports = class Bee extends Gatherer {
     this.madeHoneyAt(row, col);
 
     this.drawer.updateItemImage(row, col, true);
-    this.drawer.updateHoneyCounter(this.honey_);
   }
 
   /**
