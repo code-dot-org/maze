@@ -4,7 +4,7 @@ const SVG_NS = Drawer.SVG_NS;
 
 /**
  * Extends Drawer to draw flowers/honeycomb for bee.
- * @param {MaseMap} map
+ * @param {MazeMap} map
  * @param {Object} skin The app's skin, used to get URLs for our images
  * @param {Bee} bee The maze's Bee object.
  */
@@ -13,10 +13,6 @@ module.exports = class BeeItemDrawer extends Drawer {
     super(map, '', svg);
     this.skin_ = skin;
     this.bee_ = bee;
-
-    this.honeyImages_ = [];
-    this.nectarImages_ = [];
-    this.pegman_ = null;
 
     // is item currently covered by a cloud?
     this.clouded_ = undefined;
@@ -102,77 +98,9 @@ module.exports = class BeeItemDrawer extends Drawer {
     }
   }
 
-  createCounterImage_(prefix, i, row, href) {
-    var id = prefix + (i + 1);
-    var image = document.createElementNS(SVG_NS, 'image');
-    image.setAttribute('id', id);
-    image.setAttribute('width', SQUARE_SIZE);
-    image.setAttribute('height', SQUARE_SIZE);
-    image.setAttribute('y', row * SQUARE_SIZE);
-
-    image.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', href);
-
-    this.svg_.insertBefore(image, this.getPegmanElement_());
-
-    return image;
-  }
-
   flowerImageHref_(row, col) {
     return this.bee_.isRedFlower(row, col) ? this.skin_.redFlower :
       this.skin_.purpleFlower;
-  }
-
-  updateHoneyCounter(honeyCount) {
-    for (var i = 0; i < honeyCount; i++) {
-      if (!this.honeyImages_[i]) {
-        this.honeyImages_[i] = this.createCounterImage_('honey', i, 1,
-          this.skin_.honey);
-      }
-
-      var deltaX = SQUARE_SIZE;
-      if (honeyCount > 8) {
-        deltaX = (8 - 1) * SQUARE_SIZE / (honeyCount - 1);
-      }
-      this.honeyImages_[i].setAttribute('x', i * deltaX);
-    }
-
-    for (i = 0; i < this.honeyImages_.length; i++) {
-      this.honeyImages_[i].setAttribute('display', i < honeyCount ? 'block' : 'none');
-    }
-  }
-
-  updateNectarCounter(nectars) {
-    var nectarCount = nectars.length;
-    // create any needed images
-    for (var i = 0; i < nectarCount; i++) {
-      var href = this.flowerImageHref_(nectars[i].row, nectars[i].col);
-
-      if (!this.nectarImages_[i]) {
-        this.nectarImages_[i] = this.createCounterImage_('nectar', i, 0, href);
-      }
-
-      var deltaX = SQUARE_SIZE;
-      if (nectarCount > 8) {
-        deltaX = (8 - 1) * SQUARE_SIZE / (nectarCount - 1);
-      }
-      this.nectarImages_[i].setAttribute('x', i * deltaX);
-      this.nectarImages_[i].setAttributeNS('http://www.w3.org/1999/xlink',
-        'xlink:href', href);
-    }
-
-    for (i = 0; i < this.nectarImages_.length; i++) {
-      this.nectarImages_[i].setAttribute('display', i < nectarCount ? 'block' : 'none');
-    }
-  }
-
-  /**
-   * Cache pegman element
-   */
-  getPegmanElement_() {
-    if (!this.pegman_) {
-      this.pegman_ = document.getElementsByClassName('pegman-location')[0];
-    }
-    return this.pegman_;
   }
 
   /**
