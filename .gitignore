@@ -39,7 +39,7 @@ Icon?
 /.cake_task_cache
 
 # Build files
-/lib
+/dist
 /demo/dist
 
 # VScode settings
