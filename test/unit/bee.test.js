@@ -1,7 +1,7 @@
 /* global describe, it, expect */
 
 import Bee from '../../src/bee';
-import BeeCell from '../../src/beeCell';
+import BeeCell, {FeatureType} from '../../src/beeCell';
 import MazeMap from '../../src/mazeMap';
 
 const baseLevel = {
@@ -54,5 +54,29 @@ describe("Bee", function () {
       validate('purpleNectarHidden', 'R', 1, true, 'overriden red');
       validate('purpleNectarHidden', 'FC', 1, false, 'overriden cloud');
     });
+  });
+
+  describe('getting nectar', () => {
+    let bee;
+
+    it('builds the map', () => {
+      const map = new MazeMap([
+        [new BeeCell(1, FeatureType.FLOWER, 2)],
+      ]);
+
+      bee = new Bee({
+        map,
+        pegmanX: 0,
+        pegmanY: 0,
+      });
+
+      bee.reset();
+      expect(bee.getCell(0, 0).isFlower()).toEqual(true);
+
+      // Can get nectar twice.
+      expect(bee.tryGetNectar()).toEqual(true);
+      expect(bee.tryGetNectar()).toEqual(true);
+      expect(bee.tryGetNectar()).toEqual(false);
+    })
   });
 });
