@@ -1,4 +1,4 @@
-/* global describe, it, expect */
+/* global jest, describe, it, expect */
 
 import Bee from '../../src/bee';
 import BeeCell, {FeatureType} from '../../src/beeCell';
@@ -70,13 +70,18 @@ describe("Bee", function () {
         pegmanY: 0,
       });
 
+      const flowerEmptySpy = jest.fn();
+      bee.on('flowerEmpty', flowerEmptySpy);
       bee.reset();
       expect(bee.getCell(0, 0).isFlower()).toEqual(true);
 
       // Can get nectar twice.
       expect(bee.tryGetNectar()).toEqual(true);
       expect(bee.tryGetNectar()).toEqual(true);
+
+      // Getting nectar again returns false, and emits a "flowerEmpty" event.
       expect(bee.tryGetNectar()).toEqual(false);
+      expect(flowerEmptySpy).toHaveBeenCalledTimes(1);
     })
   });
 });
