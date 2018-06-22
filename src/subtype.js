@@ -1,5 +1,5 @@
-const Cell = require('./cell')
-const DirtDrawer = require('./dirtDrawer')
+const Cell = require('./cell');
+const DirtDrawer = require('./dirtDrawer');
 
 const SquareType = require('./tiles').SquareType;
 const EventEmitter = require('events').EventEmitter; // provided by webpack's node-libs-browser
@@ -149,11 +149,6 @@ module.exports = class Subtype extends EventEmitter {
       tile = 'null' + wallIdx;
     }
 
-    // For the first 3 levels in maze, only show the null0 image.
-    if (['2_1', '2_2', '2_3'].includes(this.level_.id)) {
-      this.wallMap[y][x] = 0;
-      tile = 'null0';
-    }
     return tile;
   }
 

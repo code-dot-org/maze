@@ -1,5 +1,5 @@
 /**
- * @overview BeeCell represents the contets of the grid elements for Bee.
+ * @overview BeeCell represents the contents of the grid elements for Bee.
  * Bee BeeCells are more complex than many other kinds of cell; they can be
  * "hidden" with clouds, they can represent multiple different kinds of
  * element (flower, hive), some of which can be multiple colors (red,
