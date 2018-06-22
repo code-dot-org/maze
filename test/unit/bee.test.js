@@ -1,8 +1,10 @@
+/* global describe, it, expect */
+
 import Bee from '../../src/bee';
 import BeeCell from '../../src/beeCell';
 import MazeMap from '../../src/mazeMap';
 
-var baseLevel = {
+const baseLevel = {
   honeyGoal: 1,
   map: [
     [0]
@@ -15,30 +17,6 @@ var baseLevel = {
 };
 
 describe("Bee", function () {
-  it("fails if no flowerType", function () {
-    var maze = {};
-    var config = {
-      level: baseLevel
-    };
-    delete config.level.flowerType;
-    expect(() => {
-      new Bee(maze, config);
-    }).toThrowError(/bad flowerType for Bee/);
-  });
-
-
-  it("fails if invalid flowerType", function () {
-    var maze = {};
-    var config = {
-      level: Object.assign(baseLevel, {
-        flowerType: 'invalid'
-      })
-    };
-    expect(() => {
-      new Bee(maze, config);
-    }).toThrowError(/bad flowerType for Bee/);
-  });
-
   describe("isRedFlower", function () {
     /**
      * Shim a 1x1 maze with the given values and validate that we get the
