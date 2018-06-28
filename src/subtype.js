@@ -34,13 +34,12 @@ const TILE_SHAPES = {
 const RANDOM_TILE_RATE = 0.2;
 
 module.exports = class Subtype extends EventEmitter {
-  constructor(maze, config) {
+  constructor(maze, {skin, level} = {}) {
     super();
 
     this.maze_ = maze;
-    this.skin_ = config.skin;
-    this.level_ = config.level;
-    this.startDirection = config.level.startDirection;
+    this.skin_ = skin;
+    this.startDirection = level ? level.startDirection : 0;
   }
 
   /**

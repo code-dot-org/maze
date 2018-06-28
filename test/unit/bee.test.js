@@ -1,8 +1,10 @@
+/* global jest, describe, it, expect */
+
 import Bee from '../../src/bee';
-import BeeCell from '../../src/beeCell';
+import BeeCell, {FeatureType} from '../../src/beeCell';
 import MazeMap from '../../src/mazeMap';
 
-var baseLevel = {
+const baseLevel = {
   honeyGoal: 1,
   map: [
     [0]
@@ -15,30 +17,6 @@ var baseLevel = {
 };
 
 describe("Bee", function () {
-  it("fails if no flowerType", function () {
-    var maze = {};
-    var config = {
-      level: baseLevel
-    };
-    delete config.level.flowerType;
-    expect(() => {
-      new Bee(maze, config);
-    }).toThrowError(/bad flowerType for Bee/);
-  });
-
-
-  it("fails if invalid flowerType", function () {
-    var maze = {};
-    var config = {
-      level: Object.assign(baseLevel, {
-        flowerType: 'invalid'
-      })
-    };
-    expect(() => {
-      new Bee(maze, config);
-    }).toThrowError(/bad flowerType for Bee/);
-  });
-
   describe("isRedFlower", function () {
     /**
      * Shim a 1x1 maze with the given values and validate that we get the
@@ -76,5 +54,34 @@ describe("Bee", function () {
       validate('purpleNectarHidden', 'R', 1, true, 'overriden red');
       validate('purpleNectarHidden', 'FC', 1, false, 'overriden cloud');
     });
+  });
+
+  describe('getting nectar', () => {
+    let bee;
+
+    it('builds the map', () => {
+      const map = new MazeMap([
+        [new BeeCell(1, FeatureType.FLOWER, 2)],
+      ]);
+
+      bee = new Bee({
+        map,
+        pegmanX: 0,
+        pegmanY: 0,
+      });
+
+      const flowerEmptySpy = jest.fn();
+      bee.on('flowerEmpty', flowerEmptySpy);
+      bee.reset();
+      expect(bee.getCell(0, 0).isFlower()).toEqual(true);
+
+      // Can get nectar twice.
+      expect(bee.tryGetNectar()).toEqual(true);
+      expect(bee.tryGetNectar()).toEqual(true);
+
+      // Getting nectar again returns false, and emits a "flowerEmpty" event.
+      expect(bee.tryGetNectar()).toEqual(false);
+      expect(flowerEmptySpy).toHaveBeenCalledTimes(1);
+    })
   });
 });

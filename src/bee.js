@@ -13,15 +13,12 @@ const HONEY_SOUND = 'honey';
 const NECTAR_SOUND = 'nectar';
 
 module.exports = class Bee extends Gatherer {
-  constructor(maze, config) {
+  constructor(maze, config = {}) {
     super(maze, config);
+    const {level} = config;
 
-    this.defaultFlowerColor_ = (config.level.flowerType === 'redWithNectar' ?
-      'red' : 'purple');
-    if (this.defaultFlowerColor_ === 'purple' &&
-        config.level.flowerType !== 'purpleNectarHidden') {
-      throw new Error(`bad flowerType for Bee: ${config.level.flowerType}`);
-    }
+    this.defaultFlowerColor_ = level && level.flowerType === 'redWithNectar' ?
+      'red' : 'purple';
 
     // at each location, tracks whether user checked to see if it was a flower or
     // honeycomb using an if block
