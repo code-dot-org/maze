@@ -1,5 +1,5 @@
-const Cell = require('./cell')
-const DirtDrawer = require('./dirtDrawer')
+const Cell = require('./cell');
+const DirtDrawer = require('./dirtDrawer');
 
 const SquareType = require('./tiles').SquareType;
 const EventEmitter = require('events').EventEmitter; // provided by webpack's node-libs-browser
@@ -29,6 +29,9 @@ const TILE_SHAPES = {
   'null3': [0, 3],
   'null4': [1, 3],
 };
+
+// Chance of showing a random wall tile other than the default.
+const RANDOM_TILE_RATE = 0.2;
 
 module.exports = class Subtype extends EventEmitter {
   constructor(maze, config) {
@@ -137,10 +140,10 @@ module.exports = class Subtype extends EventEmitter {
     );
   }
 
-  getEmptyTile(x, y, adjacentToPath) {
+  getEmptyTile(x, y, adjacentToPath, innerCorner) {
     let tile;
     // Empty square.  Use null0 for large areas, with null1-4 for borders.
-    if (!adjacentToPath && Math.random() > 0.3) {
+    if (innerCorner || (!adjacentToPath && Math.random() > RANDOM_TILE_RATE)) {
       this.wallMap[y][x] = 0;
       tile = 'null0';
     } else {
@@ -149,11 +152,6 @@ module.exports = class Subtype extends EventEmitter {
       tile = 'null' + wallIdx;
     }
 
-    // For the first 3 levels in maze, only show the null0 image.
-    if (['2_1', '2_2', '2_3'].includes(this.level_.id)) {
-      this.wallMap[y][x] = 0;
-      tile = 'null0';
-    }
     return tile;
   }
 
@@ -172,12 +170,14 @@ module.exports = class Subtype extends EventEmitter {
         this.isOnPathStr_(col, row + 1) + // South.
         this.isOnPathStr_(col - 1, row); // East.
 
-      const adjacentToPath = (tile !== '00000');
-
       // Draw the tile.
       if (!TILE_SHAPES[tile]) {
+        const adjacentToPath = tile !== '00000';
+        // Any block with 2, 3 or 4 orthogonal paths.
+        const innerCorner = adjacentToPath && tile.split('1').length > 2;
+
         // We have an empty square. Handle it differently based on skin.
-        tile = this.getEmptyTile(col, row, adjacentToPath);
+        tile = this.getEmptyTile(col, row, adjacentToPath, innerCorner);
       }
 
       this.drawTile(svg, TILE_SHAPES[tile], row, col, tileId);
