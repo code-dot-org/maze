@@ -30,6 +30,9 @@ const TILE_SHAPES = {
   'null4': [1, 3],
 };
 
+// Chance of showing a random wall tile other than the default.
+const RANDOM_TILE_RATE = 0.2;
+
 module.exports = class Subtype extends EventEmitter {
   constructor(maze, config) {
     super();
@@ -137,10 +140,10 @@ module.exports = class Subtype extends EventEmitter {
     );
   }
 
-  getEmptyTile(x, y, adjacentToPath) {
+  getEmptyTile(x, y, adjacentToPath, innerCorner) {
     let tile;
     // Empty square.  Use null0 for large areas, with null1-4 for borders.
-    if (!adjacentToPath && Math.random() > 0.3) {
+    if (innerCorner || (!adjacentToPath && Math.random() > RANDOM_TILE_RATE)) {
       this.wallMap[y][x] = 0;
       tile = 'null0';
     } else {
@@ -167,12 +170,13 @@ module.exports = class Subtype extends EventEmitter {
         this.isOnPathStr_(col, row + 1) + // South.
         this.isOnPathStr_(col - 1, row); // East.
 
-      const adjacentToPath = (tile !== '00000');
-
       // Draw the tile.
       if (!TILE_SHAPES[tile]) {
+        const adjacentToPath = tile !== '00000';
+        const innerCorner = adjacentToPath && tile.split('1').length > 2;
+
         // We have an empty square. Handle it differently based on skin.
-        tile = this.getEmptyTile(col, row, adjacentToPath);
+        tile = this.getEmptyTile(col, row, adjacentToPath, innerCorner);
       }
 
       this.drawTile(svg, TILE_SHAPES[tile], row, col, tileId);

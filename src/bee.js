@@ -398,7 +398,7 @@ module.exports = class Bee extends Gatherer {
   /**
    * @override
    */
-  getEmptyTile(x, y, adjacentToPath, wallMap) {
+  getEmptyTile(x, y, adjacentToPath) {
     // begin with three trees
     var tileChoices = ['null3', 'null4', 'null0'];
     var noTree = 'null1';
