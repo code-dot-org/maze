@@ -173,6 +173,7 @@ module.exports = class Subtype extends EventEmitter {
       // Draw the tile.
       if (!TILE_SHAPES[tile]) {
         const adjacentToPath = tile !== '00000';
+        // Any block with 2, 3 or 4 orthogonal paths.
         const innerCorner = adjacentToPath && tile.split('1').length > 2;
 
         // We have an empty square. Handle it differently based on skin.
