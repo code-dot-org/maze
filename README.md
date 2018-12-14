@@ -6,7 +6,7 @@
 
 Standalone repo for the Maze app type
 
-Steps to get up and running
+Setup steps
 ```
 git clone git@github.com:code-dot-org/maze.git
 cd maze
@@ -28,7 +28,7 @@ ls -l node_modules/@code-dot-org to verify maze is linked
 ```
 
 Add a debugger to one the files to verify that you can view changes in chrome dev tools
-- If the file cannot be found in "source files" tab, do the following:
+- If the file is not visible in "Sources" tab, do the following:
 ```
 cd dist
 open webpack.config.js
