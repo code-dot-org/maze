@@ -10,13 +10,14 @@ Steps to get up and running
 ```
 git clone git@github.com:code-dot-org/maze.git
 cd maze
+nvm install (if required)
 npm install
 npm run build:dev
 ```
 
 Steps to make changes locally in maze and to view changes in the apps build
-Set up a symlink in the apps/node_modules to point at your local changes.  
-Run "npm run build" in maze to the apps build picks up local changes the next time it builds.
+- Set up a symlink in the apps/node_modules to point at your local changes.  
+- Run "npm run build" in maze to the apps build picks up local changes the next time it builds.
 ```
 In the maze directory
 run yarn link
@@ -26,12 +27,13 @@ yarn link "@code-dot-org/maze"
 ls -l node_modules/@code-dot-org to verify maze is linked
 ```
 
-```
 Add a debugger to one the files to verify that you can view changes in chrome dev tools
-If the file cannot be found in "source files" tab, do the following:
+- If the file cannot be found in "source files" tab, do the following:
+```
 cd dist
 open webpack.config.js
 add devtool: "cheap-module-eval-source-map" to the file
+- check that the source map is added by running the command "less main.js"
 save
 npm run build:dev
 ```
