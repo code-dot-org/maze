@@ -5,3 +5,21 @@
 [![codecov](https://codecov.io/gh/code-dot-org/maze/branch/master/graph/badge.svg)](https://codecov.io/gh/code-dot-org/maze)
 
 Standalone repo for the Maze app type
+### Setup Your Project
+
+Check this project out from source:
+
+    git clone git@github.com:code-dot-org/craft.git
+    cd craft
+    
+Next, inside the project, you need to install the project's various dependencies.
+
+    yarn install
+    
+Now you should be able to run all the tests:
+
+    yarn test
+    
+And spin up a development build of your new project:
+
+    npm run build
