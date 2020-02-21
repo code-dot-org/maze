@@ -9,8 +9,8 @@ Standalone repo for the Maze app type
 
 Check this project out from source:
 
-    git clone git@github.com:code-dot-org/craft.git
-    cd craft
+    git clone git@github.com:code-dot-org/maze.git
+    cd maze
     
 Next, inside the project, you need to install the project's various dependencies.
 
@@ -22,4 +22,4 @@ Now you should be able to run all the tests:
     
 And spin up a development build of your new project:
 
-    npm run build
+    yarn build
