@@ -92,7 +92,12 @@ module.exports.isWordSearchSkin = function isWordSearchSkin(skinId) {
   return skinId === 'letters';
 }
 
+module.exports.isNeighborhoodSkin = function isNeighborhoodSkin(skinId) {
+  return skinId === 'neighborhood';
+}
+
 module.exports.getSubtypeForSkin = function getSubtypeForSkin(skinId) {
+  debugger;
   if (module.exports.isFarmerSkin(skinId)) {
     return require('./farmer');
   }
@@ -113,6 +118,9 @@ module.exports.getSubtypeForSkin = function getSubtypeForSkin(skinId) {
   }
   if (module.exports.isPlanterSkin(skinId)) {
     return require('./planter');
+  }
+  if (module.exports.isNeighborhoodSkin(skinId)) {
+    return require('./neighborhood');
   }
 
   return require('./subtype');
