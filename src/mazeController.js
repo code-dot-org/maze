@@ -305,7 +305,7 @@ module.exports = class MazeController {
    */
   animatedLook(direction, id = null) {
     var x = this.getPegmanX(id);
-    var y = this.getPegmany(id);
+    var y = this.getPegmanY(id);
     switch (direction) {
       case tiles.Direction.NORTH:
         x += 0.5;
