@@ -231,7 +231,7 @@ module.exports = class MazeController {
     this.animationsController.scheduleDance(true, timePerStep);
   }
 
-  animatedMove(direction, timeForMove, id = null) {
+  animatedMove(direction, timeForMove, id) {
     var positionChange = tiles.directionToDxDy(direction);
     var newX = this.getPegmanX(id) + positionChange.dx;
     var newY = this.getPegmanY(id) + positionChange.dy;
@@ -241,13 +241,13 @@ module.exports = class MazeController {
     this.setPegmanY(newY, id);
   }
 
-  animatedTurn(direction, id = null) {
+  animatedTurn(direction, id) {
     var newDirection = this.getPegmanD(id) + direction;
     this.animationsController.scheduleTurn(newDirection, id);
     this.setPegmanD(tiles.constrainDirection4(newDirection), id);
   }
 
-  animatedFail(forward, id = null) {
+  animatedFail(forward, id) {
     var dxDy = tiles.directionToDxDy(this.getPegmanD(id));
     var deltaX = dxDy.dx;
     var deltaY = dxDy.dy;
@@ -303,7 +303,7 @@ module.exports = class MazeController {
    * in the specified direction.
    * @param {!Direction} direction Direction (0 - 3).
    */
-  animatedLook(direction, id = null) {
+  animatedLook(direction, id) {
     var x = this.getPegmanX(id);
     var y = this.getPegmanY(id);
     switch (direction) {
@@ -361,32 +361,32 @@ module.exports = class MazeController {
     });
   }
 
-  getPegmanX(id = null) {
+  getPegmanX(id) {
     const pegman = this.pegmanController.getPegman(id);
     return pegman && pegman.getX();
   }
 
-  getPegmanY(id = null) {
+  getPegmanY(id) {
     const pegman = this.pegmanController.getPegman(id);
     return pegman && pegman.getY();
   }
 
-  getPegmanD(id = null) {
+  getPegmanD(id) {
     const pegman = this.pegmanController.getPegman(id);
     return pegman && pegman.getDirection();
   }
 
-  setPegmanX(x, id = null) {
+  setPegmanX(x, id) {
     const pegman = this.pegmanController.getOrCreatePegman(id);
     pegman.setX(x);
   }
 
-  setPegmanY(y, id = null) {
+  setPegmanY(y, id) {
     const pegman = this.pegmanController.getOrCreatePegman(id);
     pegman.setY(y);
   }
 
-  setPegmanD(d, id = null) {
+  setPegmanD(d, id) {
     const pegman = this.pegmanController.getOrCreatePegman(id);
     pegman.setDirection(d);
   }

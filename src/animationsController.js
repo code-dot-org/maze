@@ -267,9 +267,11 @@ module.exports = class AnimationsController {
   /**
    * Schedule the animations for a move from the current position
    * @param {number} endX X coordinate of the target position
-   * @param {number} endY Y coordinate of the target position
+   * @param {number} endY Y coordinate of the target position  
+   * @param {string} id Optional id of pegman. If no id is provided,
+   *   will schedule move for default pegman.
    */
-  scheduleMove(endX, endY, timeForAnimation, id = null) {
+  scheduleMove(endX, endY, timeForAnimation, id) {
     var startX = this.maze.getPegmanX(id);
     var startY = this.maze.getPegmanY(id);
     var direction = this.maze.getPegmanD(id);
@@ -336,9 +338,11 @@ module.exports = class AnimationsController {
 
   /**
    * Schedule the animations for a turn from the current direction
-   * @param {number} endDirection The direction we're turning to
+   * @param {number} endDirection The direction we're turning to  
+   * @param {string} id Optional id of pegman. If no id is provided,
+   *   will schedule turn for default pegman.
    */
-  scheduleTurn(endDirection, id = null) {
+  scheduleTurn(endDirection, id) {
     var numFrames = 4;
     var startDirection = this.maze.getPegmanD(id);
     var deltaDirection = endDirection - startDirection;
@@ -392,7 +396,7 @@ module.exports = class AnimationsController {
     }
   }
 
-  scheduleWallHit(targetX, targetY, deltaX, deltaY, frame, id = null) {
+  scheduleWallHit(targetX, targetY, deltaX, deltaY, frame, id) {
     // Play the animation of hitting the wall
     const pegmanX = this.maze.getPegmanX(id);
     const pegmanY = this.maze.getPegmanY(id);
@@ -463,7 +467,7 @@ module.exports = class AnimationsController {
     }
   }
 
-  scheduleObstacleHit(targetX, targetY, deltaX, deltaY, frame, id = null) {
+  scheduleObstacleHit(targetX, targetY, deltaX, deltaY, frame, id) {
     // Play the animation
     var obsId = targetX + this.maze.map.COLS * targetY;
     var obsIcon = document.getElementById('obstacle' + obsId);
@@ -540,8 +544,10 @@ module.exports = class AnimationsController {
    * @param {boolean} victoryDance This is a victory dance after completing the
    *   puzzle (vs. dancing on load).
    * @param {integer} timeAlloted How much time we have for our animations
+   * @param {string} id Optional id of pegman. If no id is provided, will schedule
+   *   dance for default pegman.
    */
-  scheduleDance(victoryDance, timeAlloted, id = null) {
+  scheduleDance(victoryDance, timeAlloted, id) {
     const finishIcon = document.getElementById('finish');
     const pegmanX = this.maze.getPegmanX(id);
     const pegmanY = this.maze.getPegmanY(id);
@@ -644,9 +650,11 @@ module.exports = class AnimationsController {
    * Display Pegman at the specified location, facing the specified direction.
    * @param {number} x Horizontal grid (or fraction thereof).
    * @param {number} y Vertical grid (or fraction thereof).
-   * @param {number} frame Direction (0 - 15) or dance (16 - 17).
+   * @param {number} frame Direction (0 - 15) or dance (16 - 17). * 
+   * @param {string} id Optional id of pegman. If no id is provided,
+   *   will display default pegman.
    */
-  displayPegman(x, y, frame, id = null) {
+  displayPegman(x, y, frame, id) {
     var pegmanIcon = document.getElementById('pegman');
     var clipRect = document.getElementById('clipRect');
     displayPegman(this.maze.skin, pegmanIcon, clipRect, x, y, frame);

@@ -1,5 +1,8 @@
 module.exports = class Pegman {
-  constructor(x = null, y = null, direction = null, id = null, isVisible = true) {
+  constructor(id, x = null, y = null, direction = null, isVisible = true) {
+    if (id == null) {
+      throw new Error('Pegman id cannot be null or undefined');
+    }
     this.x = x;
     this.y = y;
     this.direction = direction;

@@ -1,37 +1,42 @@
 const Pegman = require('./pegman');
 
+const DEFAULT_ID = 'defaultPegman';
+
 module.exports =  class PegmanController {
+
   constructor() {
     this.pegmen = {};
-    this.firstPegman = null;
   }
 
-  getOrCreatePegman(id = null) {
+  getOrCreatePegman(id) {
+    // if id is null or undefined, set to default value.
+    if(id == undefined) {
+      id = DEFAULT_ID;
+    }
     let pegman = this.getPegman(id);
     if (!pegman) {
-      pegman = new Pegman(null, null, null, id);
+      pegman = new Pegman(id);
       this.addPegman(pegman);
     }
     return pegman;
   }
 
-  getPegman(id = null) {
-    if (id == null) {
-      return this.firstPegman;
-    } else {
-      return this.pegmen[id];
+  getPegman(id) {
+    // if id is null or undefined, set to default value.
+    if(id == undefined) {
+      id = DEFAULT_ID;
     }
+    return this.pegmen[id];
   }
  
   addPegman(pegman) {
-    // if this is the first pegman added, store as firstPegman
-    if (this.firstPegman === null) {
-      this.firstPegman = pegman;
+    if (this.pegmen[pegman.id]) {
+      throw new Error(`Pegman with id ${pegman.id} already exists.`);
     }
-    // if the pegman has an id, put it in this.pegmen
-    // pegmen without ids cannot be accessed via this.pegmen.
-    if (pegman.id != null) {
-      this.pegmen[pegman.id] = pegman;
-    }
+    this.pegmen[pegman.id] = pegman;
+  }
+
+  isDefaultPegman(id) {
+    return id == undefined || id === DEFAULT_ID;
   }
 }
