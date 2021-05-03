@@ -138,7 +138,7 @@ module.exports = class AnimationsController {
     }
 
     // Reset pegman's visibility.
-    var pegmanIcon = document.getElementById('pegman');
+    var pegmanIcon = this.getPegmanIcon();
     pegmanIcon.setAttribute('opacity', 1);
 
     if (this.maze.skin.idlePegmanAnimation) {
@@ -655,8 +655,13 @@ module.exports = class AnimationsController {
    *   will display default pegman.
    */
   displayPegman(x, y, frame, id) {
-    var pegmanIcon = document.getElementById('pegman');
-    var clipRect = document.getElementById('clipRect');
+    var pegmanIcon = this.getPegmanIcon(id);
+    var clipRect = document.getElementById(`clipRect${utils.getElementSuffixForPegman(id)}`);
     displayPegman(this.maze.skin, pegmanIcon, clipRect, x, y, frame);
+  }
+
+  getPegmanIcon(id) {
+    var elementId = `pegman${utils.getElementSuffixForPegman(id)}`;
+    return document.getElementById(elementId);
   }
 };

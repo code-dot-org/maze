@@ -117,3 +117,13 @@ module.exports.getSubtypeForSkin = function getSubtypeForSkin(skinId) {
 
   return require('./subtype');
 }
+
+module.exports.DEFAULT_PEGMAN_ID = 'default';
+
+module.exports.getElementSuffixForPegman  = function getElementSuffixForPegman(id) {
+  if (id == null || id === module.exports.DEFAULT_PEGMAN_ID) {
+    return '';
+  } else {
+    return `-${id}`;
+  }
+}

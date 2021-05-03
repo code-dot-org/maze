@@ -1,6 +1,6 @@
 const SVG_NS = require('./constants').SVG_NS;
 const tiles = require('./tiles')
-const createUuid = require('./utils').createUuid;
+const {createUuid, getElementSuffixForPegman} = require('./utils');
 
 const SquareType = tiles.SquareType;
 
@@ -24,6 +24,44 @@ function displayPegman(skin, pegmanIcon, clipRect, x, y, frame, squareSize = 50)
 
   clipRect.setAttribute('x', x * squareSize + 1 + xOffset);
   clipRect.setAttribute('y', pegmanIcon.getAttribute('y'));
+}
+
+function addNewPegman(skin, pegmanId, x, y, direction, svg) {
+  const idSuffix = getElementSuffixForPegman(pegmanId);
+  // Pegman's clipPath element, whose (x, y) is reset by Maze.displayPegman
+  const pegmanClip = document.createElementNS(SVG_NS, 'clipPath');
+  const pegmanClipId = `pegmanClipPath-${createUuid()}`;
+  pegmanClip.setAttribute('id', pegmanClipId);
+  const clipRect = document.createElementNS(SVG_NS, 'rect');
+  clipRect.setAttribute('id', `clipRect${idSuffix}`);
+  clipRect.setAttribute('width', skin.pegmanWidth);
+  clipRect.setAttribute('height', skin.pegmanHeight);
+  pegmanClip.appendChild(clipRect);
+  svg.appendChild(pegmanClip);
+
+  var pegmanIcon = document.createElementNS(SVG_NS, 'image');
+  pegmanIcon.setAttribute('id', `pegman${idSuffix}`);
+  pegmanIcon.setAttribute('class', 'pegman-location');
+  pegmanIcon.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href',
+    skin.avatar);
+  pegmanIcon.setAttribute('height', skin.pegmanHeight);
+  pegmanIcon.setAttribute('width', skin.pegmanWidth * 21); // 49 * 21 = 1029
+  pegmanIcon.setAttribute('clip-path', `url(#${pegmanClipId})`);
+  svg.appendChild(pegmanIcon);
+
+  displayPegman(skin, pegmanIcon, clipRect, x, y,
+    tiles.directionToFrame(direction));
+
+  
+  var pegmanFadeoutAnimation = document.createElementNS(SVG_NS, 'animate');
+  pegmanFadeoutAnimation.setAttribute('id', `pegmanFadeoutAnimation${idSuffix}`);
+  pegmanFadeoutAnimation.setAttribute('attributeType', 'CSS');
+  pegmanFadeoutAnimation.setAttribute('attributeName', 'opacity');
+  pegmanFadeoutAnimation.setAttribute('from', 1);
+  pegmanFadeoutAnimation.setAttribute('to', 0);
+  pegmanFadeoutAnimation.setAttribute('dur', '1s');
+  pegmanFadeoutAnimation.setAttribute('begin', 'indefinite');
+  pegmanIcon.appendChild(pegmanFadeoutAnimation);
 }
 
 module.exports = function drawMap(svg, skin, subtype, map, squareSize = 50) {
@@ -65,40 +103,7 @@ module.exports = function drawMap(svg, skin, subtype, map, squareSize = 50) {
   svg.appendChild(hintPath);
 
   if (subtype.start) {
-    // Pegman's clipPath element, whose (x, y) is reset by Maze.displayPegman
-    const pegmanClip = document.createElementNS(SVG_NS, 'clipPath');
-    const pegmanClipId = `pegmanClipPath-${createUuid()}`;
-    pegmanClip.setAttribute('id', pegmanClipId);
-    const clipRect = document.createElementNS(SVG_NS, 'rect');
-    clipRect.setAttribute('id', 'clipRect');
-    clipRect.setAttribute('width', skin.pegmanWidth);
-    clipRect.setAttribute('height', skin.pegmanHeight);
-    pegmanClip.appendChild(clipRect);
-    svg.appendChild(pegmanClip);
-
-    // Add pegman.
-    var pegmanIcon = document.createElementNS(SVG_NS, 'image');
-    pegmanIcon.setAttribute('id', 'pegman');
-    pegmanIcon.setAttribute('class', 'pegman-location');
-    pegmanIcon.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href',
-      skin.avatar);
-    pegmanIcon.setAttribute('height', skin.pegmanHeight);
-    pegmanIcon.setAttribute('width', skin.pegmanWidth * 21); // 49 * 21 = 1029
-    pegmanIcon.setAttribute('clip-path', `url(#${pegmanClipId})`);
-    svg.appendChild(pegmanIcon);
-
-    displayPegman(skin, pegmanIcon, clipRect, subtype.start.x, subtype.start.y,
-      tiles.directionToFrame(subtype.startDirection));
-
-    var pegmanFadeoutAnimation = document.createElementNS(SVG_NS, 'animate');
-    pegmanFadeoutAnimation.setAttribute('id', 'pegmanFadeoutAnimation');
-    pegmanFadeoutAnimation.setAttribute('attributeType', 'CSS');
-    pegmanFadeoutAnimation.setAttribute('attributeName', 'opacity');
-    pegmanFadeoutAnimation.setAttribute('from', 1);
-    pegmanFadeoutAnimation.setAttribute('to', 0);
-    pegmanFadeoutAnimation.setAttribute('dur', '1s');
-    pegmanFadeoutAnimation.setAttribute('begin', 'indefinite');
-    pegmanIcon.appendChild(pegmanFadeoutAnimation);
+    addNewPegman(svg, null, subtype.start.x, subtype.start.y, subtype.startDirection, svg);
   }
 
   if (subtype.finish && skin.goalIdle) {
