@@ -472,7 +472,7 @@ module.exports = class AnimationsController {
         this.maze.skin.obstacleAnimation);
     timeoutList.setTimeout(() => {
       this.displayPegman(this.maze.getPegmanX(id) + deltaX / 2,
-                         this.maze.getPegmanY(id)+ deltaY / 2,
+                        this.maze.getPegmanY(id)+ deltaY / 2,
                         frame);
     }, this.maze.stepSpeed);
 
