@@ -272,12 +272,12 @@ module.exports = class AnimationsController {
    *   will schedule move for default pegman.
    */
   scheduleMove(endX, endY, timeForAnimation, id) {
-    var startX = this.maze.getPegmanX(id);
-    var startY = this.maze.getPegmanY(id);
-    var direction = this.maze.getPegmanD(id);
+    const startX = this.maze.getPegmanX(id);
+    const startY = this.maze.getPegmanY(id);
+    const direction = this.maze.getPegmanD(id);
 
-    var deltaX = (endX - startX);
-    var deltaY = (endY - startY);
+    const deltaX = (endX - startX);
+    const deltaY = (endY - startY);
     var numFrames;
     var timePerFrame;
 
