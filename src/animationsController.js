@@ -14,7 +14,8 @@ module.exports = class AnimationsController {
     this.createAnimations_();
   }
 
-  createAnimations_() {
+  createAnimations_(pegmanId) {
+    const pegmanElementSuffix = utils.getElementSuffixForPegman(pegmanId);
     // Add idle pegman.
     if (this.maze.skin.idlePegmanAnimation) {
       this.createPegmanAnimation_({
@@ -24,14 +25,15 @@ module.exports = class AnimationsController {
         col: this.maze.subtype.start.x,
         direction: this.maze.startDirection,
         numColPegman: this.maze.skin.idlePegmanCol,
-        numRowPegman: this.maze.skin.idlePegmanRow
+        numRowPegman: this.maze.skin.idlePegmanRow,
+        pegmanId: pegmanId
       });
 
       if (this.maze.skin.idlePegmanCol > 1 || this.maze.skin.idlePegmanRow > 1) {
         // our idle is a sprite sheet instead of a gif. schedule cycling through
         // the frames
         var numFrames = this.maze.skin.idlePegmanRow;
-        var idlePegmanIcon = document.getElementById('idlePegman');
+        var idlePegmanIcon = document.getElementById(`idlePegman${pegmanElementSuffix}`);
         var timePerFrame = 600; // timeForAnimation / numFrames;
         var idleAnimationFrame = 0;
 
@@ -42,7 +44,8 @@ module.exports = class AnimationsController {
               row: this.maze.subtype.start.y,
               col: this.maze.subtype.start.x,
               direction: this.maze.startDirection,
-              animationRow: idleAnimationFrame
+              animationRow: idleAnimationFrame,
+              pegmanId: pegmanId
             });
             idleAnimationFrame = (idleAnimationFrame + 1) % numFrames;
           }
@@ -58,7 +61,8 @@ module.exports = class AnimationsController {
         col: this.maze.subtype.start.x,
         direction: tiles.Direction.NORTH,
         numColPegman: this.maze.skin.celebratePegmanCol,
-        numRowPegman: this.maze.skin.celebratePegmanRow
+        numRowPegman: this.maze.skin.celebratePegmanRow,
+        pegmanId: pegmanId
       });
     }
 
@@ -66,7 +70,8 @@ module.exports = class AnimationsController {
     if (this.maze.skin.wallPegmanAnimation) {
       this.createPegmanAnimation_({
         idStr: 'wall',
-        pegmanImage: this.maze.skin.wallPegmanAnimation
+        pegmanImage: this.maze.skin.wallPegmanAnimation,
+        pegmanId: pegmanId
       });
     }
 
@@ -76,9 +81,10 @@ module.exports = class AnimationsController {
         idStr: 'wall',
         pegmanImage: this.maze.skin.hittingWallAnimation,
         numColPegman: this.maze.skin.hittingWallPegmanCol,
-        numRowPegman: this.maze.skin.hittingWallPegmanRow
+        numRowPegman: this.maze.skin.hittingWallPegmanRow,
+        pegmanId: pegmanId
       });
-      document.getElementById('wallPegman').setAttribute('visibility', 'hidden');
+      document.getElementById(`wallPegman${pegmanElementSuffix}`).setAttribute('visibility', 'hidden');
     }
 
     // Add the hidden moving pegman animation.
@@ -87,14 +93,15 @@ module.exports = class AnimationsController {
         idStr: 'move',
         pegmanImage: this.maze.skin.movePegmanAnimation,
         numColPegman: 4,
-        numRowPegman: (this.maze.skin.movePegmanAnimationFrameNumber || 9)
+        numRowPegman: (this.maze.skin.movePegmanAnimationFrameNumber || 9),
+        pegmanId: pegmanId
       });
     }
 
     // Add wall hitting animation
     if (this.maze.skin.hittingWallAnimation) {
       var wallAnimationIcon = document.createElementNS(SVG_NS, 'image');
-      wallAnimationIcon.setAttribute('id', 'wallAnimation');
+      wallAnimationIcon.setAttribute('id', `wallAnimation${pegmanElementSuffix}`);
       wallAnimationIcon.setAttribute('height', this.maze.SQUARE_SIZE);
       wallAnimationIcon.setAttribute('width', this.maze.SQUARE_SIZE);
       wallAnimationIcon.setAttribute('visibility', 'hidden');
@@ -114,8 +121,10 @@ module.exports = class AnimationsController {
         this.scheduleTurn(this.maze.startDirection);
       }, danceTime + 150);
     } else {
-      this.displayPegman(this.maze.getPegmanX(), this.maze.getPegmanY(), tiles.directionToFrame(this.maze.getPegmanD()));
-
+      // TODO: reset for mazes with placeholder/multiple pegmen
+      if (!this.maze.subtype.initializeWithPlaceholderPegman() && !this.maze.subtype.allowMultiplePegmen()) {
+        this.displayPegman(this.maze.getPegmanX(), this.maze.getPegmanY(), tiles.directionToFrame(this.maze.getPegmanD()));
+      }
       const finishIcon = document.getElementById('finish');
       if (finishIcon) {
         finishIcon.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', this.maze.skin.goalIdle);
@@ -177,11 +186,12 @@ module.exports = class AnimationsController {
    * numRowPegman number of the pegman in each column, default is 1.
    */
   createPegmanAnimation_(options) {
+    const pegmanElementSuffix = utils.getElementSuffixForPegman(options.pegmanId);
     // Create clip path.
     var clip = document.createElementNS(SVG_NS, 'clipPath');
     clip.setAttribute('id', options.idStr + 'PegmanClip');
     var rect = document.createElementNS(SVG_NS, 'rect');
-    rect.setAttribute('id', options.idStr + 'PegmanClipRect');
+    rect.setAttribute('id', options.idStr + 'PegmanClipRect' + pegmanElementSuffix);
     if (options.col !== undefined) {
       rect.setAttribute('x', options.col * this.maze.SQUARE_SIZE + 1 + this.maze.PEGMAN_X_OFFSET);
     }
@@ -200,7 +210,7 @@ module.exports = class AnimationsController {
     img.setAttribute('height', this.maze.PEGMAN_HEIGHT * (options.numRowPegman || 1));
     img.setAttribute('width', this.maze.PEGMAN_WIDTH * (options.numColPegman || 4));
     img.setAttribute('clip-path', 'url(#' + options.idStr + 'PegmanClip)');
-    img.setAttribute('id', options.idStr + 'Pegman');
+    img.setAttribute('id', options.idStr + 'Pegman' + pegmanElementSuffix);
     this.svg.appendChild(img);
     // Update pegman icon & clip path.
     if (options.col !== undefined && options.direction !== undefined) {
@@ -231,10 +241,11 @@ module.exports = class AnimationsController {
     * animationRow which row of the sprite sheet the pegman animation needs
     */
   updatePegmanAnimation_(options) {
-    var rect = document.getElementById(options.idStr + 'PegmanClipRect');
+    const pegmanElementSuffix = utils.getElementSuffixForPegman(options.pegmanId);
+    var rect = document.getElementById(options.idStr + 'PegmanClipRect' + pegmanElementSuffix);
     rect.setAttribute('x', options.col * this.maze.SQUARE_SIZE + 1 + this.maze.PEGMAN_X_OFFSET);
     rect.setAttribute('y', getPegmanYForRow(this.maze.skin, options.row));
-    var img = document.getElementById(options.idStr + 'Pegman');
+    var img = document.getElementById(options.idStr + 'Pegman' + pegmanElementSuffix);
     var x = this.maze.SQUARE_SIZE * options.col -
         options.direction * this.maze.PEGMAN_WIDTH + 1 + this.maze.PEGMAN_X_OFFSET;
     img.setAttribute('x', x);
@@ -246,8 +257,9 @@ module.exports = class AnimationsController {
   /**
    * Schedule a movement animating using a spritesheet.
    */
-  scheduleSheetedMovement_(start, delta, numFrames, timePerFrame, idStr, direction, hidePegman) {
-    var pegmanIcon = document.getElementById('pegman');
+  scheduleSheetedMovement_(start, delta, numFrames, timePerFrame, idStr, direction, hidePegman, pegmanId) {
+    const pegmanElementSuffix = utils.getElementSuffixForPegman(pegmanId);
+    var pegmanIcon = document.getElementById(`pegman${pegmanElementSuffix}`);
     utils.range(0, numFrames - 1).forEach((frame) => {
       timeoutList.setTimeout(() => {
         if (hidePegman) {
@@ -258,7 +270,8 @@ module.exports = class AnimationsController {
           col: start.x + delta.x * frame / numFrames,
           row: start.y + delta.y * frame / numFrames,
           direction: direction,
-          animationRow: frame
+          animationRow: frame,
+          pegmanId
         });
       }, timePerFrame * frame);
     });
@@ -271,10 +284,11 @@ module.exports = class AnimationsController {
    * @param {string} id Optional id of pegman. If no id is provided,
    *   will schedule move for default pegman.
    */
-  scheduleMove(endX, endY, timeForAnimation, id) {
-    var startX = this.maze.getPegmanX(id);
-    var startY = this.maze.getPegmanY(id);
-    var direction = this.maze.getPegmanD(id);
+  scheduleMove(endX, endY, timeForAnimation, pegmanId) {
+    var startX = this.maze.getPegmanX(pegmanId);
+    var startY = this.maze.getPegmanY(pegmanId);
+    var direction = this.maze.getPegmanD(pegmanId);
+    const pegmanElementSuffix = utils.getElementSuffixForPegman(pegmanId);
 
     var deltaX = (endX - startX);
     var deltaY = (endY - startY);
@@ -285,8 +299,8 @@ module.exports = class AnimationsController {
       numFrames = this.maze.skin.movePegmanAnimationFrameNumber;
       // If move animation of pegman is set, and this is not a turn.
       // Show the animation.
-      var pegmanIcon = document.getElementById('pegman');
-      var movePegmanIcon = document.getElementById('movePegman');
+      var pegmanIcon = document.getElementById(`pegman${pegmanElementSuffix}`);
+      var movePegmanIcon = document.getElementById(`movePegman${pegmanElementSuffix}`);
       timePerFrame = timeForAnimation / numFrames;
 
       this.scheduleSheetedMovement_({
@@ -296,13 +310,13 @@ module.exports = class AnimationsController {
           x: deltaX,
           y: deltaY
         },
-        numFrames, timePerFrame, 'move', direction, true);
+        numFrames, timePerFrame, 'move', direction, true, pegmanId);
 
       // Hide movePegman and set pegman to the end position.
       timeoutList.setTimeout(() => {
         movePegmanIcon.setAttribute('visibility', 'hidden');
         pegmanIcon.setAttribute('visibility', 'visible');
-        this.displayPegman(endX, endY, tiles.directionToFrame(direction));
+        this.displayPegman(endX, endY, tiles.directionToFrame(direction), pegmanId);
         if (this.maze.subtype.isWordSearch()) {
           this.maze.subtype.markTileVisited(endY, endX, true);
         }
@@ -316,7 +330,8 @@ module.exports = class AnimationsController {
           this.displayPegman(
             startX + deltaX * frame / numFrames,
             startY + deltaY * frame / numFrames,
-            tiles.directionToFrame(direction));
+            tiles.directionToFrame(direction),
+            pegmanId);
         }, timePerFrame * frame);
       });
     }
@@ -342,16 +357,17 @@ module.exports = class AnimationsController {
    * @param {string} id Optional id of pegman. If no id is provided,
    *   will schedule turn for default pegman.
    */
-  scheduleTurn(endDirection, id) {
+  scheduleTurn(endDirection, pegmanId) {
     var numFrames = 4;
-    var startDirection = this.maze.getPegmanD(id);
+    var startDirection = this.maze.getPegmanD(pegmanId);
     var deltaDirection = endDirection - startDirection;
     utils.range(1, numFrames).forEach((frame) => {
       timeoutList.setTimeout(() => {
         this.displayPegman(
-          this.maze.getPegmanX(id),
-          this.maze.getPegmanY(id),
-          tiles.directionToFrame(startDirection + deltaDirection * frame / numFrames));
+          this.maze.getPegmanX(pegmanId),
+          this.maze.getPegmanY(pegmanId),
+          tiles.directionToFrame(startDirection + deltaDirection * frame / numFrames),
+          pegmanId);
       }, this.maze.stepSpeed * (frame - 1));
     });
   }
@@ -396,12 +412,13 @@ module.exports = class AnimationsController {
     }
   }
 
-  scheduleWallHit(targetX, targetY, deltaX, deltaY, frame, id) {
+  scheduleWallHit(targetX, targetY, deltaX, deltaY, frame, pegmanId) {
     // Play the animation of hitting the wall
-    const pegmanX = this.maze.getPegmanX(id);
-    const pegmanY = this.maze.getPegmanY(id);
+    const pegmanX = this.maze.getPegmanX(pegmanId);
+    const pegmanY = this.maze.getPegmanY(pegmanId);
     if (this.maze.skin.hittingWallAnimation) {
-      var wallAnimationIcon = document.getElementById('wallAnimation');
+      const pegmanElementSuffix = utils.getElementSuffixForPegman(pegmanId);
+      var wallAnimationIcon = document.getElementById(`wallAnimation${pegmanElementSuffix}`);
       var numFrames = this.maze.skin.hittingWallAnimationFrameNumber || 0;
 
       if (numFrames > 1) {
@@ -422,9 +439,9 @@ module.exports = class AnimationsController {
             x: deltaX,
             y: deltaY
           }, numFrames, timePerFrame, 'wall',
-          tiles.Direction.NORTH, true);
+          tiles.Direction.NORTH, true, pegmanId);
         setTimeout(function () {
-          document.getElementById('wallPegman').setAttribute('visibility', 'hidden');
+          document.getElementById(`wallPegman${pegmanElementSuffix}`).setAttribute('visibility', 'hidden');
         }, numFrames * timePerFrame);
       } else {
         // active our gif
@@ -443,31 +460,31 @@ module.exports = class AnimationsController {
       }
     }
     timeoutList.setTimeout(() => {
-      this.displayPegman(pegmanX, pegmanY, frame, id);
+      this.displayPegman(pegmanX, pegmanY, frame, pegmanId);
     }, this.maze.stepSpeed);
     timeoutList.setTimeout(() => {
       this.displayPegman(pegmanX + deltaX / 4, pegmanY + deltaY / 4,
-        frame, id);
+        frame, pegmanId);
     }, this.maze.stepSpeed * 2);
     timeoutList.setTimeout(() => {
-      this.displayPegman(pegmanX, pegmanY, frame, id);
+      this.displayPegman(pegmanX, pegmanY, frame, pegmanId);
     }, this.maze.stepSpeed * 3);
 
     if (this.maze.skin.wallPegmanAnimation) {
       timeoutList.setTimeout(() => {
-        var pegmanIcon = document.getElementById('pegman');
+        var pegmanIcon = this.getPegmanIcon(pegmanId);
         pegmanIcon.setAttribute('visibility', 'hidden');
         this.updatePegmanAnimation_({
           idStr: 'wall',
           row: pegmanY,
           col: pegmanX,
-          direction: this.maze.getPegmanD(id)
+          direction: this.maze.getPegmanD(pegmanId)
         });
       }, this.maze.stepSpeed * 4);
     }
   }
 
-  scheduleObstacleHit(targetX, targetY, deltaX, deltaY, frame, id) {
+  scheduleObstacleHit(targetX, targetY, deltaX, deltaY, frame, pegmanId) {
     // Play the animation
     var obsId = targetX + this.maze.map.COLS * targetY;
     var obsIcon = document.getElementById('obstacle' + obsId);
@@ -475,8 +492,8 @@ module.exports = class AnimationsController {
         'http://www.w3.org/1999/xlink', 'xlink:href',
         this.maze.skin.obstacleAnimation);
     timeoutList.setTimeout(() => {
-      this.displayPegman(this.maze.getPegmanX(id) + deltaX / 2,
-                        this.maze.getPegmanY(id)+ deltaY / 2,
+      this.displayPegman(this.maze.getPegmanX(pegmanId) + deltaX / 2,
+                        this.maze.getPegmanY(pegmanId)+ deltaY / 2,
                         frame);
     }, this.maze.stepSpeed);
 
@@ -494,7 +511,7 @@ module.exports = class AnimationsController {
 
     // Remove pegman
     if (!this.maze.skin.nonDisappearingPegmanHittingObstacle) {
-      var pegmanIcon = document.getElementById('pegman');
+      var pegmanIcon = this.getPegmanIcon(pegmanId);
 
       timeoutList.setTimeout(function () {
         pegmanIcon.setAttribute('visibility', 'hidden');
@@ -529,11 +546,12 @@ module.exports = class AnimationsController {
     }, delay);
   }
 
-  stopIdling() {
+  stopIdling(pegmanId) {
     // Removing the idle animation and replace with pegman sprite
     if (this.maze.skin.idlePegmanAnimation) {
-      var pegmanIcon = document.getElementById('pegman');
-      var idlePegmanIcon = document.getElementById('idlePegman');
+      var pegmanIcon = this.getPegmanIcon(pegmanId);
+      const pegmanElementSuffix = utils.getElementSuffixForPegman(pegmanId);
+      var idlePegmanIcon = document.getElementById(`idlePegman${pegmanElementSuffix}`);
       idlePegmanIcon.setAttribute('visibility', 'hidden');
       pegmanIcon.setAttribute('visibility', 'visible');
     }
@@ -547,10 +565,10 @@ module.exports = class AnimationsController {
    * @param {string} id Optional id of pegman. If no id is provided, will schedule
    *   dance for default pegman.
    */
-  scheduleDance(victoryDance, timeAlloted, id) {
+  scheduleDance(victoryDance, timeAlloted, pegmanId) {
     const finishIcon = document.getElementById('finish');
-    const pegmanX = this.maze.getPegmanX(id);
-    const pegmanY = this.maze.getPegmanY(id);
+    const pegmanX = this.maze.getPegmanX(pegmanId);
+    const pegmanY = this.maze.getPegmanY(pegmanId);
 
     // Some skins (like scrat) have custom celebration animations we want to
     // suport
@@ -570,12 +588,13 @@ module.exports = class AnimationsController {
         'celebrate',
         tiles.Direction.NORTH,
         true,
+        pegmanId
       );
       return;
     }
 
-    var originalFrame = tiles.directionToFrame(this.maze.getPegmanD(id));
-    this.displayPegman(pegmanX, pegmanY, 16, id);
+    var originalFrame = tiles.directionToFrame(this.maze.getPegmanD(pegmanId));
+    this.displayPegman(pegmanX, pegmanY, 16, pegmanId);
 
     // If victoryDance === true, play the goal animation, else reset it
     if (victoryDance && finishIcon) {
@@ -585,21 +604,21 @@ module.exports = class AnimationsController {
 
     var danceSpeed = timeAlloted / 5;
     timeoutList.setTimeout(() => {
-      this.displayPegman(pegmanX, pegmanY, 18, id);
+      this.displayPegman(pegmanX, pegmanY, 18, pegmanId);
     }, danceSpeed);
     timeoutList.setTimeout(() => {
-      this.displayPegman(pegmanX, pegmanY, 20, id);
+      this.displayPegman(pegmanX, pegmanY, 20, pegmanId);
     }, danceSpeed * 2);
     timeoutList.setTimeout(() => {
-      this.displayPegman(pegmanX, pegmanY, 18, id);
+      this.displayPegman(pegmanX, pegmanY, 18, pegmanId);
     }, danceSpeed * 3);
     timeoutList.setTimeout(() => {
-      this.displayPegman(pegmanX, pegmanY, 20, id);
+      this.displayPegman(pegmanX, pegmanY, 20, pegmanId);
     }, danceSpeed * 4);
 
     timeoutList.setTimeout(() => {
       if (!victoryDance || this.maze.skin.turnAfterVictory) {
-        this.displayPegman(pegmanX, pegmanY, originalFrame, id);
+        this.displayPegman(pegmanX, pegmanY, originalFrame, pegmanId);
       }
 
       if (victoryDance && this.maze.skin.transparentTileEnding) {
@@ -634,9 +653,10 @@ module.exports = class AnimationsController {
     }
   }
 
-  setPegmanTransparent_() {
-    var pegmanFadeoutAnimation = document.getElementById('pegmanFadeoutAnimation');
-    var pegmanIcon = document.getElementById('pegman');
+  setPegmanTransparent_(pegmanId) {
+    const pegmanElementSuffix = utils.getElementSuffixForPegman(pegmanId);
+    var pegmanFadeoutAnimation = document.getElementById(`pegmanFadeoutAnimation${pegmanElementSuffix}`);
+    var pegmanIcon = this.getPegmanIcon(pegmanId);
     if (pegmanIcon) {
       pegmanIcon.setAttribute('opacity', 0);
     }
@@ -654,14 +674,14 @@ module.exports = class AnimationsController {
    * @param {string} id Optional id of pegman. If no id is provided,
    *   will display default pegman.
    */
-  displayPegman(x, y, frame, id) {
-    var pegmanIcon = this.getPegmanIcon(id);
-    var clipRect = document.getElementById(`clipRect${utils.getElementSuffixForPegman(id)}`);
+  displayPegman(x, y, frame, pegmanId) {
+    var pegmanIcon = this.getPegmanIcon(pegmanId);
+    var clipRect = document.getElementById(`clipRect${utils.getElementSuffixForPegman(pegmanId)}`);
     displayPegman(this.maze.skin, pegmanIcon, clipRect, x, y, frame);
   }
 
-  getPegmanIcon(id) {
-    var elementId = `pegman${utils.getElementSuffixForPegman(id)}`;
+  getPegmanIcon(pegmanId) {
+    var elementId = `pegman${utils.getElementSuffixForPegman(pegmanId)}`;
     return document.getElementById(elementId);
   }
 };

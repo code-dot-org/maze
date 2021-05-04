@@ -103,7 +103,7 @@ module.exports = function drawMap(svg, skin, subtype, map, squareSize = 50) {
   svg.appendChild(hintPath);
 
   if (subtype.start) {
-    addNewPegman(svg, null, subtype.start.x, subtype.start.y, subtype.startDirection, svg);
+    addNewPegman(skin, undefined, subtype.start.x, subtype.start.y, subtype.startDirection, svg);
   }
 
   if (subtype.finish && skin.goalIdle) {

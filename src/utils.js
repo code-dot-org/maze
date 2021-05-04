@@ -121,9 +121,13 @@ module.exports.getSubtypeForSkin = function getSubtypeForSkin(skinId) {
 module.exports.DEFAULT_PEGMAN_ID = 'default';
 
 module.exports.getElementSuffixForPegman  = function getElementSuffixForPegman(id) {
-  if (id == null || id === module.exports.DEFAULT_PEGMAN_ID) {
+  if (module.exports.isDefaultPegman(id)) {
     return '';
   } else {
     return `-${id}`;
   }
+}
+
+module.exports.isDefaultPegman  = function isDefaultPegmen(id){
+  return id == null || id === module.exports.DEFAULT_PEGMEN_ID;
 }
