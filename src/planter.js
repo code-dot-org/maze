@@ -33,8 +33,8 @@ module.exports = class Planter extends Subtype {
   }
 
   atType(type) {
-    const col = this.maze_.pegmanX;
-    const row = this.maze_.pegmanY;
+    const col = this.maze_.getPegmanX();
+    const row = this.maze_.getPegmanY();
 
     const cell = this.getCell(row, col);
 
@@ -52,8 +52,8 @@ module.exports = class Planter extends Subtype {
    * @return {boolean} whether or not this attempt was successful
    */
   tryPlant() {
-    const col = this.maze_.pegmanX;
-    const row = this.maze_.pegmanY;
+    const col = this.maze_.getPegmanX();
+    const row = this.maze_.getPegmanY();
 
     const cell = this.getCell(row, col);
 
@@ -76,8 +76,8 @@ module.exports = class Planter extends Subtype {
    * @throws Will throw an error if the current cell has no nectar.
    */
   animatePlant() {
-    const col = this.maze_.pegmanX;
-    const row = this.maze_.pegmanY;
+    const col = this.maze_.getPegmanX();
+    const row = this.maze_.getPegmanY();
 
     const cell = this.getCell(row, col);
 

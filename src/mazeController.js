@@ -25,6 +25,7 @@
 const timeoutList = require('./timeoutList');
 
 const AnimationsController = require('./animationsController');
+const PegmanController = require('./pegmanController');
 const MazeMap = require('./mazeMap');
 const drawMap = require('./drawMap');
 const getSubtypeForSkin = require('./utils').getSubtypeForSkin;
@@ -42,10 +43,7 @@ module.exports = class MazeController {
     this.subtype = null;
     this.map = null;
     this.animationsController = null;
-
-    this.pegmanD = null;
-    this.pegmanX = null;
-    this.pegmanY = null;
+    this.pegmanController = new PegmanController();
 
     this.MAZE_HEIGHT = null;
     this.MAZE_WIDTH = null;
@@ -172,12 +170,12 @@ module.exports = class MazeController {
 
     // Kill all tasks.
     timeoutList.clearTimeouts();
-
     // Move Pegman into position.
-    this.pegmanX = this.subtype.start.x;
-    this.pegmanY = this.subtype.start.y;
-
-    this.pegmanD = this.startDirection;
+    if (!this.subtype.initializeWithPlaceholderPegman()) {
+      this.setPegmanX(this.subtype.start.x);
+      this.setPegmanY(this.subtype.start.y);
+      this.setPegmanD(this.startDirection);
+    }
     this.animationsController.reset(first);
 
     // Move the init dirt marker icons into position.
@@ -233,24 +231,24 @@ module.exports = class MazeController {
     this.animationsController.scheduleDance(true, timePerStep);
   }
 
-  animatedMove(direction, timeForMove) {
+  animatedMove(direction, timeForMove, id) {
     var positionChange = tiles.directionToDxDy(direction);
-    var newX = this.pegmanX + positionChange.dx;
-    var newY = this.pegmanY + positionChange.dy;
-    this.animationsController.scheduleMove(newX, newY, timeForMove);
+    var newX = this.getPegmanX(id) + positionChange.dx;
+    var newY = this.getPegmanY(id) + positionChange.dy;
+    this.animationsController.scheduleMove(newX, newY, timeForMove, id);
     this.playAudio('walk');
-    this.pegmanX = newX;
-    this.pegmanY = newY;
+    this.setPegmanX(newX, id);
+    this.setPegmanY(newY, id);
   }
 
-  animatedTurn(direction) {
-    var newDirection = this.pegmanD + direction;
-    this.animationsController.scheduleTurn(newDirection);
-    this.pegmanD = tiles.constrainDirection4(newDirection);
+  animatedTurn(direction, id) {
+    var newDirection = this.getPegmanD(id) + direction;
+    this.animationsController.scheduleTurn(newDirection, id);
+    this.setPegmanD(tiles.constrainDirection4(newDirection), id);
   }
 
-  animatedFail(forward) {
-    var dxDy = tiles.directionToDxDy(this.pegmanD);
+  animatedFail(forward, id) {
+    var dxDy = tiles.directionToDxDy(this.getPegmanD(id));
     var deltaX = dxDy.dx;
     var deltaY = dxDy.dy;
 
@@ -259,13 +257,14 @@ module.exports = class MazeController {
       deltaY = -deltaY;
     }
 
-    var targetX = this.pegmanX + deltaX;
-    var targetY = this.pegmanY + deltaY;
-    var frame = tiles.directionToFrame(this.pegmanD);
+    var targetX = this.getPegmanX(id) + deltaX;
+    var targetY = this.getPegmanY(id) + deltaY;
+    var frame = tiles.directionToFrame(this.getPegmanD(id));
     this.animationsController.displayPegman(
-      this.pegmanX + deltaX / 4,
-      this.pegmanY + deltaY / 4,
+      this.getPegmanX(id) + deltaX / 4,
+      this.getPegmanY(id) + deltaY / 4,
       frame,
+      id
     );
     // Play sound and animation for hitting wall or obstacle
     var squareType = this.map.getTile(targetY, targetX);
@@ -285,14 +284,14 @@ module.exports = class MazeController {
         this.animationsController.crackSurroundingIce(targetX, targetY);
       }
 
-      this.animationsController.scheduleWallHit(targetX, targetY, deltaX, deltaY, frame);
+      this.animationsController.scheduleWallHit(targetX, targetY, deltaX, deltaY, frame, id);
       timeoutList.setTimeout(() => {
         this.playAudioOnFailure();
       }, this.stepSpeed * 2);
     } else if (squareType === tiles.SquareType.OBSTACLE) {
       // Play the sound
       this.playAudio('obstacle');
-      this.animationsController.scheduleObstacleHit(targetX, targetY, deltaX, deltaY, frame);
+      this.animationsController.scheduleObstacleHit(targetX, targetY, deltaX, deltaY, frame, id);
       timeoutList.setTimeout(() => {
         this.playAudioOnFailure();
       }, this.stepSpeed);
@@ -304,9 +303,9 @@ module.exports = class MazeController {
    * in the specified direction.
    * @param {!Direction} direction Direction (0 - 3).
    */
-  animatedLook(direction) {
-    var x = this.pegmanX;
-    var y = this.pegmanY;
+  animatedLook(direction, id) {
+    var x = this.getPegmanX(id);
+    var y = this.getPegmanY(id);
     switch (direction) {
       case tiles.Direction.NORTH:
         x += 0.5;
@@ -331,8 +330,8 @@ module.exports = class MazeController {
   }
 
   scheduleDirtChange_(options) {
-    var col = this.pegmanX;
-    var row = this.pegmanY;
+    var col = this.getPegmanX();
+    var row = this.getPegmanY();
 
     // cells that started as "flat" will be undefined
     var previousValue = this.map.getValue(row, col) || 0;
@@ -360,5 +359,35 @@ module.exports = class MazeController {
       amount: -1,
       sound: 'dig',
     });
+  }
+
+  getPegmanX(id) {
+    const pegman = this.pegmanController.getPegman(id);
+    return pegman && pegman.getX();
+  }
+
+  getPegmanY(id) {
+    const pegman = this.pegmanController.getPegman(id);
+    return pegman && pegman.getY();
+  }
+
+  getPegmanD(id) {
+    const pegman = this.pegmanController.getPegman(id);
+    return pegman && pegman.getDirection();
+  }
+
+  setPegmanX(x, id) {
+    const pegman = this.pegmanController.getOrCreatePegman(id);
+    pegman.setX(x);
+  }
+
+  setPegmanY(y, id) {
+    const pegman = this.pegmanController.getOrCreatePegman(id);
+    pegman.setY(y);
+  }
+
+  setPegmanD(d, id) {
+    const pegman = this.pegmanController.getOrCreatePegman(id);
+    pegman.setDirection(d);
   }
 };

@@ -42,8 +42,8 @@ module.exports = class Harvester extends Gatherer {
   }
 
   hasCrop(crop) {
-    const col = this.maze_.pegmanX;
-    const row = this.maze_.pegmanY;
+    const col = this.maze_.getPegmanX();
+    const row = this.maze_.getPegmanY();
 
     const cell = this.getCell(row, col);
 
@@ -63,8 +63,8 @@ module.exports = class Harvester extends Gatherer {
   }
 
   atCrop(crop) {
-    const col = this.maze_.pegmanX;
-    const row = this.maze_.pegmanY;
+    const col = this.maze_.getPegmanX();
+    const row = this.maze_.getPegmanY();
 
     const cell = this.getCell(row, col);
 
@@ -100,8 +100,8 @@ module.exports = class Harvester extends Gatherer {
    * @return {boolean} whether or not this attempt was successful
    */
   tryGetCrop(crop) {
-    const col = this.maze_.pegmanX;
-    const row = this.maze_.pegmanY;
+    const col = this.maze_.getPegmanX();
+    const row = this.maze_.getPegmanY();
 
     const cell = this.getCell(row, col);
 
@@ -143,8 +143,8 @@ module.exports = class Harvester extends Gatherer {
    *         available to harvest.
    */
   animateGetCrop(crop) {
-    const col = this.maze_.pegmanX;
-    const row = this.maze_.pegmanY;
+    const col = this.maze_.getPegmanX();
+    const row = this.maze_.getPegmanY();
 
     const cell = this.getCell(row, col);
 

@@ -66,8 +66,8 @@ describe("Bee", function () {
 
       bee = new Bee({
         map,
-        pegmanX: 0,
-        pegmanY: 0,
+        getPegmanX: () => {return 0;},
+        getPegmanY: () => {return 0;}
       });
 
       const flowerEmptySpy = jest.fn();

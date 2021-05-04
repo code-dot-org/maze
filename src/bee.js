@@ -278,8 +278,8 @@ module.exports = class Bee extends Gatherer {
    * @return {boolean} whether or not this attempt was successful
    */
   tryGetNectar() {
-    const col = this.maze_.pegmanX;
-    const row = this.maze_.pegmanY;
+    const col = this.maze_.getPegmanX();
+    const row = this.maze_.getPegmanY();
 
     // Make sure we're at a flower.
     if (!this.isFlower(row, col)) {
@@ -309,8 +309,8 @@ module.exports = class Bee extends Gatherer {
    * @return {boolean} whether or not this attempt was successful
    */
   tryMakeHoney() {
-    const col = this.maze_.pegmanX;
-    const row = this.maze_.pegmanY;
+    const col = this.maze_.getPegmanX();
+    const row = this.maze_.getPegmanY();
 
     if (!this.isHive(row, col)) {
       this.emit('notAtHive');
@@ -326,8 +326,8 @@ module.exports = class Bee extends Gatherer {
   }
 
   nectarRemaining(userCheck=false) {
-    const col = this.maze_.pegmanX;
-    const row = this.maze_.pegmanY;
+    const col = this.maze_.getPegmanX();
+    const row = this.maze_.getPegmanY();
 
     if (userCheck) {
       this.userChecks_[row][col].checkedForNectar = true;
@@ -337,8 +337,8 @@ module.exports = class Bee extends Gatherer {
   }
 
   honeyAvailable() {
-    const col = this.maze_.pegmanX;
-    const row = this.maze_.pegmanY;
+    const col = this.maze_.getPegmanX();
+    const row = this.maze_.getPegmanY();
 
     return this.hiveRemainingCapacity(row, col);
   }
@@ -354,8 +354,8 @@ module.exports = class Bee extends Gatherer {
    * @throws Will throw an error if the current cell has no nectar.
    */
   animateGetNectar() {
-    const col = this.maze_.pegmanX;
-    const row = this.maze_.pegmanY;
+    const col = this.maze_.getPegmanX();
+    const row = this.maze_.getPegmanY();
 
     if (this.getValue(row, col) <= 0) {
       throw new Error("Shouldn't be able to end up with a nectar animation if " +
@@ -378,8 +378,8 @@ module.exports = class Bee extends Gatherer {
    * @throws Will throw an error if the current cell is not a hive.
    */
   animateMakeHoney() {
-    const col = this.maze_.pegmanX;
-    const row = this.maze_.pegmanY;
+    const col = this.maze_.getPegmanX();
+    const row = this.maze_.getPegmanY();
 
     if (!this.isHive(row, col)) {
       throw new Error("Shouldn't be able to end up with a honey animation if " +

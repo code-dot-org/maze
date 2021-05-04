@@ -30,12 +30,12 @@ describe("Maze", function () {
         }
       });
       mazeController.subtype.createDrawer(document.getElementById('svgMaze'));
-      mazeController.pegmanX = 0;
-      mazeController.pegmanY = 0;
+      mazeController.setPegmanX(0);
+      mazeController.setPegmanY(0);
     });
 
     it("can cycle through all types", function () {
-      var dirtId = DirtDrawer.cellId('', mazeController.pegmanX, mazeController.pegmanY);
+      var dirtId = DirtDrawer.cellId('', mazeController.getPegmanX(), mazeController.getPegmanY());
       var image;
 
       // image starts out nonexistant

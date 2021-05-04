@@ -235,4 +235,14 @@ module.exports = class Subtype extends EventEmitter {
       }
     }
   }
+
+  // Whether this subype supports multiple pegmen or not. Default false.
+  allowMultiplePegmen() {
+    return false;
+  }
+
+  // Whether this subtype should be initialized with a placeholder pegman. Default false.
+  initializeWithPlaceholderPegman() {
+    return false;
+  }
 }
