@@ -1,4 +1,4 @@
-const DEFAULT_PEGMAN_ID = require('./constants').DEFAULT_PEGMAN_ID;
+import {DEFAULT_PEGMAN_ID} from './constants'
 
 /**
  * Version of modulo which, unlike javascript's `%` operator,
