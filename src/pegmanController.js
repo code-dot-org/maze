@@ -1,5 +1,5 @@
 const Pegman = require('./pegman');
-const DEFAULT_PEGMAN_ID = require('./utils').DEFAULT_PEGMAN_ID;
+const DEFAULT_PEGMAN_ID = require('./constants').DEFAULT_PEGMAN_ID;
 
 module.exports =  class PegmanController {
 

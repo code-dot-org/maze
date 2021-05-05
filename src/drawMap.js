@@ -1,6 +1,6 @@
-const SVG_NS = require('./constants').SVG_NS;
+const {SVG_NS, pegmanElements} = require('./constants');
 const tiles = require('./tiles')
-const {createUuid, getElementSuffixForPegman} = require('./utils');
+const {createUuid, getPegmanElementId} = require('./utils');
 
 const SquareType = tiles.SquareType;
 
@@ -27,20 +27,19 @@ function displayPegman(skin, pegmanIcon, clipRect, x, y, frame, squareSize = 50)
 }
 
 function addNewPegman(skin, pegmanId, x, y, direction, svg) {
-  const idSuffix = getElementSuffixForPegman(pegmanId);
   // Pegman's clipPath element, whose (x, y) is reset by Maze.displayPegman
   const pegmanClip = document.createElementNS(SVG_NS, 'clipPath');
   const pegmanClipId = `pegmanClipPath-${createUuid()}`;
   pegmanClip.setAttribute('id', pegmanClipId);
   const clipRect = document.createElementNS(SVG_NS, 'rect');
-  clipRect.setAttribute('id', `clipRect${idSuffix}`);
+  clipRect.setAttribute('id', getPegmanElementId(pegmanElements.CLIP_RECT, pegmanId));
   clipRect.setAttribute('width', skin.pegmanWidth);
   clipRect.setAttribute('height', skin.pegmanHeight);
   pegmanClip.appendChild(clipRect);
   svg.appendChild(pegmanClip);
 
   var pegmanIcon = document.createElementNS(SVG_NS, 'image');
-  pegmanIcon.setAttribute('id', `pegman${idSuffix}`);
+  pegmanIcon.setAttribute('id', getPegmanElementId(pegmanElements.PEGMAN, pegmanId));
   pegmanIcon.setAttribute('class', 'pegman-location');
   pegmanIcon.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href',
     skin.avatar);
@@ -54,7 +53,7 @@ function addNewPegman(skin, pegmanId, x, y, direction, svg) {
 
   
   var pegmanFadeoutAnimation = document.createElementNS(SVG_NS, 'animate');
-  pegmanFadeoutAnimation.setAttribute('id', `pegmanFadeoutAnimation${idSuffix}`);
+  pegmanFadeoutAnimation.setAttribute('id', getPegmanElementId(pegmanElements.FADEOUT, pegmanId));
   pegmanFadeoutAnimation.setAttribute('attributeType', 'CSS');
   pegmanFadeoutAnimation.setAttribute('attributeName', 'opacity');
   pegmanFadeoutAnimation.setAttribute('from', 1);
