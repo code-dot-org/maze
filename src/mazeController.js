@@ -390,8 +390,4 @@ module.exports = class MazeController {
     const pegman = this.pegmanController.getOrCreatePegman(id);
     pegman.setDirection(d);
   }
-
-  getPegmenIds() {
-    return this.pegmanController.getPegmenIds();
-  }
 };

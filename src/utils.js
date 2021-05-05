@@ -123,12 +123,9 @@ module.exports.getSubtypeForSkin = function getSubtypeForSkin(skinId) {
 // Get html id for a pegman-specific element
 module.exports.getPegmanElementId = function getElementId(elementPrefix, pegmanId) {
   var pegmanSuffix = '';
-  if (!module.exports.isDefaultPegman(pegmanId)) {
+  // if pegmanId is not null, undefined, or DEFAULT_PEGMAN_ID, append it to the elementPrefix
+  if (pegmanId != null && pegmanId !== DEFAULT_PEGMAN_ID) {
     pegmanSuffix = `-${pegmanId}`;
   }
   return `${elementPrefix}${pegmanSuffix}`;
-}
-
-module.exports.isDefaultPegman  = function isDefaultPegman(id){
-  return id == null || id === DEFAULT_PEGMAN_ID;
 }
