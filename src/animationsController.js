@@ -184,12 +184,15 @@ module.exports = class AnimationsController {
    * direction which direction the pegman is facing at.
    * numColPegman number of the pegman in each row, default is 4.
    * numRowPegman number of the pegman in each column, default is 1.
+   * pegmanId id of pegman to create animation for. If no id is provided, the default will
+   *   be used.
    */
   createPegmanAnimation_(options) {
     const pegmanElementSuffix = utils.getElementSuffixForPegman(options.pegmanId);
     // Create clip path.
     var clip = document.createElementNS(SVG_NS, 'clipPath');
-    clip.setAttribute('id', options.idStr + 'PegmanClip');
+    const pegmanClipId = `${options.idStr}PegmanClip${pegmanElementSuffix}`;
+    clip.setAttribute('id', pegmanClipId);
     var rect = document.createElementNS(SVG_NS, 'rect');
     rect.setAttribute('id', options.idStr + 'PegmanClipRect' + pegmanElementSuffix);
     if (options.col !== undefined) {
@@ -209,7 +212,7 @@ module.exports = class AnimationsController {
         'http://www.w3.org/1999/xlink', 'xlink:href', imgSrc);
     img.setAttribute('height', this.maze.PEGMAN_HEIGHT * (options.numRowPegman || 1));
     img.setAttribute('width', this.maze.PEGMAN_WIDTH * (options.numColPegman || 4));
-    img.setAttribute('clip-path', 'url(#' + options.idStr + 'PegmanClip)');
+    img.setAttribute('clip-path', 'url(#' + pegmanClipId + ')');
     img.setAttribute('id', options.idStr + 'Pegman' + pegmanElementSuffix);
     this.svg.appendChild(img);
     // Update pegman icon & clip path.
