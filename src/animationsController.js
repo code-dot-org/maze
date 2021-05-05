@@ -314,7 +314,7 @@ module.exports = class AnimationsController {
       numFrames = this.maze.skin.movePegmanAnimationFrameNumber;
       // If move animation of pegman is set, and this is not a turn.
       // Show the animation.
-      var pegmanIcon = document.getElementById(utils.getPegmanElementId(pegmanElements.PEGMAN, pegmanId));
+      var pegmanIcon = this.getPegmanIcon(pegmanId);
       var movePegmanIcon = document.getElementById(utils.getPegmanElementId(pegmanElements.MOVE, pegmanId));
       timePerFrame = timeForAnimation / numFrames;
 

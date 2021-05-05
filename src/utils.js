@@ -129,6 +129,6 @@ module.exports.getPegmanElementId = function getElementId(elementPrefix, pegmanI
   return `${elementPrefix}${pegmanSuffix}`;
 }
 
-module.exports.isDefaultPegman  = function isDefaultPegmen(id){
+module.exports.isDefaultPegman  = function isDefaultPegman(id){
   return id == null || id === DEFAULT_PEGMAN_ID;
 }
