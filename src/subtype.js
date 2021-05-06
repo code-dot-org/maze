@@ -125,6 +125,10 @@ module.exports = class Subtype extends EventEmitter {
     return false;
   }
 
+  isNeighborhood() {
+    return false;
+  }
+
   // Return a value of '0' if the specified square is wall or out of bounds '1'
   // otherwise (empty, obstacle, start, finish).
   isOnPathStr_(x, y) {
