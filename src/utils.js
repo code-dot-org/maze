@@ -1,3 +1,5 @@
+import {DEFAULT_PEGMAN_ID} from './constants'
+
 /**
  * Version of modulo which, unlike javascript's `%` operator,
  * will always return a positive remainder.
@@ -116,4 +118,14 @@ module.exports.getSubtypeForSkin = function getSubtypeForSkin(skinId) {
   }
 
   return require('./subtype');
+}
+
+// Get html id for a pegman-specific element
+module.exports.getPegmanElementId = function getElementId(elementPrefix, pegmanId) {
+  var pegmanSuffix = '';
+  // if pegmanId is not null, undefined, or DEFAULT_PEGMAN_ID, append it to the elementPrefix
+  if (pegmanId != null && pegmanId !== DEFAULT_PEGMAN_ID) {
+    pegmanSuffix = `-${pegmanId}`;
+  }
+  return `${elementPrefix}${pegmanSuffix}`;
 }

@@ -1,6 +1,5 @@
 const Pegman = require('./pegman');
-
-const DEFAULT_ID = 'defaultPegman';
+const DEFAULT_PEGMAN_ID = require('./constants').DEFAULT_PEGMAN_ID;
 
 module.exports =  class PegmanController {
 
@@ -11,7 +10,7 @@ module.exports =  class PegmanController {
   getOrCreatePegman(id) {
     // if id is null or undefined, set to default value.
     if(id == undefined) {
-      id = DEFAULT_ID;
+      id = DEFAULT_PEGMAN_ID;
     }
     let pegman = this.getPegman(id);
     if (!pegman) {
@@ -24,7 +23,7 @@ module.exports =  class PegmanController {
   getPegman(id) {
     // if id is null or undefined, set to default value.
     if(id == undefined) {
-      id = DEFAULT_ID;
+      id = DEFAULT_PEGMAN_ID;
     }
     return this.pegmen[id];
   }
@@ -34,9 +33,5 @@ module.exports =  class PegmanController {
       throw new Error(`Pegman with id ${pegman.id} already exists.`);
     }
     this.pegmen[pegman.id] = pegman;
-  }
-
-  isDefaultPegman(id) {
-    return id == undefined || id === DEFAULT_ID;
   }
 }
