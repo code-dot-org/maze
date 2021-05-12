@@ -15,7 +15,7 @@ module.exports = class Neighborhood extends Subtype {
    * @override
    */
   isNeighborhood() {
-    return false;
+    return true;
   }
   
   /**
