@@ -53,7 +53,6 @@ module.exports = class Neighborhood extends Subtype {
     });
   }
 
-
   /** 
    * @override 
   **/

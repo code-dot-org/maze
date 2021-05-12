@@ -247,7 +247,7 @@ module.exports = class Drawer {
     tileAnimation.setAttribute('begin', 'indefinite');
     tileElement.appendChild(tileAnimation);
   }
- }
+}
 
 module.exports.SQUARE_SIZE = SQUARE_SIZE;
 module.exports.SVG_NS = SVG_NS;
