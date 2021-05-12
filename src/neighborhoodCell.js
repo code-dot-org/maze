@@ -2,14 +2,14 @@ const Cell = require('./cell');
 
 module.exports = class NeighborhoodCell extends Cell {
   // value is paint count
-  constructor(tileType, value, isBucket, color) {
+  constructor(tileType, value, hasBucket, color) {
     super(tileType, value);
-    this.isBucket = isBucket;
+    this.hasBucket = hasBucket;
     this.color = color;
   }
 
-  isBucket() {
-    return this.isBucket;
+  hasBucket() {
+    return this.hasBucket;
   }
 
   getColor() {
