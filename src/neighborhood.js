@@ -6,8 +6,9 @@ module.exports = class Neighborhood extends Subtype {
   constructor(maze, config = {}) {
     super(maze, config);
 
-    // TODO: this should be defined by the layout of the level
+    // TODO: these should be defined by the level
     this.initializeWithPlaceholder = true;
+    this.squareSize = 50;
   }
 
   /**
@@ -57,6 +58,6 @@ module.exports = class Neighborhood extends Subtype {
    * @override 
   **/
   createDrawer(svg) {
-    this.drawer = new NeighborhoodDrawer(this.maze_.map, this.skin_, svg);
+    this.drawer = new NeighborhoodDrawer(this.maze_.map, this.skin_, svg, this.squareSize);
   }
 }
