@@ -26,6 +26,7 @@ const timeoutList = require('./timeoutList');
 
 const AnimationsController = require('./animationsController');
 const PegmanController = require('./pegmanController');
+const Pegman = require('./pegman');
 const MazeMap = require('./mazeMap');
 const drawMap = require('./drawMap');
 const getSubtypeForSkin = require('./utils').getSubtypeForSkin;
@@ -389,5 +390,10 @@ module.exports = class MazeController {
   setPegmanD(d, id) {
     const pegman = this.pegmanController.getOrCreatePegman(id);
     pegman.setDirection(d);
+  }
+
+  addPegman(id, x, y, d) {
+    const pegman = new Pegman(id, x, y, d);
+    this.pegmanController.addPegman(pegman);
   }
 };
