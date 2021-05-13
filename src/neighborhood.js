@@ -6,7 +6,7 @@ module.exports = class Neighborhood extends Subtype {
   constructor(maze, config = {}) {
     super(maze, config);
     this.spriteMap = this.skin_.spriteMap;
-    this.sheetHeights = this.skin_.sheetHeights;
+    this.sheetRows = this.skin_.sheetRows;
 
     // TODO: these should be defined by the level
     this.initializeWithPlaceholder = true;
@@ -118,6 +118,6 @@ module.exports = class Neighborhood extends Subtype {
 
   // Get dimensions for spritesheet of static images.
   getDimensionsForSheet(sheet) {
-    return [10 * this.squareSize, this.sheetHeights[sheet] * this.squareSize];
+    return [10 * this.squareSize, this.sheetRows[sheet] * this.squareSize];
   }
 }
