@@ -176,6 +176,8 @@ module.exports = class MazeController {
       this.setPegmanX(this.subtype.start.x);
       this.setPegmanY(this.subtype.start.y);
       this.setPegmanD(this.startDirection);
+    } else {
+      // TODO: remove all pegmen except the default
     }
     this.animationsController.reset(first);
 

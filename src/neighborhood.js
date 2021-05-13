@@ -5,8 +5,8 @@ import NeighborhoodDrawer from './neighborhoodDrawer';
 module.exports = class Neighborhood extends Subtype {
   constructor(maze, config = {}) {
     super(maze, config);
-
     this.spriteMap = this.skin_.spriteMap;
+    this.sheetHeights = this.skin_.sheetHeights;
 
     // TODO: these should be defined by the level
     this.initializeWithPlaceholder = true;
@@ -49,24 +49,26 @@ module.exports = class Neighborhood extends Subtype {
     // Compute and draw the tile for each square.
     let tileId = 0;
     this.maze_.map.forEachCell((cell, row, col) => {
-      // each cell with either be a blank tile or an asset tile.
-      // choose based on configuration of tile.
       const asset = this.drawer.getAsset('', row, col);
+
+      // draw blank tile
+      this.drawTile(svg, [0, 0], row, col, tileId);
       if (asset) {
-        // asset is in format {name: <>, sheet: x, row: y, column: z}
-        this.drawTileHelper(
-          asset.sheet, 
-          [asset.row, asset.column], 
+        // add assset on top of blank tile if it exists
+        // asset is in format {name: 'sample name', sheet: x, row: y, column: z}
+        const assetHref = this.skin_.assetUrl(asset.sheet);
+        const [sheetWidth, sheetHeight] = this.getDimensionsForSheet(asset.sheet);
+        this.drawer.drawTileHelper(
+          svg, 
+          [asset.column, asset.row], 
           row, 
           col, 
           tileId, 
-          'auto', 
-          'auto', 
+          assetHref,
+          sheetWidth, 
+          sheetHeight, 
           this.squareSize
         );
-      } else {
-        // draw blank tile
-        this.drawTile(svg, [0, 0], row, col, tileId);
       }
       
       tileId++;
@@ -112,5 +114,10 @@ module.exports = class Neighborhood extends Subtype {
   // Sprite map maps asset ids to sprites within a spritesheet.
   getSpriteMap() {
     return this.spriteMap;
+  }
+
+  // Get dimensions for spritesheet of static images.
+  getDimensionsForSheet(sheet) {
+    return [10 * this.squareSize, this.sheetHeights[sheet] * this.squareSize];
   }
 }

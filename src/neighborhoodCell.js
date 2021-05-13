@@ -21,8 +21,8 @@ module.exports = class NeighborhoodCell extends Cell {
     this.color = color;
   }
 
-  getAssetId(assetId) {
-    this.assetId = assetId;
+  getAssetId() {
+    return this.assetId;
   }
 
   /**
@@ -32,8 +32,6 @@ module.exports = class NeighborhoodCell extends Cell {
    */
   serialize() {
     return Object.assign({}, super.serialize(), {
-      tileType: this.tileType,
-      value: this.value,
       assetId: this.assetId,
       hasBucket: this.hasBucket,
       color: this.color

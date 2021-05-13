@@ -15,9 +15,6 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     const cell = this.neighborhood.getCell(row, col);
     if (cell.getAssetId() != null) {
       return this.neighborhood.getSpriteMap()[cell.getAssetId()];
-    } else {
-      // if there's no asset id for the cell, return
-      return;
     }
   }
 
