@@ -173,23 +173,53 @@ module.exports = class Drawer {
   }
 
   /**
-   * Draw the given tile at row, col
+   * Draw the given tile at row, col from a 
+   * tile sheet that is SQUARE_SIZE * 5 x SQUARE_SIZE * 4
    */
   drawTile(svg, tileSheetLocation, row, col, tileId, tileSheetHref) {
-    const [left, top] = tileSheetLocation;
 
     const tileSheetWidth = SQUARE_SIZE * 5;
     const tileSheetHeight = SQUARE_SIZE * 4;
+
+    this.drawTileHelper(
+      svg, 
+      tileSheetLocation, 
+      row, 
+      col, 
+      tileId, 
+      tileSheetHref, 
+      tileSheetWidth, 
+      tileSheetHeight, 
+      SQUARE_SIZE
+    );
+  }
+
+  /**
+   * Helper function for drawing a tile from a tile sheet 
+   * with the given dimensions and square size.
+   */
+  drawTileHelper(
+    svg, 
+    tileSheetLocation, 
+    row, 
+    col, 
+    tileId, 
+    tileSheetHref, 
+    tileSheetWidth, 
+    tileSheetHeight, 
+    squareSize
+  ) {
+    const [left, top] = tileSheetLocation;
 
     // Tile's clipPath element.
     const tileClip = document.createElementNS(SVG_NS, 'clipPath');
     tileClip.setAttribute('id', 'tileClipPath' + tileId);
     const tileClipRect = document.createElementNS(SVG_NS, 'rect');
-    tileClipRect.setAttribute('width', SQUARE_SIZE);
-    tileClipRect.setAttribute('height', SQUARE_SIZE);
+    tileClipRect.setAttribute('width', squareSize);
+    tileClipRect.setAttribute('height', squareSize);
 
-    tileClipRect.setAttribute('x', col * SQUARE_SIZE);
-    tileClipRect.setAttribute('y', row * SQUARE_SIZE);
+    tileClipRect.setAttribute('x', col * squareSize);
+    tileClipRect.setAttribute('y', row * squareSize);
     tileClip.appendChild(tileClipRect);
     svg.appendChild(tileClip);
 
@@ -202,8 +232,8 @@ module.exports = class Drawer {
     tileElement.setAttribute('width', tileSheetWidth);
     tileElement.setAttribute('clip-path',
                             'url(#tileClipPath' + tileId + ')');
-    tileElement.setAttribute('x', (col - left) * SQUARE_SIZE);
-    tileElement.setAttribute('y', (row - top) * SQUARE_SIZE);
+    tileElement.setAttribute('x', (col - left) * squareSize);
+    tileElement.setAttribute('y', (row - top) * squareSize);
     svg.appendChild(tileElement);
 
     // Tile animation
