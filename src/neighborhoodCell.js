@@ -31,11 +31,12 @@ module.exports = class NeighborhoodCell extends Cell {
    * @override
    */
   serialize() {
-    return Object.assign({}, super.serialize(), {
+    return {
+      ...super.serialize(),
       assetId: this.assetId,
       hasBucket: this.hasBucket,
       color: this.color
-    });
+    };
   }
 
   /**
