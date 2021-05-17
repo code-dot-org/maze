@@ -2,9 +2,20 @@ const Drawer = require('./drawer')
 
 module.exports = class NeighborhoodDrawer extends Drawer {
 
-  constructor(map, asset, svg, squareSize) {
+  constructor(map, asset, svg, squareSize, neighborhood) {
     super(map, asset, svg);
     this.squareSize = squareSize;
+    this.neighborhood = neighborhood
+  }
+
+  /**
+   * @override
+   */
+  getAsset(prefix, row, col) {
+    const cell = this.neighborhood.getCell(row, col);
+    if (cell.getAssetId() != null) {
+      return this.neighborhood.getSpriteMap()[cell.getAssetId()];
+    }
   }
 
   /**
