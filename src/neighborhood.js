@@ -11,6 +11,7 @@ module.exports = class Neighborhood extends Subtype {
     // TODO: these should be defined by the level
     this.initializeWithPlaceholder = true;
     this.squareSize = 50;
+    this.drawer = null;
   }
 
   /**
@@ -46,33 +47,7 @@ module.exports = class Neighborhood extends Subtype {
    * Draw the tiles making up the maze map.
    */
   drawMapTiles(svg) {
-    // Compute and draw the tile for each square.
-    let tileId = 0;
-    this.maze_.map.forEachCell((cell, row, col) => {
-      const asset = this.drawer.getAsset('', row, col);
-
-      // draw blank tile
-      this.drawTile(svg, [0, 0], row, col, tileId);
-      if (asset) {
-        // add assset on top of blank tile if it exists
-        // asset is in format {name: 'sample name', sheet: x, row: y, column: z}
-        const assetHref = this.skin_.assetUrl(asset.sheet);
-        const [sheetWidth, sheetHeight] = this.getDimensionsForSheet(asset.sheet);
-        this.drawer.drawTileHelper(
-          svg, 
-          [asset.column, asset.row], 
-          row, 
-          col, 
-          tileId, 
-          assetHref,
-          sheetWidth, 
-          sheetHeight, 
-          this.squareSize
-        );
-      }
-      
-      tileId++;
-    });
+    this.drawer.drawMapTiles(svg);
   }
 
   /** 
