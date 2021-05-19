@@ -171,13 +171,16 @@ module.exports = class MazeController {
 
     // Kill all tasks.
     timeoutList.clearTimeouts();
-    // Move Pegman into position.
-    if (!this.subtype.initializeWithPlaceholderPegman()) {
+    if (this.subtype.allowMultiplePegmen()) {
+      const pegmanIds = this.pegmanController.getAllPegmanIds();
+      pegmanIds.forEach(pegmanId => {
+        this.animationsController.hidePegman(pegmanId);
+      });
+    } else {
+      // Move Pegman into position.
       this.setPegmanX(this.subtype.start.x);
       this.setPegmanY(this.subtype.start.y);
       this.setPegmanD(this.startDirection);
-    } else {
-      // TODO: remove all pegmen except the default
     }
     this.animationsController.reset(first);
 
@@ -395,7 +398,25 @@ module.exports = class MazeController {
   }
 
   addPegman(id, x, y, d) {
-    const pegman = new Pegman(id, x, y, d);
-    this.pegmanController.addPegman(pegman);
+    if (this.pegmanController.getPegman(id)) {
+      this.animationsController.hidePegman(id);
+      const pegman = this.pegmanController.getPegman(id);
+        pegman.setX(x);
+        pegman.setY(y);
+        pegman.setDirection(d);
+      
+      var frame = tiles.directionToFrame(d);
+      this.animationsController.displayPegman(
+        x,
+        y,
+        frame,
+        id
+      );
+      this.animationsController.showPegman(id);
+    } else {
+      const pegman = new Pegman(id, x, y, d);
+      this.pegmanController.addPegman(pegman);
+      this.animationsController.addNewPegman(id, x, y, d);
+    }
   }
 };

@@ -153,3 +153,4 @@ module.exports = function drawMap(svg, skin, subtype, map, squareSize = 50) {
 
 module.exports.getPegmanYForRow = getPegmanYForRow;
 module.exports.displayPegman = displayPegman;
+module.exports.addNewPegman = addNewPegman;

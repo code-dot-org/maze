@@ -34,4 +34,8 @@ module.exports =  class PegmanController {
     }
     this.pegmen[pegman.id] = pegman;
   }
+
+  getAllPegmanIds() {
+    return Object.keys(this.pegmen);
+  }
 }

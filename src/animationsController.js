@@ -2,6 +2,7 @@ const {SVG_NS, pegmanElements} = require('./constants');
 const drawMap = require('./drawMap');
 const displayPegman = drawMap.displayPegman;
 const getPegmanYForRow = drawMap.getPegmanYForRow;
+const addNewPegman = drawMap.addNewPegman;
 const timeoutList = require('./timeoutList');
 const utils = require('./utils');
 const tiles = require('./tiles');
@@ -16,7 +17,7 @@ module.exports = class AnimationsController {
 
   createAnimations_(pegmanId) {
     // Add idle pegman.
-    if (this.maze.skin.idlePegmanAnimation) {
+    if (this.maze.skin.idlePegmanAnimation && this.maze.subtype.start) {
       this.createPegmanAnimation_({
         type: pegmanElements.IDLE,
         pegmanImage: this.maze.skin.idlePegmanAnimation,
@@ -128,7 +129,7 @@ module.exports = class AnimationsController {
       }, danceTime + 150);
     } else {
       // TODO: reset for mazes with placeholder/multiple pegmen
-      if (!this.maze.subtype.initializeWithPlaceholderPegman() && !this.maze.subtype.allowMultiplePegmen()) {
+      if (!this.maze.subtype.allowMultiplePegmen()) {
         this.displayPegman(this.maze.getPegmanX(), this.maze.getPegmanY(), tiles.directionToFrame(this.maze.getPegmanD()));
       }
       const finishIcon = document.getElementById('finish');
@@ -144,17 +145,21 @@ module.exports = class AnimationsController {
 
     // Make 'look' icon invisible and promote to top.
     var lookIcon = document.getElementById('look');
-    lookIcon.style.display = 'none';
-    lookIcon.parentNode.appendChild(lookIcon);
-    var paths = lookIcon.getElementsByTagName('path');
-    for (let i = 0; i < paths.length; i++) {
-      var path = paths[i];
-      path.setAttribute('stroke', this.maze.skin.look);
+    if (lookIcon) {
+      lookIcon.style.display = 'none';
+      lookIcon.parentNode.appendChild(lookIcon);
+      var paths = lookIcon.getElementsByTagName('path');
+      for (let i = 0; i < paths.length; i++) {
+        var path = paths[i];
+        path.setAttribute('stroke', this.maze.skin.look);
+      }
     }
 
-    // Reset pegman's visibility.
-    var pegmanIcon = this.getPegmanIcon();
-    pegmanIcon.setAttribute('opacity', 1);
+    // Reset pegman's visibility if there is only one pegman
+    if (!this.maze.subtype.allowMultiplePegmen()) {
+      var pegmanIcon = this.getPegmanIcon();
+      pegmanIcon.setAttribute('opacity', 1);
+    }
 
     if (this.maze.skin.idlePegmanAnimation) {
       pegmanIcon.setAttribute('visibility', 'hidden');
@@ -162,7 +167,7 @@ module.exports = class AnimationsController {
         utils.getPegmanElementId(pegmanElements.IDLE)
       );
       idlePegmanIcon.setAttribute('visibility', 'visible');
-    } else {
+    } else if (!this.maze.subtype.allowMultiplePegmen()) {
       pegmanIcon.setAttribute('visibility', 'visible');
     }
 
@@ -576,6 +581,16 @@ module.exports = class AnimationsController {
     }
   }
 
+  hidePegman(pegmanId) {
+    var pegmanIcon = this.getPegmanIcon(pegmanId);
+    pegmanIcon.setAttribute('visibility', 'hidden');
+  }
+
+  showPegman(pegmanId) {
+    var pegmanIcon = this.getPegmanIcon(pegmanId);
+    pegmanIcon.setAttribute('visibility', 'visible');
+  }
+
   /**
    * Schedule the animations and sound for a dance.
    * @param {boolean} victoryDance This is a victory dance after completing the
@@ -700,5 +715,9 @@ module.exports = class AnimationsController {
 
   getPegmanIcon(pegmanId) {
     return document.getElementById(utils.getPegmanElementId(pegmanElements.PEGMAN, pegmanId));
+  }
+
+  addNewPegman(pegmanId, x, y, d) {
+    addNewPegman(this.maze.skin, pegmanId, x, y, d, this.svg);
   }
 };
