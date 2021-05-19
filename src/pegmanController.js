@@ -38,4 +38,8 @@ module.exports =  class PegmanController {
   getAllPegmanIds() {
     return Object.keys(this.pegmen);
   }
+
+  isDefaultPegman(pegmanId) {
+    return pegmanId == undefined || pegmanId === DEFAULT_PEGMAN_ID;
+  }
 }

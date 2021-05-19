@@ -172,9 +172,14 @@ module.exports = class MazeController {
     // Kill all tasks.
     timeoutList.clearTimeouts();
     if (this.subtype.allowMultiplePegmen()) {
+      // hide all pegman except the default. Show the default if it exists
       const pegmanIds = this.pegmanController.getAllPegmanIds();
       pegmanIds.forEach(pegmanId => {
-        this.animationsController.hidePegman(pegmanId);
+        if (this.pegmanController.isDefaultPegman(pegmanId)) {
+          this.animationsController.showPegman(pegmanId);
+        } else {
+          this.animationsController.hidePegman(pegmanId);
+        }
       });
     } else {
       // Move Pegman into position.
@@ -418,5 +423,9 @@ module.exports = class MazeController {
       this.pegmanController.addPegman(pegman);
       this.animationsController.addNewPegman(id, x, y, d);
     }
+  }
+
+  hideDefaultPegman() {
+    this.animationsController.hidePegman();
   }
 };
