@@ -171,6 +171,14 @@ module.exports = class MazeController {
 
     // Kill all tasks.
     timeoutList.clearTimeouts();
+
+    if (this.subtype.start) {
+      // Move default Pegman into position.
+      this.setPegmanX(this.subtype.start.x);
+      this.setPegmanY(this.subtype.start.y);
+      this.setPegmanD(this.startDirection);
+    }
+
     if (this.subtype.allowMultiplePegmen()) {
       // hide all pegman except the default. Show the default if it exists
       const pegmanIds = this.pegmanController.getAllPegmanIds();
@@ -181,12 +189,7 @@ module.exports = class MazeController {
           this.animationsController.hidePegman(pegmanId);
         }
       });
-    } else {
-      // Move Pegman into position.
-      this.setPegmanX(this.subtype.start.x);
-      this.setPegmanY(this.subtype.start.y);
-      this.setPegmanD(this.startDirection);
-    }
+    } 
     this.animationsController.reset(first);
 
     // Move the init dirt marker icons into position.
@@ -426,6 +429,9 @@ module.exports = class MazeController {
   }
 
   hideDefaultPegman() {
-    this.animationsController.hidePegman();
+    // if default pegman exists, hide it
+    if (this.pegmanController.getPegman()) {
+      this.animationsController.hidePegman();
+    }
   }
 };

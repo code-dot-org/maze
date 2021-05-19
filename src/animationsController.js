@@ -128,7 +128,8 @@ module.exports = class AnimationsController {
         this.scheduleTurn(this.maze.startDirection);
       }, danceTime + 150);
     } else {
-      // TODO: reset for mazes with placeholder/multiple pegmen
+      // Reset the pegman for a maze with 1 pegman. Mazes that allow multiple pegmen will only show/hide a static
+      // default, which is reset by the maze controller.
       if (!this.maze.subtype.allowMultiplePegmen()) {
         this.displayPegman(this.maze.getPegmanX(), this.maze.getPegmanY(), tiles.directionToFrame(this.maze.getPegmanD()));
       }

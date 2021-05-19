@@ -44,7 +44,8 @@ function addNewPegman(skin, pegmanId, x, y, direction, svg) {
   pegmanIcon.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href',
     skin.avatar);
   pegmanIcon.setAttribute('height', skin.pegmanHeight);
-  const sheetWidth = skin.pegmanSheetWidth || skin.pegmanWidth * 21 // 49 * 21 = 1029
+  // default pegman sheet has 21 sprites. Skin may override with a specific width for the sheet.
+  const sheetWidth = skin.pegmanSheetWidth || skin.pegmanWidth * 21
   pegmanIcon.setAttribute('width', sheetWidth);
   pegmanIcon.setAttribute('clip-path', `url(#${pegmanClipId})`);
   svg.appendChild(pegmanIcon);
