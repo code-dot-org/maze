@@ -70,7 +70,6 @@ module.exports = class Neighborhood extends Subtype {
           this.squareSize
         );
       }
-      this.drawer.updateItemImage(row, col, true);
       tileId++;
     });
   }
@@ -95,6 +94,8 @@ module.exports = class Neighborhood extends Subtype {
     const cell = this.getCell(row, col);
     cell.setColor(color);
     // TODO: update color on map
+    this.map_.currentStaticGrid[row][col].originalValue_ = color;
+    this.drawer.updateItemImage(row, col, true);
   }
 
   /**
