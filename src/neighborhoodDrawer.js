@@ -1,7 +1,7 @@
 const { SQUARE_SIZE, SVG_NS } = require("./drawer");
-const Subtype = require('./subtype');
+const Drawer = require('./drawer')
 
-// World's worst React.createElement, but for SVG
+// Helper for creating SVG elements
 function svgElement(tag, props, parent) {
   const element = document.createElementNS(SVG_NS, tag);
   Object.keys(props).map(function (key) {
@@ -9,7 +9,7 @@ function svgElement(tag, props, parent) {
   });
 
   if (parent) {
-    parent.appendChild(el);
+    parent.appendChild(element);
   }
 
   return element;
@@ -36,18 +36,7 @@ function cutout(size) {
   return `m0 0v${hs}c0-${cp} ${cp}-${hs} ${hs}-${hs}z`
 }
 
-
-// Path of the triangular corner
-// +----+
-// |  /
-// | /
-// +
-function corner(size) {
-  let hs = size / 2;
-  return `m${hs} 0h-${hs}v${hs}z`
-}
-
-module.exports = class NeighborhoodDrawer extends Subtype {
+module.exports = class NeighborhoodDrawer extends Drawer {
 
   constructor(map, asset, svg, squareSize, neighborhood) {
     super(map, asset, svg);
@@ -65,6 +54,16 @@ module.exports = class NeighborhoodDrawer extends Subtype {
     }
   }
 
+  resetTiles() {}
+
+  // TODO: There is a way to get the value of a cell reliably but I couldn't
+  // get it to work. This is a workaround method to simplify the logic below
+  cellColor(row, col) {
+    if (row >= this.map_.ROWS) return "none";
+    if (col >= this.map_.COLS) return "none";
+    return this.map_.currentStaticGrid[row][col].originalValue_ || "none";
+  }
+
   /**
    * @override
    * Draw the given tile at row, col
@@ -75,7 +74,7 @@ module.exports = class NeighborhoodDrawer extends Subtype {
     const tileSheetWidth = this.squareSize;
     const tileSheetHeight = this.squareSize;
 
-    this.drawTileHelper(
+    super.drawTileHelper(
       svg, 
       tileSheetLocation, 
       row, 
@@ -88,24 +87,17 @@ module.exports = class NeighborhoodDrawer extends Subtype {
     );
   }
 
-  resetTiles() {}
+    /**
+   * @override
+   * Draw the given tile at row, col
+   */
+  updateItemImage(r, co, running) {
 
-  // TODO: There is a way to get the value of a cell reliably but I couldn't
-  // get it to work. This is a workaround method to simplify the logic below
-  cellColor(row, col) {
-    if (row >= this.maze_.map.ROWS) return "none";
-    if (col >= this.maze_.map.COLS) return "none";
-    return this.maze_.map.currentStaticGrid[row][col].originalValue_ || "none";
-  }
-
-  drawMapTiles(svg) {
     let qc = quarterCircle(SQUARE_SIZE);
     let c = cutout(SQUARE_SIZE);
-    let co = corner(SQUARE_SIZE);
     
-    let tileId = 0;
-    for (let row = 0; row < this.maze_.map.ROWS; row++) {
-      for (let col = 0; col < this.maze_.map.COLS; col++) {
+    for (let row = 0; row < this.map_.ROWS; row++) {
+      for (let col = 0; col < this.map_.COLS; col++) {
         // Top left, top right, bottom left, bottom right
         let cells = [
           this.cellColor(row, col),
@@ -117,7 +109,7 @@ module.exports = class NeighborhoodDrawer extends Subtype {
         let grid = svgElement("grid", {
             transform: `translate(${row * SQUARE_SIZE + SQUARE_SIZE/2}, 
               ${col * SQUARE_SIZE + SQUARE_SIZE/2})`
-          }, svg);
+          }, this.svg_);
 
         // Add a quarter circle to the top left corner of the block if there is 
         // a color value there
