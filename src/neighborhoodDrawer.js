@@ -1,4 +1,5 @@
 const Drawer = require('./drawer')
+const tiles = require('./tiles');
 
 module.exports = class NeighborhoodDrawer extends Drawer {
 
@@ -13,7 +14,9 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    */
   getAsset(prefix, row, col) {
     const cell = this.neighborhood.getCell(row, col);
-    if (cell.getAssetId() != null) {
+    // If the tile has an asset id, return the sprite asset. Ignore the asset id
+    // if this is a start tile, as start tiles will handle placing the pegman separately.
+    if (cell.getAssetId() != null && cell.getTile() !== tiles.SquareType.START) {
       return this.neighborhood.getSpriteMap()[cell.getAssetId()];
     }
   }

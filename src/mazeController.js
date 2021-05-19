@@ -406,6 +406,9 @@ module.exports = class MazeController {
   }
 
   addPegman(id, x, y, d) {
+    // if pegman with id <id> already exists, reset 
+    // its location and direction. Otherwise, create a
+    // new pegman and add it to the maze.
     if (this.pegmanController.getPegman(id)) {
       this.animationsController.hidePegman(id);
       const pegman = this.pegmanController.getPegman(id);

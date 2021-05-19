@@ -17,7 +17,7 @@ module.exports = class AnimationsController {
 
   createAnimations_(pegmanId) {
     // Add idle pegman.
-    if (this.maze.skin.idlePegmanAnimation && this.maze.subtype.start) {
+    if (this.maze.skin.idlePegmanAnimation) {
       this.createPegmanAnimation_({
         type: pegmanElements.IDLE,
         pegmanImage: this.maze.skin.idlePegmanAnimation,
@@ -128,8 +128,9 @@ module.exports = class AnimationsController {
         this.scheduleTurn(this.maze.startDirection);
       }, danceTime + 150);
     } else {
-      // Reset the pegman for a maze with 1 pegman. Mazes that allow multiple pegmen will only show/hide a static
-      // default, which is reset by the maze controller.
+      // Reset the pegman for a maze with 1 pegman. Mazes that allow multiple
+      // pegmen will only show/hide a static default, which is 
+      // reset by the maze controller.
       if (!this.maze.subtype.allowMultiplePegmen()) {
         this.displayPegman(this.maze.getPegmanX(), this.maze.getPegmanY(), tiles.directionToFrame(this.maze.getPegmanD()));
       }
