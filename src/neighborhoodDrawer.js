@@ -92,8 +92,6 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * Draw the given tile at row, col
    */
   updateItemImage(r, co, running) {
-    console.log("beginning of update");
-
     let qc = quarterCircle(SQUARE_SIZE);
     let c = cutout(SQUARE_SIZE);
     

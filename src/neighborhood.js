@@ -72,6 +72,9 @@ module.exports = class Neighborhood extends Subtype {
       }
       tileId++;
     });
+
+    // TODO: remove this demo
+    this.paintGlommingDemo('blue');
   }
 
   /** 
@@ -93,9 +96,21 @@ module.exports = class Neighborhood extends Subtype {
 
     const cell = this.getCell(row, col);
     cell.setColor(color);
-    // TODO: update color on map
-    this.map_.currentStaticGrid[row][col].originalValue_ = color;
+    // TODO: figure out why getCell is broken
+    this.maze_.map.currentStaticGrid[row][col].originalValue_ = color;
     this.drawer.updateItemImage(row, col, true);
+  }
+
+  // This is to show the two steps required to ensure paint is added
+  paintGlommingDemo(color) {
+    this.maze_.map.currentStaticGrid[4][4].originalValue_ = color;
+    this.drawer.updateItemImage(4, 4, true);
+    this.maze_.map.currentStaticGrid[4][5].originalValue_ = color;
+    this.drawer.updateItemImage(4, 5, true);
+    this.maze_.map.currentStaticGrid[5][4].originalValue_ = 'green';
+    this.drawer.updateItemImage(5, 4, true);
+    this.maze_.map.currentStaticGrid[5][5].originalValue_ = 'green';
+    this.drawer.updateItemImage(5, 5, true);
   }
 
   /**
