@@ -165,8 +165,10 @@ module.exports = class MazeController {
   /**
    * Reset the maze to the start position and kill any pending animation tasks.
    * @param {boolean} first True if an opening animation is to be played.
+   * @param {boolean} showDefault True if the default pegman should be shown. Only applies
+   * to subtypes that allow multiple pegman
    */
-  reset(first) {
+  reset(first, showDefault = true) {
     this.subtype.reset();
 
     // Kill all tasks.
@@ -180,10 +182,11 @@ module.exports = class MazeController {
     }
 
     if (this.subtype.allowMultiplePegmen()) {
-      // hide all pegman except the default. Show the default if it exists
+      // hide all pegman except the default. Show the default if it exists and
+      // showDefault is true
       const pegmanIds = this.pegmanController.getAllPegmanIds();
       pegmanIds.forEach(pegmanId => {
-        if (this.pegmanController.isDefaultPegman(pegmanId)) {
+        if (this.pegmanController.isDefaultPegman(pegmanId) && showDefault) {
           this.animationsController.showPegman(pegmanId);
         } else {
           this.animationsController.hidePegman(pegmanId);
