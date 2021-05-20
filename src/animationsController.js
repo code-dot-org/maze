@@ -153,7 +153,7 @@ module.exports = class AnimationsController {
     for (let i = 0; i < paths.length; i++) {
       var path = paths[i];
       path.setAttribute('stroke', this.maze.skin.look);
-      }
+    }
 
     // Reset pegman's visibility if there is only one pegman
     const pegmanIcon = this.getPegmanIcon();
