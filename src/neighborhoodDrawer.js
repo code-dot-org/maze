@@ -56,12 +56,11 @@ module.exports = class NeighborhoodDrawer extends Drawer {
 
   resetTiles() {}
 
-  // TODO: There is a way to get the value of a cell reliably but I couldn't
-  // get it to work. This is a workaround method to simplify the logic below
+  // Quick helper to retrieve the color stored in this cell
   cellColor(row, col) {
-    if (row >= this.map_.ROWS) return "none";
-    if (col >= this.map_.COLS) return "none";
-    return this.map_.currentStaticGrid[row][col].originalValue_ || "none";
+    if (row >= this.map_.ROWS || row < 0) return "none";
+    if (col >= this.map_.COLS || col < 0) return "none";
+    return this.map_.getCell(row, col).getColor() || "none";
   }
 
   /**
@@ -95,8 +94,8 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     let qc = quarterCircle(SQUARE_SIZE);
     let c = cutout(SQUARE_SIZE);
     
-    for (let row = 0; row < this.map_.ROWS; row++) {
-      for (let col = 0; col < this.map_.COLS; col++) {
+    for (let row = -1; row < this.map_.ROWS; row++) {
+      for (let col = -1; col < this.map_.COLS; col++) {
         // Top left, top right, bottom left, bottom right
         let cells = [
           this.cellColor(row, col),
@@ -106,43 +105,50 @@ module.exports = class NeighborhoodDrawer extends Drawer {
   
         // Create grid block group
         let grid = svgElement("g", {
-            transform: `translate(${row * SQUARE_SIZE + SQUARE_SIZE/2}, 
-              ${col * SQUARE_SIZE + SQUARE_SIZE/2})`
+            transform: `translate(${row * SQUARE_SIZE + SQUARE_SIZE}, 
+              ${col * SQUARE_SIZE + SQUARE_SIZE})`
           }, this.svg_);
 
         // Add a quarter circle to the top left corner of the block if there is 
         // a color value there
         if (cells[0] !== "none") {
-          svgElement("path", {d: qc, fill: cells[0], transform:"rotate(180)"}, grid);
+          svgElement("path", {d: qc, transform: "rotate(180)", fill: cells[0]}, grid);
         }
 
-        // Add a cutout shape if the top left corner has a color and one other
+        // Add the cutout shape if the top left corner has a color and one other
         // corner shares that color, filling in the top left quadrant of the block
         // completely
         if (cells[0] !== "none" && 
-          (cells[0] == cells[1] || cells[0] == cells[2] || cells[0] == cells[3])) {
+          (cells[0] == cells[1] || cells[0] == cells[2])) {
             svgElement("path", {d: c, transform: "rotate(180)", fill: cells[0]}, grid);
 
         // Otherwise, if the two adjacent corners have the same color, add the 
         // cutout shape with that color
         } else if (cells[0] == "none" && cells[1] !== "none" && cells[1] == cells[2]) {
           svgElement("path", {d: c, transform: "rotate(180)", fill: cells[1]}, grid);
-        } else if (cells[0] !== "none" && cells[1] !== "none" && cells[2] !== "none" && cells[3] !== "none") {
+
+        // Fill in center corner only if an adjacent cell has the same color, or if 
+        // kitty-corner cell is same color and either adjacent is empty
+        // Note: this additional logic handles the "clover case", where we want each
+        // cell to "pop" out with its own color if diagonals are matching
+        } else if (cells[0] !== "none" && (cells[1] == cells[0] || cells[2] == cells[0] || 
+          (cells[3] == cells[0] && (cells[1] == "none" || cells[2] == "none")))) {
           svgElement("path", {d: c, transform: "rotate(180)", fill: cells[0]}, grid);
         }
 
         // The rest of these statements follow the same pattern for each corner
         // of the block
         if (cells[1] && cells[1] !== "none") {
-          svgElement("path", {d: qc, fill: cells[1], transform: "rotate(-90)"}, grid);
+          svgElement("path", {d: qc, transform: "rotate(180)", fill: cells[1], transform: "rotate(-90)"}, grid);
         }
 
         if (cells[1] !== "none" && 
-          (cells[1] == cells[2] || cells[1] == cells[3] || cells[1] == cells[0])) {
+          (cells[1] == cells[3] || cells[1] == cells[0])) {
           svgElement("path", {d: c, transform: "rotate(-90)", fill: cells[1]}, grid);
         } else if (cells[1] == "none" & cells[0] !== "none" && cells[0] == cells[3]) {
           svgElement("path", {d: c, transform: "rotate(-90)", fill: cells[0]}, grid);
-        } else if (cells[1] !== "none" && cells[0] !== "none" && cells[2] !== "none" && cells[3] !== "none") {
+        } else if (cells[1] !== "none" && (cells[0] == cells[1] || cells[3] == cells[1] ||
+          (cells[2] == cells[1] && (cells[0] == "none" || cells[3] == "none")))) {
           svgElement("path", {d: c, transform: "rotate(-90)", fill: cells[1]}, grid);
         }
 
@@ -151,11 +157,12 @@ module.exports = class NeighborhoodDrawer extends Drawer {
         }
         
         if (cells[2] !== "none" && 
-          (cells[2] == cells[3] || cells[2] == cells[0] || cells[2] == cells[1])) {
+          (cells[2] == cells[3] || cells[2] == cells[0])) {
             svgElement("path", {d: c, transform: "rotate(90)", fill: cells[2]}, grid);
         } else if (cells[2] == "none" && cells[0] !== "none" && cells[0] == cells[3]) {
           svgElement("path", {d: c, transform: "rotate(90)", fill: cells[0]}, grid);
-        } else if (cells[2] !== "none" && cells[0] !== "none" && cells[1] !== "none" && cells[3] !== "none") {
+        } else if (cells[2] !== "none" && (cells[0] == cells[2] || cells[3] == cells[2] ||
+          (cells[2] == cells[1] && (cells[0] == "none" || cells[3] == "none")))) {
           svgElement("path", {d: c, transform: "rotate(90)", fill: cells[2]}, grid);
         }
 
@@ -164,11 +171,12 @@ module.exports = class NeighborhoodDrawer extends Drawer {
         }
 
         if (cells[3] !== "none" && 
-          (cells[3] == cells[0] || cells[3] == cells[1] || cells[3] == cells[2])) {
+          (cells[3] == cells[1] || cells[3] == cells[2])) {
           svgElement("path", {d: c, fill: cells[3]}, grid);
         } else if (cells[3] == "none" && cells[1] !== "none" && cells[1] == cells[2]) {
           svgElement("path", {d: c, fill: cells[1]}, grid);
-        } else if (cells[3] !== "none" && cells[0] !== "none" && cells[1] !== "none" && cells[2] !== "none") {
+        } else if (cells[3] !== "none" && (cells[1] == cells[3] || cells[2] == cells[3] ||
+          (cells[3] == cells[0] && (cells[1] == "none" || cells[2] == "none")))) {
           svgElement("path", {d: c,  fill: cells[3]}, grid);
         }
       }

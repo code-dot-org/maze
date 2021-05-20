@@ -96,21 +96,16 @@ module.exports = class Neighborhood extends Subtype {
 
     const cell = this.getCell(row, col);
     cell.setColor(color);
-    // TODO: figure out why getCell is broken
-    this.maze_.map.currentStaticGrid[row][col].originalValue_ = color;
     this.drawer.updateItemImage(row, col, true);
   }
 
   // This is to show the two steps required to ensure paint is added
   paintGlommingDemo(color) {
-    this.maze_.map.currentStaticGrid[4][4].originalValue_ = color;
-    this.drawer.updateItemImage(4, 4, true);
-    this.maze_.map.currentStaticGrid[4][5].originalValue_ = color;
-    this.drawer.updateItemImage(4, 5, true);
-    this.maze_.map.currentStaticGrid[5][4].originalValue_ = 'green';
-    this.drawer.updateItemImage(5, 4, true);
-    this.maze_.map.currentStaticGrid[5][5].originalValue_ = 'green';
-    this.drawer.updateItemImage(5, 5, true);
+    this.getCell(0, 0).setColor(color);
+    this.getCell(1, 1).setColor(color);
+    this.getCell(0, 1).setColor('green');
+    this.getCell(1, 0).setColor('green');
+    this.drawer.updateItemImage(1, 0, true);
   }
 
   /**
