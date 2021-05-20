@@ -186,11 +186,9 @@ module.exports = class MazeController {
       // showDefault is true
       const pegmanIds = this.pegmanController.getAllPegmanIds();
       pegmanIds.forEach(pegmanId => {
-        if (this.pegmanController.isDefaultPegman(pegmanId) && showDefault) {
-          this.animationsController.showPegman(pegmanId);
-        } else {
-          this.animationsController.hidePegman(pegmanId);
-        }
+        this.pegmanController.isDefaultPegman(pegmanId) && showDefault 
+          ? this.animationsController.showPegman(pegmanId) 
+          : this.animationsController.hidePegman(pegmanId);
       });
     } 
     this.animationsController.reset(first);
@@ -428,10 +426,14 @@ module.exports = class MazeController {
       );
       this.animationsController.showPegman(id);
     } else {
-      const pegman = new Pegman(id, x, y, d);
-      this.pegmanController.addPegman(pegman);
-      this.animationsController.addNewPegman(id, x, y, d);
+      this.createAndDisplayPegman(id, x, y, d);
     }
+  }
+
+  createAndDisplayPegman(id, x, y, d) {
+    const pegman = new Pegman(id, x, y, d);
+    this.pegmanController.addPegman(pegman);
+    this.animationsController.addNewPegman(id, x, y, d);
   }
 
   hideDefaultPegman() {

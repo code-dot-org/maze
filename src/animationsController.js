@@ -147,19 +147,17 @@ module.exports = class AnimationsController {
 
     // Make 'look' icon invisible and promote to top.
     var lookIcon = document.getElementById('look');
-    if (lookIcon) {
-      lookIcon.style.display = 'none';
-      lookIcon.parentNode.appendChild(lookIcon);
-      var paths = lookIcon.getElementsByTagName('path');
-      for (let i = 0; i < paths.length; i++) {
-        var path = paths[i];
-        path.setAttribute('stroke', this.maze.skin.look);
+    lookIcon.style.display = 'none';
+    lookIcon.parentNode.appendChild(lookIcon);
+    var paths = lookIcon.getElementsByTagName('path');
+    for (let i = 0; i < paths.length; i++) {
+      var path = paths[i];
+      path.setAttribute('stroke', this.maze.skin.look);
       }
-    }
 
     // Reset pegman's visibility if there is only one pegman
+    const pegmanIcon = this.getPegmanIcon();
     if (!this.maze.subtype.allowMultiplePegmen()) {
-      var pegmanIcon = this.getPegmanIcon();
       pegmanIcon.setAttribute('opacity', 1);
     }
 
