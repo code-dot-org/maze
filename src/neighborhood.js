@@ -8,8 +8,7 @@ module.exports = class Neighborhood extends Subtype {
     this.spriteMap = this.skin_.spriteMap;
     this.sheetRows = this.skin_.sheetRows;
 
-    // TODO: these should be defined by the level
-    this.initializeWithPlaceholder = true;
+    // TODO: this should be defined by the level
     this.squareSize = 50;
   }
 
@@ -25,13 +24,6 @@ module.exports = class Neighborhood extends Subtype {
    */
   allowMultiplePegmen() {
     return true;
-  }
-
-   /**
-   * @override
-   */
-  initializeWithPlaceholderPegman() {
-    return this.initializeWithPlaceholder;
   }
 
   /**

@@ -165,20 +165,32 @@ module.exports = class MazeController {
   /**
    * Reset the maze to the start position and kill any pending animation tasks.
    * @param {boolean} first True if an opening animation is to be played.
+   * @param {boolean} showDefault True if the default pegman should be shown. Only applies
+   * to subtypes that allow multiple pegman
    */
-  reset(first) {
+  reset(first, showDefault = true) {
     this.subtype.reset();
 
     // Kill all tasks.
     timeoutList.clearTimeouts();
-    // Move Pegman into position.
-    if (!this.subtype.initializeWithPlaceholderPegman()) {
+
+    if (this.subtype.start) {
+      // Move default Pegman into position.
       this.setPegmanX(this.subtype.start.x);
       this.setPegmanY(this.subtype.start.y);
       this.setPegmanD(this.startDirection);
-    } else {
-      // TODO: remove all pegmen except the default
     }
+
+    if (this.subtype.allowMultiplePegmen()) {
+      // hide all pegman except the default. Show the default if it exists and
+      // showDefault is true
+      const pegmanIds = this.pegmanController.getAllPegmanIds();
+      pegmanIds.forEach(pegmanId => {
+        this.pegmanController.isDefaultPegman(pegmanId) && showDefault 
+          ? this.animationsController.showPegman(pegmanId) 
+          : this.animationsController.hidePegman(pegmanId);
+      });
+    } 
     this.animationsController.reset(first);
 
     // Move the init dirt marker icons into position.
@@ -395,7 +407,39 @@ module.exports = class MazeController {
   }
 
   addPegman(id, x, y, d) {
+    // if pegman with id <id> already exists, reset 
+    // its location and direction. Otherwise, create a
+    // new pegman and add it to the maze.
+    if (this.pegmanController.getPegman(id)) {
+      this.animationsController.hidePegman(id);
+      const pegman = this.pegmanController.getPegman(id);
+        pegman.setX(x);
+        pegman.setY(y);
+        pegman.setDirection(d);
+      
+      var frame = tiles.directionToFrame(d);
+      this.animationsController.displayPegman(
+        x,
+        y,
+        frame,
+        id
+      );
+      this.animationsController.showPegman(id);
+    } else {
+      this.createAndDisplayPegman(id, x, y, d);
+    }
+  }
+
+  createAndDisplayPegman(id, x, y, d) {
     const pegman = new Pegman(id, x, y, d);
     this.pegmanController.addPegman(pegman);
+    this.animationsController.addNewPegman(id, x, y, d);
+  }
+
+  hideDefaultPegman() {
+    // if default pegman exists, hide it
+    if (this.pegmanController.getPegman()) {
+      this.animationsController.hidePegman();
+    }
   }
 };
