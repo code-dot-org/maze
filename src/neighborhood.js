@@ -104,6 +104,7 @@ module.exports = class Neighborhood extends Subtype {
     this.getCell(0, 0).setColor(color);
     this.getCell(1, 1).setColor(color);
     this.getCell(2, 2).setColor(color);
+    this.getCell(7, 7).setColor(color);
     this.drawer.updateItemImage(1, 0, true);
   }
 

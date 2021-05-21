@@ -64,6 +64,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
   resetTiles() {}
 
   // Quick helper to retrieve the color stored in this cell
+  // Ensures 'padding cells' (row/col < 0) have no color
   cellColor(row, col) {
     if (row >= this.map_.ROWS || row < 0) return null;
     if (col >= this.map_.COLS || col < 0) return null;
@@ -130,6 +131,9 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * to get the paint glomming correct
    */
   updateItemImage(r, co, running) {
+
+    // Because this processes a grid of cells at a time, we start at -1 to allow for
+    // a 'padding' row and column with no color.
     for (let row = -1; row < this.map_.ROWS; row++) {
       for (let col = -1; col < this.map_.COLS; col++) {
 
