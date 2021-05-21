@@ -34,7 +34,7 @@ module.exports = class Neighborhood extends Subtype {
   }
 
   /**
-   * @override 
+   * @override
    * Draw the tiles making up the maze map.
    */
   drawMapTiles(svg) {
@@ -62,7 +62,6 @@ module.exports = class Neighborhood extends Subtype {
           this.squareSize
         );
       }
-      
       tileId++;
     });
   }
@@ -86,7 +85,7 @@ module.exports = class Neighborhood extends Subtype {
 
     const cell = this.getCell(row, col);
     cell.setColor(color);
-    // TODO: update color on map
+    this.drawer.updateItemImage(row, col, true);
   }
 
   /**
@@ -100,7 +99,7 @@ module.exports = class Neighborhood extends Subtype {
 
     const cell = this.getCell(row, col);
     cell.setColor(null);
-    // TODO: remove color from map
+    this.drawer.updateItemImage(row, col, true);
   }
 
   // Sprite map maps asset ids to sprites within a spritesheet.
