@@ -72,7 +72,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
   }
 
   // Helper method for determining color and path based on neighbors
-  pathCalculator(subjectCell, adjacent1, adjacent2, kitty, transform, grid) {
+  pathCalculator(subjectCell, adjacent1, adjacent2, diagonal, transform, grid) {
     let pie = quarterCircle(SQUARE_SIZE);
     let cutOut = cutout(SQUARE_SIZE);
     let tag = "path";
@@ -83,21 +83,21 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     }
     // Add the cutout if the top left corner has a color and an adjacent cell
     // shares that color, filling in the top left quadrant of the block entirely
-    if (subjectCell && (subjectCell == adjacent1 || subjectCell == adjacent2)) {
+    if (subjectCell && (subjectCell === adjacent1 || subjectCell === adjacent2)) {
       svgElement(tag, {d: cutOut, transform: transform, fill: subjectCell}, grid);
     } 
     // Otherwise, if the two adjacent corners have the same color, add the 
     // cutout shape with that color
-    else if (adjacent1 && adjacent1 == adjacent2 && 
-      ((!kitty || !subjectCell) || subjectCell !== kitty)) {
+    else if (adjacent1 && adjacent1 === adjacent2 && 
+      ((!diagonal || !subjectCell) || subjectCell !== diagonal)) {
       svgElement(tag, {d: cutOut, transform: transform, fill: adjacent1}, grid);
     }
     // Fill in center corner only if an adjacent cell has the same color, or if 
-    // kitty-corner cell is same color and either adjacent is empty
+    // the diagonal cell is same color and either adjacent is empty
     // Note: this handles the "clover case", where we want each
     // cell to "pop" out with its own color if diagonals are matching
-    else if (subjectCell && (adjacent1 == subjectCell || adjacent2 == subjectCell ||
-      (kitty == subjectCell && ((adjacent1 == null || adjacent2 == null) || adjacent1 !== adjacent2)))) {
+    else if (subjectCell && (adjacent1 === subjectCell || adjacent2 === subjectCell ||
+      (diagonal === subjectCell && ((!adjacent1 || !adjacent2) || adjacent1 !== adjacent2)))) {
       svgElement(tag, {d: cutOut, transform: transform, fill: subjectCell}, grid);
     }
   }
@@ -106,7 +106,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * @override
    * Draw the given tile at row, col
    */
-   drawTile(svg, tileSheetLocation, row, col, tileId, tileSheetHref) {
+  drawTile(svg, tileSheetLocation, row, col, tileId, tileSheetHref) {
     // we have one background tile for neighborhood (we don't define paths like
     // the other skins). Therefore our 'tile sheet' is just one square.
     const tileSheetWidth = this.squareSize;
@@ -125,7 +125,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     );
   }
 
-    /**
+  /**
    * @override
    * This method is used to display the paint, so has to reprocess the entire grid
    * to get the paint glomming correct
@@ -139,7 +139,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
 
         /**
          * In a grid of four cells: top left, top right, bottom left, bottom right
-         * So if we are painting cell 0, adjacent cells are 1 & 2, kittycorner is 3
+         * So if we are painting cell 0, adjacent cells are 1 & 2, diagonal is 3
          * +-------+
          * | 0 | 1 |
          * --------

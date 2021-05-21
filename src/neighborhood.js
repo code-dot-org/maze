@@ -72,9 +72,6 @@ module.exports = class Neighborhood extends Subtype {
       }
       tileId++;
     });
-
-    // TODO: remove this demo
-    this.paintGlommingDemo('blue');
   }
 
   /** 
@@ -99,15 +96,6 @@ module.exports = class Neighborhood extends Subtype {
     this.drawer.updateItemImage(row, col, true);
   }
 
-  // This is to show the two steps required to ensure paint is added
-  paintGlommingDemo(color) {
-    this.getCell(0, 0).setColor(color);
-    this.getCell(1, 1).setColor(color);
-    this.getCell(2, 2).setColor(color);
-    this.getCell(7, 7).setColor(color);
-    this.drawer.updateItemImage(1, 0, true);
-  }
-
   /**
    * Remove paint from the location of the pegman with id pegmanId, if there
    * is any paint.
@@ -119,7 +107,7 @@ module.exports = class Neighborhood extends Subtype {
 
     const cell = this.getCell(row, col);
     cell.setColor(null);
-    // TODO: remove color from map
+    this.drawer.updateItemImage(row, col, true);
   }
 
   // Sprite map maps asset ids to sprites within a spritesheet.
