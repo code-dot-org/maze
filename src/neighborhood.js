@@ -103,13 +103,7 @@ module.exports = class Neighborhood extends Subtype {
   paintGlommingDemo(color) {
     this.getCell(0, 0).setColor(color);
     this.getCell(1, 1).setColor(color);
-    this.getCell(0, 1).setColor('green');
-    this.getCell(1, 0).setColor('green');
-    this.getCell(3, 3).setColor('purple');
-    this.getCell(4, 4).setColor('purple');
-    this.getCell(5, 5).setColor('purple');
-    this.getCell(3, 0).setColor('yellow');
-    this.getCell(3, 1).setColor('yellow');
+    this.getCell(2, 2).setColor(color);
     this.drawer.updateItemImage(1, 0, true);
   }
 
