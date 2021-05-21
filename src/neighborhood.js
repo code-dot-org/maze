@@ -42,10 +42,10 @@ module.exports = class Neighborhood extends Subtype {
   }
 
   /**
-   * 
+   * @override
    * Draw the tiles making up the maze map.
    */
-   drawMapTiles(svg) {
+  drawMapTiles(svg) {
     // Compute and draw the tile for each square.
     let tileId = 0;
     this.maze_.map.forEachCell((cell, row, col) => {
