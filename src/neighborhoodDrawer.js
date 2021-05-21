@@ -20,9 +20,9 @@ function svgElement(tag, props, parent) {
 //  /   |
 //  +---+
 function quarterCircle(size) {
-  let hs = size/2;
-  let cp = size/4;
-  return `m${hs} ${hs}h-${hs}c0-${cp} ${cp}-${hs} ${hs}-${hs}z`;
+  let halfSize = size/2;
+  let quarterSize = size/4;
+  return `m${halfSize} ${halfSize}h-${halfSize}c0-${quarterSize} ${quarterSize}-${halfSize} ${halfSize}-${halfSize}z`;
 }
 
 // Path of the the slice of a square remaining once a quarter circle is 
@@ -31,9 +31,16 @@ function quarterCircle(size) {
 // | /
 // + 
 function cutout(size) {
-  let hs = size / 2;
-  let cp = size / 4;
-  return `m0 0v${hs}c0-${cp} ${cp}-${hs} ${hs}-${hs}z`
+  let halfSize = size / 2;
+  let quarterSize = size / 4;
+  return `m0 0v${halfSize}c0-${quarterSize} ${quarterSize}-${halfSize} ${halfSize}-${halfSize}z`
+}
+
+function makeGrid(row, col, svg) {
+  return svgElement("g", {
+    transform: `translate(${col * SQUARE_SIZE + SQUARE_SIZE}, 
+      ${row * SQUARE_SIZE + SQUARE_SIZE})`
+  }, svg);
 }
 
 module.exports = class NeighborhoodDrawer extends Drawer {
@@ -91,12 +98,12 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * Draw the given tile at row, col
    */
   updateItemImage(r, co, running) {
-    let qc = quarterCircle(SQUARE_SIZE);
-    let c = cutout(SQUARE_SIZE);
+    let pie = quarterCircle(SQUARE_SIZE);
+    let cutOut = cutout(SQUARE_SIZE);
     
     for (let row = -1; row < this.map_.ROWS; row++) {
       for (let col = -1; col < this.map_.COLS; col++) {
-        // Top left, top right, bottom left, bottom right
+
         let cells = [
           this.cellColor(row, col),
           this.cellColor(row+1, col),
@@ -104,15 +111,12 @@ module.exports = class NeighborhoodDrawer extends Drawer {
           this.cellColor(row+1,col+1)];
   
         // Create grid block group
-        let grid = svgElement("g", {
-            transform: `translate(${row * SQUARE_SIZE + SQUARE_SIZE}, 
-              ${col * SQUARE_SIZE + SQUARE_SIZE})`
-          }, this.svg_);
+        let grid = makeGrid(row, col, this.svg_);
 
         // Add a quarter circle to the top left corner of the block if there is 
         // a color value there
         if (cells[0] !== "none") {
-          svgElement("path", {d: qc, transform: "rotate(180)", fill: cells[0]}, grid);
+          svgElement("path", {d: pie, transform: "rotate(180)", fill: cells[0]}, grid);
         }
 
         // Add the cutout shape if the top left corner has a color and one other
@@ -120,12 +124,12 @@ module.exports = class NeighborhoodDrawer extends Drawer {
         // completely
         if (cells[0] !== "none" && 
           (cells[0] == cells[1] || cells[0] == cells[2])) {
-            svgElement("path", {d: c, transform: "rotate(180)", fill: cells[0]}, grid);
+            svgElement("path", {d: cutOut, transform: "rotate(180)", fill: cells[0]}, grid);
 
         // Otherwise, if the two adjacent corners have the same color, add the 
         // cutout shape with that color
         } else if (cells[0] == "none" && cells[1] !== "none" && cells[1] == cells[2]) {
-          svgElement("path", {d: c, transform: "rotate(180)", fill: cells[1]}, grid);
+          svgElement("path", {d: cutOut, transform: "rotate(180)", fill: cells[1]}, grid);
 
         // Fill in center corner only if an adjacent cell has the same color, or if 
         // kitty-corner cell is same color and either adjacent is empty
@@ -133,51 +137,51 @@ module.exports = class NeighborhoodDrawer extends Drawer {
         // cell to "pop" out with its own color if diagonals are matching
         } else if (cells[0] !== "none" && (cells[1] == cells[0] || cells[2] == cells[0] || 
           (cells[3] == cells[0] && (cells[1] == "none" || cells[2] == "none")))) {
-          svgElement("path", {d: c, transform: "rotate(180)", fill: cells[0]}, grid);
+          svgElement("path", {d: cutOut, transform: "rotate(180)", fill: cells[0]}, grid);
         }
 
         // The rest of these statements follow the same pattern for each corner
         // of the block
         if (cells[1] && cells[1] !== "none") {
-          svgElement("path", {d: qc, transform: "rotate(180)", fill: cells[1], transform: "rotate(-90)"}, grid);
+          svgElement("path", {d: pie, transform: "rotate(90)", fill: cells[1]}, grid);
         }
 
         if (cells[1] !== "none" && 
           (cells[1] == cells[3] || cells[1] == cells[0])) {
-          svgElement("path", {d: c, transform: "rotate(-90)", fill: cells[1]}, grid);
+          svgElement("path", {d: cutOut, transform: "rotate(90)", fill: cells[1]}, grid);
         } else if (cells[1] == "none" & cells[0] !== "none" && cells[0] == cells[3]) {
-          svgElement("path", {d: c, transform: "rotate(-90)", fill: cells[0]}, grid);
+          svgElement("path", {d: cutOut, transform: "rotate(90)", fill: cells[0]}, grid);
         } else if (cells[1] !== "none" && (cells[0] == cells[1] || cells[3] == cells[1] ||
           (cells[2] == cells[1] && (cells[0] == "none" || cells[3] == "none")))) {
-          svgElement("path", {d: c, transform: "rotate(-90)", fill: cells[1]}, grid);
+          svgElement("path", {d: cutOut, transform: "rotate(90)", fill: cells[1]}, grid);
         }
 
         if (cells[2] && cells[2] !== "none") {  
-          svgElement("path", {d: qc, fill: cells[2], transform: "rotate(90)"}, grid);
+          svgElement("path", {d: pie, fill: cells[2], transform: "rotate(-90)"}, grid);
         }
         
         if (cells[2] !== "none" && 
           (cells[2] == cells[3] || cells[2] == cells[0])) {
-            svgElement("path", {d: c, transform: "rotate(90)", fill: cells[2]}, grid);
+            svgElement("path", {d: cutOut, transform: "rotate(-90)", fill: cells[2]}, grid);
         } else if (cells[2] == "none" && cells[0] !== "none" && cells[0] == cells[3]) {
-          svgElement("path", {d: c, transform: "rotate(90)", fill: cells[0]}, grid);
+          svgElement("path", {d: cutOut, transform: "rotate(-90)", fill: cells[0]}, grid);
         } else if (cells[2] !== "none" && (cells[0] == cells[2] || cells[3] == cells[2] ||
           (cells[2] == cells[1] && (cells[0] == "none" || cells[3] == "none")))) {
-          svgElement("path", {d: c, transform: "rotate(90)", fill: cells[2]}, grid);
+          svgElement("path", {d: cutOut, transform: "rotate(-90)", fill: cells[2]}, grid);
         }
 
         if (cells[3] && cells[3] !== "none") {
-          svgElement("path", {d: qc, fill: cells[3]}, grid);
+          svgElement("path", {d: pie, fill: cells[3]}, grid);
         }
 
         if (cells[3] !== "none" && 
           (cells[3] == cells[1] || cells[3] == cells[2])) {
-          svgElement("path", {d: c, fill: cells[3]}, grid);
+          svgElement("path", {d: cutOut, fill: cells[3]}, grid);
         } else if (cells[3] == "none" && cells[1] !== "none" && cells[1] == cells[2]) {
-          svgElement("path", {d: c, fill: cells[1]}, grid);
+          svgElement("path", {d: cutOut, fill: cells[1]}, grid);
         } else if (cells[3] !== "none" && (cells[1] == cells[3] || cells[2] == cells[3] ||
           (cells[3] == cells[0] && (cells[1] == "none" || cells[2] == "none")))) {
-          svgElement("path", {d: c,  fill: cells[3]}, grid);
+          svgElement("path", {d: cutOut,  fill: cells[3]}, grid);
         }
       }
     }
