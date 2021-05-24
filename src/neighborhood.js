@@ -9,7 +9,7 @@ module.exports = class Neighborhood extends Subtype {
     this.sheetRows = this.skin_.sheetRows;
 
     // TODO: this should be defined by the level
-    this.squareSize = 50;
+    this.squareSize = 32;
   }
 
   /**
