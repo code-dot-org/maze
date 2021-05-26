@@ -9,7 +9,7 @@ module.exports = class Neighborhood extends Subtype {
     this.sheetRows = this.skin_.sheetRows;
 
     // TODO: this should be defined by the level
-    this.squareSize = 32;
+    this.squareSize = 50;
   }
 
   /**
@@ -80,8 +80,8 @@ module.exports = class Neighborhood extends Subtype {
    *                       Must be hex code or html color.
   **/ 
   addPaint(pegmanId, color) {
-    const col = this.maze_.getPegmanX();
-    const row = this.maze_.getPegmanY();
+    const col = this.maze_.getPegmanX(pegmanId);
+    const row = this.maze_.getPegmanY(pegmanId);
 
     const cell = this.getCell(row, col);
     cell.setColor(color);
@@ -94,11 +94,12 @@ module.exports = class Neighborhood extends Subtype {
    * @param {String} pegmanId
   **/ 
  removePaint(pegmanId) {
-    const col = this.maze_.getPegmanX();
-    const row = this.maze_.getPegmanY();
+    const col = this.maze_.getPegmanX(pegmanId);
+    const row = this.maze_.getPegmanY(pegmanId);
 
     const cell = this.getCell(row, col);
     cell.setColor(null);
+    this.maze_.reset;
     this.drawer.updateItemImage(row, col, true);
   }
 

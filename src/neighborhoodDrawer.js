@@ -64,8 +64,6 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     }
   }
 
-  resetTiles() {}
-
   // Quick helper to retrieve the color stored in this cell
   // Ensures 'padding cells' (row/col < 0) have no color
   cellColor(row, col) {
