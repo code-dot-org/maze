@@ -80,7 +80,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
 
   /**
    * @override
-   */
+  */
   getAsset(prefix, row, col) {
     const cell = this.neighborhood.getCell(row, col);
     // If the tile has an asset id, return the sprite asset. Ignore the asset id
@@ -89,6 +89,8 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       return this.neighborhood.getSpriteMap()[cell.getAssetId()];
     }
   }
+
+  resetTiles() {}
 
   // Quick helper to retrieve the color stored in this cell
   // Ensures 'padding cells' (row/col < 0) have no color
