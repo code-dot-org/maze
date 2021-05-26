@@ -99,7 +99,7 @@ module.exports = class Neighborhood extends Subtype {
 
     const cell = this.getCell(row, col);
     cell.setColor(null);
-    this.maze_.reset;
+    this.drawer.resetTile(row, col);
     this.drawer.updateItemImage(row, col, true);
   }
 
