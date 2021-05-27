@@ -12,10 +12,10 @@ const PIE = "pie";
 // Helper for creating SVG elements
 function svgElement(tag, props, parent, id) {
   var node = document.getElementById(id);
-    if (!node) {
-      node = document.createElementNS(SVG_NS, tag);
-      node.setAttribute("id", id);
-    }
+  if (!node) {
+    node = document.createElementNS(SVG_NS, tag);
+    node.setAttribute("id", id);
+  }
   Object.keys(props).map(function (key) {
     node.setAttribute(key, props[key])
   });
@@ -108,18 +108,18 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     // Add a quarter circle to the top left corner of the block if there is 
     // a color value there
     if (subjectCell) {
-      svgElement(tag, {d: pie, stroke: subjectCell, transform: transform, fill: subjectCell}, grid, id + PIE);
+      svgElement(tag, {d: pie, stroke: subjectCell, transform: transform, fill: subjectCell}, grid, `${id}-${PIE}`);
     }
     // Add the cutout if the top left corner has a color and an adjacent cell
     // shares that color, filling in the top left quadrant of the block entirely
     if (subjectCell && (subjectCell === adjacent1 || subjectCell === adjacent2)) {
-      svgElement(tag, {d: cutOut, stroke: subjectCell, transform: transform, fill: subjectCell}, grid, id + CUT);
+      svgElement(tag, {d: cutOut, stroke: subjectCell, transform: transform, fill: subjectCell}, grid, `${id}-${CUT}`);
     } 
     // Otherwise, if the two adjacent corners have the same color, add the 
     // cutout shape with that color
     else if (adjacent1 && adjacent1 === adjacent2 && 
       ((!diagonal || !subjectCell) || subjectCell !== diagonal)) {
-      svgElement(tag, {d: cutOut, stroke: adjacent1, transform: transform, fill: adjacent1}, grid, id + CUT);
+      svgElement(tag, {d: cutOut, stroke: adjacent1, transform: transform, fill: adjacent1}, grid, `${id}-${CUT}`);
     }
     // Fill in center corner only if an adjacent cell has the same color, or if 
     // the diagonal cell is same color and either adjacent is empty
@@ -127,7 +127,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     // cell to "pop" out with its own color if diagonals are matching
     else if (subjectCell && (adjacent1 === subjectCell || adjacent2 === subjectCell ||
       (diagonal === subjectCell && ((!adjacent1 || !adjacent2) || adjacent1 !== adjacent2)))) {
-      svgElement(tag, {d: cutOut, stroke: subjectCell, transform: transform, fill: subjectCell}, grid, id + CUT);
+      svgElement(tag, {d: cutOut, stroke: subjectCell, transform: transform, fill: subjectCell}, grid, `${id}-${CUT}`);
     }
   }
 
