@@ -217,7 +217,7 @@ module.exports = class AnimationsController {
       rect.setAttribute('x', options.col * this.maze.SQUARE_SIZE + 1 + this.maze.PEGMAN_X_OFFSET);
     }
     if (options.row !== undefined) {
-      rect.setAttribute('y', getPegmanYForRow(this.maze.skin, options.row));
+      rect.setAttribute('y', getPegmanYForRow(this.maze.skin, options.row, this.maze.SQUARE_SIZE));
     }
     rect.setAttribute('width', this.maze.PEGMAN_WIDTH);
     rect.setAttribute('height', this.maze.PEGMAN_HEIGHT);
@@ -240,7 +240,7 @@ module.exports = class AnimationsController {
       img.setAttribute('x', x);
     }
     if (options.row !== undefined) {
-      img.setAttribute('y', getPegmanYForRow(this.maze.skin, options.row));
+      img.setAttribute('y', getPegmanYForRow(this.maze.skin, options.row, this.maze.SQUARE_SIZE));
     }
   }
 
@@ -266,12 +266,12 @@ module.exports = class AnimationsController {
   updatePegmanAnimation_(options) {
     var rect = document.getElementById(utils.getPegmanElementId(`${options.type}ClipRect`, options.pegmanId));
     rect.setAttribute('x', options.col * this.maze.SQUARE_SIZE + 1 + this.maze.PEGMAN_X_OFFSET);
-    rect.setAttribute('y', getPegmanYForRow(this.maze.skin, options.row));
+    rect.setAttribute('y', getPegmanYForRow(this.maze.skin, options.row, this.maze.SQUARE_SIZE));
     var img = document.getElementById(utils.getPegmanElementId(options.type, options.pegmanId));
     var x = this.maze.SQUARE_SIZE * options.col -
         options.direction * this.maze.PEGMAN_WIDTH + 1 + this.maze.PEGMAN_X_OFFSET;
     img.setAttribute('x', x);
-    var y = getPegmanYForRow(this.maze.skin, options.row) - this.getPegmanFrameOffsetY_(options.animationRow);
+    var y = getPegmanYForRow(this.maze.skin, options.row, this.maze.SQUARE_SIZE) - this.getPegmanFrameOffsetY_(options.animationRow);
     img.setAttribute('y', y);
     img.setAttribute('visibility', 'visible');
   }
@@ -710,7 +710,7 @@ module.exports = class AnimationsController {
   displayPegman(x, y, frame, pegmanId) {
     var pegmanIcon = this.getPegmanIcon(pegmanId);
     var clipRect = document.getElementById(utils.getPegmanElementId(pegmanElements.CLIP_RECT, pegmanId));
-    displayPegman(this.maze.skin, pegmanIcon, clipRect, x, y, frame);
+    displayPegman(this.maze.skin, pegmanIcon, clipRect, x, y, frame, this.maze.SQUARE_SIZE);
   }
 
   getPegmanIcon(pegmanId) {
@@ -718,6 +718,6 @@ module.exports = class AnimationsController {
   }
 
   addNewPegman(pegmanId, x, y, d) {
-    addNewPegman(this.maze.skin, pegmanId, x, y, d, this.svg);
+    addNewPegman(this.maze.skin, pegmanId, x, y, d, this.svg, this.maze.SQUARE_SIZE);
   }
 };
