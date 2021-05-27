@@ -14,7 +14,7 @@ const PIE = "pie";
  * Groups are created by grid tile, under which paths are nested. These groups
  * begin with "g" in the id. By checking for this when determining its position
  * within the hierarchy, we can nest these groups just before the pegman,
- * insuring the pegman will appear on top of the paint.
+ * ensuring the pegman will appear on top of the paint.
  * 
  * @param tag representing the element type, 'g' for group, 'path' for paths
  * @param props representing the details of the element
@@ -72,9 +72,12 @@ function makeGrid(row, col, svg) {
 }
 
 /**
- * This drawer hosts all paint glomming logic. As a rule: paint glomming will
- * work as expected as long as old colors are erased/scraped first. Otherwise,
- * new colors will layer on top of old paint.
+ * This drawer hosts all paint glomming logic. 
+ * A note on layering paint: If paint is applied on top of existing paint 
+ * (that has not been removed/scraped), portions of the cell might still
+ * display the first layer of paint. Example: [blue][blue] in layer 1 will
+ * create a "pill" visual. If the second cell is then painted [yellow], the
+ * yellow circle will appear on top, with the blue cutouts still visible below.
  */
 module.exports = class NeighborhoodDrawer extends Drawer {
 
