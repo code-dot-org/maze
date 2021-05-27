@@ -1,4 +1,3 @@
-const { NeighborhoodSignalType } = require("../../apps/src/javalab/constants");
 const { SQUARE_SIZE, SVG_NS } = require("./drawer");
 const Drawer = require('./drawer')
 const tiles = require('./tiles');
@@ -75,7 +74,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       if (node) {
         node.querySelectorAll('*').forEach(n => n.remove());
       }
-    };
+    }
   }
 
   /**
