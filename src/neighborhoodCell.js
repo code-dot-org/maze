@@ -2,15 +2,10 @@ const Cell = require('./cell');
 
 module.exports = class NeighborhoodCell extends Cell {
   // value is paint count
-  constructor(tileType, value, assetId, hasBucket, color) {
+  constructor(tileType, value, assetId, color) {
     super(tileType, value);
     this.assetId = assetId;
-    this.hasBucket = hasBucket || value > 0;
     this.color = color;
-  }
-
-  hasBucket() {
-    return this.hasBucket;
   }
 
   getColor() {
@@ -34,7 +29,6 @@ module.exports = class NeighborhoodCell extends Cell {
     return {
       ...super.serialize(),
       assetId: this.assetId,
-      hasBucket: this.hasBucket,
       color: this.color
     };
   }
@@ -47,7 +41,6 @@ module.exports = class NeighborhoodCell extends Cell {
       serialized.tileType,
       serialized.value,
       serialized.assetId,
-      serialized.hasBucket,
       serialized.color
     );
   }

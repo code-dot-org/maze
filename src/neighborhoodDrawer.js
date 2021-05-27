@@ -56,10 +56,11 @@ function makeGrid(row, col, svg) {
 
 module.exports = class NeighborhoodDrawer extends Drawer {
 
-  constructor(map, asset, svg, squareSize, neighborhood) {
-    super(map, asset, svg);
+  constructor(map, skin, svg, squareSize, neighborhood) {
+    super(map, '', svg);
     this.squareSize = squareSize;
-    this.neighborhood = neighborhood
+    this.neighborhood = neighborhood;
+    this.skin_ = skin;
   }
 
   resetTile(row, col) {
@@ -82,11 +83,25 @@ module.exports = class NeighborhoodDrawer extends Drawer {
   */
   getAsset(prefix, row, col) {
     const cell = this.neighborhood.getCell(row, col);
-    // If the tile has an asset id, return the sprite asset. Ignore the asset id
-    // if this is a start tile, as start tiles will handle placing the pegman separately.
-    if (cell.getAssetId() != null && cell.getTile() !== tiles.SquareType.START) {
-      return this.neighborhood.getSpriteMap()[cell.getAssetId()];
+    // only cells with a value are handled by getAsset.
+    if (cell.getCurrentValue()) {
+      return this.skin_.paintCan;
     }
+  }
+
+  getBackgroundTileInfo(row, col) {
+    const cell = this.neighborhood.getCell(row, col);
+    // If the tile has an asset id, return the sprite asset. Ignore the asset id
+    // if this is a start tile or the cell has a value value. 
+    // Start tiles will handle placing the pegman separately,
+    // and tiles with a value are paint cans, which are handled as images instead of background tiles.
+    if (cell.getAssetId() != null && cell.getTile() !== tiles.SquareType.START && !cell.getOriginalValue()) {
+      return this.getSpriteData(cell);
+    }
+  }
+
+  getSpriteData(cell) {
+    return this.neighborhood.getSpriteMap()[cell.getAssetId()];
   }
 
   resetTiles() {}
@@ -160,6 +175,18 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * to get the paint glomming correct
    */
   updateItemImage(r, co, running) {
+    let cell = this.map_.getCell(r, co);
+
+    // if the cell value has ever been greater than 0, this has been or 
+    // is a paint can square. Ensure it is shown/hidden appropriately 
+    // and with the correct value.
+    if (cell.getOriginalValue() > 0) {
+      const newValue = cell.getCurrentValue() > 0 ? cell.getCurrentValue() : '';
+      super.updateOrCreateText_('counter', r, co, newValue);
+      // drawImage_ calls getAsset. If currentValue() is 0, getAsset will return
+      // undefined and the paint can will be hidden. Otherwise we will get the paint can image.
+      super.drawImage_('', r, co);
+    }
 
     // Because this processes a grid of cells at a time, we start at -1 to allow for
     // a 'padding' row and column with no color.
