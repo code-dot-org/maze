@@ -1,4 +1,4 @@
-const { SQUARE_SIZE, SVG_NS } = require("./drawer");
+const { SVG_NS } = require("./drawer");
 const Drawer = require('./drawer')
 const tiles = require('./tiles');
 
@@ -44,14 +44,6 @@ function cutout(size) {
   let halfSize = size / 2;
   let quarterSize = size / 4;
   return `m0 0v${halfSize}c0-${quarterSize} ${quarterSize}-${halfSize} ${halfSize}-${halfSize}z`
-}
-
-function makeGrid(row, col, svg) {
-  let id = "g" + row + "." + col;
-  return svgElement("g", {
-    transform: `translate(${col * SQUARE_SIZE + SQUARE_SIZE}, 
-      ${row * SQUARE_SIZE + SQUARE_SIZE})`
-  }, svg, id);
 }
 
 module.exports = class NeighborhoodDrawer extends Drawer {
@@ -116,8 +108,8 @@ module.exports = class NeighborhoodDrawer extends Drawer {
 
   // Helper method for determining color and path based on neighbors
   pathCalculator(subjectCell, adjacent1, adjacent2, diagonal, transform, grid, id) {
-    let pie = quarterCircle(SQUARE_SIZE);
-    let cutOut = cutout(SQUARE_SIZE);
+    let pie = quarterCircle(this.squareSize);
+    let cutOut = cutout(this.squareSize);
     let tag = "path";
 
     // Add a quarter circle to the top left corner of the block if there is 
@@ -144,6 +136,14 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       (diagonal === subjectCell && ((!adjacent1 || !adjacent2) || adjacent1 !== adjacent2)))) {
       svgElement(tag, {d: cutOut, stroke: subjectCell, transform: transform, fill: subjectCell}, grid, `${id}-${CUT}`);
     }
+  }
+
+  makeGrid(row, col, svg) {
+    let id = "g" + row + "." + col;
+    return svgElement("g", {
+      transform: `translate(${col * this.squareSize + this.squareSize}, 
+        ${row * this.squareSize + this.squareSize})`
+    }, svg, id);
   }
 
   /**
@@ -182,10 +182,10 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     // and with the correct value.
     if (cell.getOriginalValue() > 0) {
       const newValue = cell.getCurrentValue() > 0 ? cell.getCurrentValue() : '';
-      super.updateOrCreateText_('counter', r, co, newValue);
       // drawImage_ calls getAsset. If currentValue() is 0, getAsset will return
       // undefined and the paint can will be hidden. Otherwise we will get the paint can image.
       super.drawImage_('', r, co);
+      this.updateOrCreateText_('counter', r, co, newValue, this.squareSize);
     }
 
     // Because this processes a grid of cells at a time, we start at -1 to allow for
@@ -211,7 +211,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
 
         if (cells[0] || cells[1] || cells[2] || cells[3]) {
           // Create grid block group
-          let grid = makeGrid(row, col, this.svg_);
+          let grid = this.makeGrid(row, col, this.svg_);
           let id0 = row + "." + col + "." + ROTATE180;
           let id1 = row + "." + col + "." + ROTATENEG90;
           let id2 = row + "." + col + "." + ROTATE90;
@@ -226,4 +226,35 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       }
     }
   }
+
+  /**
+   * @override
+   * Create SVG text element for given cell
+   * @param {string} prefix
+   * @param {number} row
+   * @param {number} col
+   * @param {string} text
+  */
+  // updateOrCreateText_(prefix, row, col, text) {
+  //   const pegmanElement = this.svg_.getElementsByClassName('pegman-location')[0];
+  //   let textElement = this.svg_.querySelector('#' + Drawer.cellId(prefix, row, col));
+
+  //   if (!textElement) {
+  //     // Create text.
+  //     //const hPadding = this.squareSize / 4;
+  //     //const vPadding = this.squareSize / 4;
+  //     textElement = document.createElementNS(SVG_NS, 'text');
+  //     textElement.setAttribute('class', 'paint-counter-text');
+
+  //     // Position text in center of asset.
+  //     textElement.setAttribute('x', (col) * this.squareSize + this.squareSize / 2);
+  //     textElement.setAttribute('y', (row) * this.squareSize + this.squareSize / 2 + 5);
+  //     textElement.setAttribute('id', Drawer.cellId(prefix, row, col));
+  //     textElement.appendChild(document.createTextNode(''));
+  //     this.svg_.insertBefore(textElement, pegmanElement);
+  //   }
+
+  //   textElement.firstChild.nodeValue = text;
+  //   return textElement;
+  // }
 };
