@@ -8,8 +8,7 @@ module.exports = class Neighborhood extends Subtype {
     this.spriteMap = this.skin_.spriteMap;
     this.sheetRows = this.skin_.sheetRows;
 
-    // TODO: this should be defined by the level
-    this.squareSize = 50;
+    this.squareSize = this.skin_.squareSize;
   }
 
   /**

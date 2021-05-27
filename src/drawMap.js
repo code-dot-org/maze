@@ -20,13 +20,13 @@ function displayPegman(skin, pegmanIcon, clipRect, x, y, frame, squareSize = 50)
   const xOffset = skin.pegmanXOffset || 0;
   pegmanIcon.setAttribute('x',
     x * squareSize - frame * skin.pegmanWidth + 1 + xOffset);
-  pegmanIcon.setAttribute('y', getPegmanYForRow(skin, y));
+  pegmanIcon.setAttribute('y', getPegmanYForRow(skin, y, squareSize));
 
   clipRect.setAttribute('x', x * squareSize + 1 + xOffset);
   clipRect.setAttribute('y', pegmanIcon.getAttribute('y'));
 }
 
-function addNewPegman(skin, pegmanId, x, y, direction, svg) {
+function addNewPegman(skin, pegmanId, x, y, direction, svg, squareSize = 50) {
   // Pegman's clipPath element, whose (x, y) is reset by Maze.displayPegman
   const pegmanClip = document.createElementNS(SVG_NS, 'clipPath');
   const pegmanClipId = `pegmanClipPath-${createUuid()}`;
@@ -51,7 +51,7 @@ function addNewPegman(skin, pegmanId, x, y, direction, svg) {
   svg.appendChild(pegmanIcon);
 
   displayPegman(skin, pegmanIcon, clipRect, x, y,
-    tiles.directionToFrame(direction));
+    tiles.directionToFrame(direction), squareSize);
 
   
   var pegmanFadeoutAnimation = document.createElementNS(SVG_NS, 'animate');
@@ -104,7 +104,7 @@ module.exports = function drawMap(svg, skin, subtype, map, squareSize = 50) {
   svg.appendChild(hintPath);
 
   if (subtype.start) {
-    addNewPegman(skin, undefined, subtype.start.x, subtype.start.y, subtype.startDirection, svg);
+    addNewPegman(skin, undefined, subtype.start.x, subtype.start.y, subtype.startDirection, svg, squareSize);
   }
 
   if (subtype.finish && skin.goalIdle) {

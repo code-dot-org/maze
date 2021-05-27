@@ -123,14 +123,14 @@ module.exports = class MazeController {
     }
 
     // Pixel height and width of each maze square (i.e. tile).
-    this.SQUARE_SIZE = 50;
+    this.SQUARE_SIZE = this.skin.squareSize  || 50;
     this.PEGMAN_HEIGHT = this.skin.pegmanHeight;
     this.PEGMAN_WIDTH = this.skin.pegmanWidth;
     this.PEGMAN_X_OFFSET = this.skin.pegmanXOffset || 0;
     this.PEGMAN_Y_OFFSET = this.skin.pegmanYOffset;
 
-    this.MAZE_WIDTH = this.SQUARE_SIZE * this.map.COLS;
-    this.MAZE_HEIGHT = this.SQUARE_SIZE * this.map.ROWS;
+    this.MAZE_WIDTH = this.skin.mazeWidth || this.SQUARE_SIZE * this.map.COLS;
+    this.MAZE_HEIGHT = this.skin.mazeHeight || this.SQUARE_SIZE * this.map.ROWS;
     this.PATH_WIDTH = this.SQUARE_SIZE / 3;
   }
 
