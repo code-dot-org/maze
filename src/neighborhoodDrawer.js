@@ -2,18 +2,27 @@ const { SQUARE_SIZE, SVG_NS } = require("./drawer");
 const Drawer = require('./drawer')
 const tiles = require('./tiles');
 
+const ROTATE180 = "rotate(180)";
+const ROTATENEG90 = "rotate(-90)";
+const ROTATE90 = "rotate(90)";
+const ROTATE0 = "rotate(0)";
+const CUT = "cut";
+const PIE = "pie";
+
 // Helper for creating SVG elements
-function svgElement(tag, props, parent) {
-  const element = document.createElementNS(SVG_NS, tag);
-  Object.keys(props).map(function (key) {
-    element.setAttribute(key, props[key])
-  });
-
-  if (parent) {
-    parent.appendChild(element);
+function svgElement(tag, props, parent, id) {
+  var node = document.getElementById(id);
+  if (!node) {
+    node = document.createElementNS(SVG_NS, tag);
+    node.setAttribute("id", id);
   }
-
-  return element;
+  Object.keys(props).map(function (key) {
+    node.setAttribute(key, props[key])
+  });
+  if (parent) {
+    parent.appendChild(node);
+  }
+  return node;
 }
 
 // Path drawing a quarter circle
@@ -38,10 +47,11 @@ function cutout(size) {
 }
 
 function makeGrid(row, col, svg) {
+  let id = "g" + row + "." + col;
   return svgElement("g", {
     transform: `translate(${col * SQUARE_SIZE + SQUARE_SIZE}, 
       ${row * SQUARE_SIZE + SQUARE_SIZE})`
-  }, svg);
+  }, svg, id);
 }
 
 module.exports = class NeighborhoodDrawer extends Drawer {
@@ -52,9 +62,24 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     this.neighborhood = neighborhood
   }
 
+  resetTile(row, col) {
+    let neighbors = [
+      "g" + row + "." + col,
+      "g" + (row - 1) + "." + (col - 1),
+      "g" + row + "." + (col - 1),
+      "g" + (row - 1) + "." + col
+    ];
+    for (const neighbor of neighbors) {
+      var node = document.getElementById(neighbor);
+      if (node) {
+        node.querySelectorAll('*').forEach(n => n.remove());
+      }
+    }
+  }
+
   /**
    * @override
-   */
+  */
   getAsset(prefix, row, col) {
     const cell = this.neighborhood.getCell(row, col);
     // If the tile has an asset id, return the sprite asset. Ignore the asset id
@@ -75,25 +100,26 @@ module.exports = class NeighborhoodDrawer extends Drawer {
   }
 
   // Helper method for determining color and path based on neighbors
-  pathCalculator(subjectCell, adjacent1, adjacent2, diagonal, transform, grid) {
+  pathCalculator(subjectCell, adjacent1, adjacent2, diagonal, transform, grid, id) {
     let pie = quarterCircle(SQUARE_SIZE);
     let cutOut = cutout(SQUARE_SIZE);
     let tag = "path";
+
     // Add a quarter circle to the top left corner of the block if there is 
     // a color value there
     if (subjectCell) {
-      svgElement(tag, {d: pie, transform: transform, fill: subjectCell}, grid);
+      svgElement(tag, {d: pie, stroke: subjectCell, transform: transform, fill: subjectCell}, grid, `${id}-${PIE}`);
     }
     // Add the cutout if the top left corner has a color and an adjacent cell
     // shares that color, filling in the top left quadrant of the block entirely
     if (subjectCell && (subjectCell === adjacent1 || subjectCell === adjacent2)) {
-      svgElement(tag, {d: cutOut, transform: transform, fill: subjectCell}, grid);
+      svgElement(tag, {d: cutOut, stroke: subjectCell, transform: transform, fill: subjectCell}, grid, `${id}-${CUT}`);
     } 
     // Otherwise, if the two adjacent corners have the same color, add the 
     // cutout shape with that color
     else if (adjacent1 && adjacent1 === adjacent2 && 
       ((!diagonal || !subjectCell) || subjectCell !== diagonal)) {
-      svgElement(tag, {d: cutOut, transform: transform, fill: adjacent1}, grid);
+      svgElement(tag, {d: cutOut, stroke: adjacent1, transform: transform, fill: adjacent1}, grid, `${id}-${CUT}`);
     }
     // Fill in center corner only if an adjacent cell has the same color, or if 
     // the diagonal cell is same color and either adjacent is empty
@@ -101,7 +127,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     // cell to "pop" out with its own color if diagonals are matching
     else if (subjectCell && (adjacent1 === subjectCell || adjacent2 === subjectCell ||
       (diagonal === subjectCell && ((!adjacent1 || !adjacent2) || adjacent1 !== adjacent2)))) {
-      svgElement(tag, {d: cutOut, transform: transform, fill: subjectCell}, grid);
+      svgElement(tag, {d: cutOut, stroke: subjectCell, transform: transform, fill: subjectCell}, grid, `${id}-${CUT}`);
     }
   }
 
@@ -153,16 +179,23 @@ module.exports = class NeighborhoodDrawer extends Drawer {
           this.cellColor(row, col),
           this.cellColor(row, col+1),
           this.cellColor(row+1, col),
-          this.cellColor(row+1,col+1)];
+          this.cellColor(row+1,col+1)
+        ];
 
-        // Create grid block group
-        let grid = makeGrid(row, col, this.svg_);
+        if (cells[0] || cells[1] || cells[2] || cells[3]) {
+          // Create grid block group
+          let grid = makeGrid(row, col, this.svg_);
+          let id0 = row + "." + col + "." + ROTATE180;
+          let id1 = row + "." + col + "." + ROTATENEG90;
+          let id2 = row + "." + col + "." + ROTATE90;
+          let id3 = row + "." + col + "." + ROTATE0;
 
-        // Calculate all the svg paths based on neighboring cell colors
-        this.pathCalculator(cells[0], cells[1], cells[2], cells[3], "rotate(180)", grid);
-        this.pathCalculator(cells[1], cells[0], cells[3], cells[2], "rotate(-90)", grid);
-        this.pathCalculator(cells[2], cells[0], cells[3], cells[1], "rotate(90)", grid);
-        this.pathCalculator(cells[3], cells[1], cells[2], cells[0], "rotate(0)", grid);
+          // Calculate all the svg paths based on neighboring cell colors
+          this.pathCalculator(cells[0], cells[1], cells[2], cells[3], ROTATE180, grid, id0);
+          this.pathCalculator(cells[1], cells[0], cells[3], cells[2], ROTATENEG90, grid, id1);
+          this.pathCalculator(cells[2], cells[0], cells[3], cells[1], ROTATE90, grid, id2);
+          this.pathCalculator(cells[3], cells[1], cells[2], cells[0], ROTATE0, grid, id3);
+        }
       }
     }
   }

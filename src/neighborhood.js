@@ -80,8 +80,8 @@ module.exports = class Neighborhood extends Subtype {
    *                       Must be hex code or html color.
   **/ 
   addPaint(pegmanId, color) {
-    const col = this.maze_.getPegmanX();
-    const row = this.maze_.getPegmanY();
+    const col = this.maze_.getPegmanX(pegmanId);
+    const row = this.maze_.getPegmanY(pegmanId);
 
     const cell = this.getCell(row, col);
     cell.setColor(color);
@@ -94,11 +94,12 @@ module.exports = class Neighborhood extends Subtype {
    * @param {String} pegmanId
   **/ 
  removePaint(pegmanId) {
-    const col = this.maze_.getPegmanX();
-    const row = this.maze_.getPegmanY();
+    const col = this.maze_.getPegmanX(pegmanId);
+    const row = this.maze_.getPegmanY(pegmanId);
 
     const cell = this.getCell(row, col);
     cell.setColor(null);
+    this.drawer.resetTile(row, col);
     this.drawer.updateItemImage(row, col, true);
   }
 
