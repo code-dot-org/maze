@@ -1,6 +1,7 @@
 import Subtype from './subtype';
 import NeighborhoodCell from './neighborhoodCell';
 import NeighborhoodDrawer from './neighborhoodDrawer';
+import { Direction } from './tiles';
 
 module.exports = class Neighborhood extends Subtype {
   constructor(maze, config = {}) {
@@ -100,6 +101,29 @@ module.exports = class Neighborhood extends Subtype {
     cell.setColor(null);
     this.drawer.resetTile(row, col);
     this.drawer.updateItemImage(row, col, true);
+  }
+
+  /**
+   * Turns the painter left by one direction.
+   * @param {String} pegmanId
+   */
+  turnLeft(pegmanId) {
+    const newDirection;
+    switch (this.maze_.getPegmanD(pegmanId)) {
+      case Direction.NORTH:
+        newDirection = Direction.WEST;
+        break;
+      case Direction.EAST:
+        newDirection = Direction.NORTH;
+        break;
+      case Direction.SOUTH:
+        newDirection = Direction.EAST;
+        break;
+      case Direction.WEST:
+        newDirection = Direction.SOUTH;
+        break;
+    }
+    this.maze_.animatedTurn(newDirection, pegmanId);
   }
 
   // Sprite map maps asset ids to sprites within a spritesheet.
