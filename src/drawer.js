@@ -51,8 +51,8 @@ module.exports = class Drawer {
    * @param {number} col
    * @param {boolean} running
    */
-  updateItemImage(row, col, running) {
-    return this.drawImage_('', row, col);
+  updateItemImage(row, col, running, squareSize = SQUARE_SIZE) {
+    return this.drawImage_('', row, col, squareSize);
   }
 
   /**
@@ -62,7 +62,7 @@ module.exports = class Drawer {
    * @param {number} col
    * @return {Element} img
    */
-  drawImage_(prefix, row, col) {
+  drawImage_(prefix, row, col, squareSize = SQUARE_SIZE) {
     let img = this.svg_.querySelector('#' + Drawer.cellId(prefix, row, col));
     let href = this.getAsset(prefix, row, col);
 
@@ -75,7 +75,7 @@ module.exports = class Drawer {
     // otherwise create the image if we don't already have one, update
     // the href to whatever we want it to be, and hide it if we don't
     // have one
-    img = this.getOrCreateImage_(prefix, row, col);
+    img = this.getOrCreateImage_(prefix, row, col, true, squareSize);
     if (img) {
       img.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', href || '');
       img.setAttribute('visibility', href ? 'visible' : 'hidden');
@@ -93,7 +93,7 @@ module.exports = class Drawer {
    * @param {boolean} createClipPath
    * @return {Element} img
    */
-  getOrCreateImage_(prefix, row, col, createClipPath=true, squareSize=SQUARE_SIZE) {
+  getOrCreateImage_(prefix, row, col, createClipPath = true, squareSize = SQUARE_SIZE) {
     let href = this.getAsset(prefix, row, col);
 
     let imgId = Drawer.cellId(prefix, row, col);
@@ -148,17 +148,28 @@ module.exports = class Drawer {
    * @param {number} row
    * @param {number} col
    * @param {string} text
+   * @param {number} squareSize (optional): size of tile
+   * @param {number} hPadding (optional): horizontal padding from bottom left corner
+   * @param {number} vPadding (optional): vertical padding from bottom left corner
+   * @param {string} className (optional): css class name to apply to the text element
    */
-  updateOrCreateText_(prefix, row, col, text, squareSize = SQUARE_SIZE) {
+  updateOrCreateText_(
+    prefix,
+    row,
+    col,
+    text, 
+    squareSize = SQUARE_SIZE, 
+    hPadding = 2,
+    vPadding = 2,
+    className = 'karel-counter-text'
+  ) {
     const pegmanElement = this.svg_.getElementsByClassName('pegman-location')[0];
     let textElement = this.svg_.querySelector('#' + Drawer.cellId(prefix, row, col));
 
     if (!textElement) {
       // Create text.
-      const hPadding = 2;
-      const vPadding = 2;
       textElement = document.createElementNS(SVG_NS, 'text');
-      textElement.setAttribute('class', 'karel-counter-text');
+      textElement.setAttribute('class', className);
 
       // Position text just inside the bottom right corner.
       textElement.setAttribute('x', (col + 1) * squareSize - hPadding);

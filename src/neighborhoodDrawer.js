@@ -208,8 +208,8 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       const newValue = cell.getCurrentValue() > 0 ? cell.getCurrentValue() : '';
       // drawImage_ calls getAsset. If currentValue() is 0, getAsset will return
       // undefined and the paint can will be hidden. Otherwise we will get the paint can image.
-      super.drawImage_('', r, co);
-      this.updateOrCreateText_('counter', r, co, newValue, this.squareSize);
+      super.drawImage_('', r, co, this.squareSize);
+      super.updateOrCreateText_('counter', r, co, newValue, this.squareSize, 1, 1, 'karel-counter-text paint');
     }
 
     // Because this processes a grid of cells at a time, we start at -1 to allow for
@@ -250,35 +250,4 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       }
     }
   }
-
-  /**
-   * @override
-   * Create SVG text element for given cell
-   * @param {string} prefix
-   * @param {number} row
-   * @param {number} col
-   * @param {string} text
-  */
-  // updateOrCreateText_(prefix, row, col, text) {
-  //   const pegmanElement = this.svg_.getElementsByClassName('pegman-location')[0];
-  //   let textElement = this.svg_.querySelector('#' + Drawer.cellId(prefix, row, col));
-
-  //   if (!textElement) {
-  //     // Create text.
-  //     //const hPadding = this.squareSize / 4;
-  //     //const vPadding = this.squareSize / 4;
-  //     textElement = document.createElementNS(SVG_NS, 'text');
-  //     textElement.setAttribute('class', 'paint-counter-text');
-
-  //     // Position text in center of asset.
-  //     textElement.setAttribute('x', (col) * this.squareSize + this.squareSize / 2);
-  //     textElement.setAttribute('y', (row) * this.squareSize + this.squareSize / 2 + 5);
-  //     textElement.setAttribute('id', Drawer.cellId(prefix, row, col));
-  //     textElement.appendChild(document.createTextNode(''));
-  //     this.svg_.insertBefore(textElement, pegmanElement);
-  //   }
-
-  //   textElement.firstChild.nodeValue = text;
-  //   return textElement;
-  // }
 };
