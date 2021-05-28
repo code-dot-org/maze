@@ -108,7 +108,7 @@ module.exports = class Neighborhood extends Subtype {
    * @param {String} pegmanId
    */
   turnLeft(pegmanId) {
-    const newDirection = null;
+    let newDirection = null;
     switch (this.maze_.getPegmanD(pegmanId)) {
       case Direction.NORTH:
         newDirection = Direction.WEST;
