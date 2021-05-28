@@ -51,7 +51,7 @@ module.exports = class Drawer {
    * @param {number} col
    * @param {boolean} running
    */
-  updateItemImage(row, col, running, squareSize = SQUARE_SIZE) {
+  updateItemImage(row, col, running, squareSize=SQUARE_SIZE) {
     return this.drawImage_('', row, col, squareSize);
   }
 
@@ -62,7 +62,7 @@ module.exports = class Drawer {
    * @param {number} col
    * @return {Element} img
    */
-  drawImage_(prefix, row, col, squareSize = SQUARE_SIZE) {
+  drawImage_(prefix, row, col, squareSize=SQUARE_SIZE) {
     let img = this.svg_.querySelector('#' + Drawer.cellId(prefix, row, col));
     let href = this.getAsset(prefix, row, col);
 
@@ -93,7 +93,7 @@ module.exports = class Drawer {
    * @param {boolean} createClipPath
    * @return {Element} img
    */
-  getOrCreateImage_(prefix, row, col, createClipPath = true, squareSize = SQUARE_SIZE) {
+  getOrCreateImage_(prefix, row, col, createClipPath=true, squareSize=SQUARE_SIZE) {
     let href = this.getAsset(prefix, row, col);
 
     let imgId = Drawer.cellId(prefix, row, col);
@@ -158,10 +158,10 @@ module.exports = class Drawer {
     row,
     col,
     text, 
-    squareSize = SQUARE_SIZE, 
-    hPadding = 2,
-    vPadding = 2,
-    className = 'karel-counter-text'
+    squareSize=SQUARE_SIZE, 
+    hPadding=2,
+    vPadding=2,
+    className='karel-counter-text'
   ) {
     const pegmanElement = this.svg_.getElementsByClassName('pegman-location')[0];
     let textElement = this.svg_.querySelector('#' + Drawer.cellId(prefix, row, col));
