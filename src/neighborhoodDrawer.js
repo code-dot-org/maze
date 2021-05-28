@@ -9,7 +9,19 @@ const ROTATE0 = "rotate(0)";
 const CUT = "cut";
 const PIE = "pie";
 
-// Helper for creating SVG elements
+/**
+ * This is a helper for creating SVG Elements. 
+ * Groups are created by grid tile, under which paths are nested. These groups
+ * begin with "g" in the id. By checking for this when determining its position
+ * within the hierarchy, we can nest these groups just before the pegman,
+ * ensuring the pegman will appear on top of the paint.
+ * 
+ * @param tag representing the element type, 'g' for group, 'path' for paths
+ * @param props representing the details of the element
+ * @param parent the parent it should be nested under
+ * @param id the unique identifier, beginning with 'g' if a group element
+ * @returns the element itself
+ */
 function svgElement(tag, props, parent, id) {
   var node = document.getElementById(id);
   if (!node) {
@@ -19,7 +31,11 @@ function svgElement(tag, props, parent, id) {
   Object.keys(props).map(function (key) {
     node.setAttribute(key, props[key])
   });
-  if (parent) {
+  if (parent && id.startsWith("g")) {
+    let pegmanElement = parent.getElementsByClassName('pegman-location')[0];
+    parent.insertBefore(node, pegmanElement);
+  }
+  else if (parent) {
     parent.appendChild(node);
   }
   return node;
@@ -46,6 +62,14 @@ function cutout(size) {
   return `m0 0v${halfSize}c0-${quarterSize} ${quarterSize}-${halfSize} ${halfSize}-${halfSize}z`
 }
 
+/**
+ * This drawer hosts all paint glomming logic. 
+ * A note on layering paint: If paint is applied on top of existing paint 
+ * (that has not been removed/scraped), portions of the cell might still
+ * display the first layer of paint. Example: [blue][blue] in layer 1 will
+ * create a "pill" visual. If the second cell is then painted [yellow], the
+ * yellow circle will appear on top, with the blue cutouts still visible below.
+ */
 module.exports = class NeighborhoodDrawer extends Drawer {
 
   constructor(map, skin, svg, squareSize, neighborhood) {
@@ -72,7 +96,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
 
   /**
    * @override
-  */
+   */
   getAsset(prefix, row, col) {
     const cell = this.neighborhood.getCell(row, col);
     // only cells with a value are handled by getAsset.

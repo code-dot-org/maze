@@ -54,6 +54,8 @@ module.exports = class MazeController {
     this.PEGMAN_X_OFFSET = null;
     this.PEGMAN_Y_OFFSET = null;
     this.SQUARE_SIZE = null;
+    this.SVG_WIDTH = null;
+    this.SVG_HEIGHT = null;
 
     if (options.methods) {
       this.rebindMethods(options.methods);
@@ -80,9 +82,18 @@ module.exports = class MazeController {
   }
 
   initWithSvg(svg) {
-    // Adjust outer element size.
-    svg.setAttribute('width', this.MAZE_WIDTH);
-    svg.setAttribute('height', this.MAZE_HEIGHT);
+    // Adjust outer element size to desired size of overall SVG.
+    // This may be equal to the 'actual' maze size 
+    // (square size * num_columns x square size * num_rows)
+    // if no svg size was provided by the skin.
+    svg.setAttribute('width', this.SVG_WIDTH);
+    svg.setAttribute('height', this.SVG_HEIGHT);
+    // Adjust view box. View box width and height are the 'actual' maze dimensions.
+    // This attribute combined with the width and height will scale the svg to our
+    // desired size. We want to maintain the top corner location, so the min-x 
+    // and min-y values are set to 0.
+    // See view box explanation here: https://css-tricks.com/scale-svg/
+    svg.setAttribute('viewBox', `0 0 ${this.MAZE_WIDTH} ${this.MAZE_HEIGHT}`);
 
     drawMap(svg, this.skin, this.subtype, this.map, this.SQUARE_SIZE);
     this.animationsController = new AnimationsController(this, svg);
@@ -123,7 +134,7 @@ module.exports = class MazeController {
     }
 
     // Pixel height and width of each maze square (i.e. tile).
-    this.SQUARE_SIZE = 50;
+    this.SQUARE_SIZE = this.skin.squareSize  || 50;
     this.PEGMAN_HEIGHT = this.skin.pegmanHeight;
     this.PEGMAN_WIDTH = this.skin.pegmanWidth;
     this.PEGMAN_X_OFFSET = this.skin.pegmanXOffset || 0;
@@ -131,6 +142,9 @@ module.exports = class MazeController {
 
     this.MAZE_WIDTH = this.SQUARE_SIZE * this.map.COLS;
     this.MAZE_HEIGHT = this.SQUARE_SIZE * this.map.ROWS;
+    this.SVG_WIDTH = this.skin.svgWidth || this.MAZE_WIDTH;
+    this.SVG_HEIGHT = this.skin.svgHeight || this.MAZE_HEIGHT;
+
     this.PATH_WIDTH = this.SQUARE_SIZE / 3;
   }
 
