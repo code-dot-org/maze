@@ -40,10 +40,10 @@ module.exports = class Neighborhood extends Subtype {
     // Compute and draw the tile for each square.
     let tileId = 0;
     this.maze_.map.forEachCell((cell, row, col) => {
-      const asset = this.drawer.getBackgroundTileInfo(row, col);
-
       // draw blank tile
       this.drawTile(svg, [0, 0], row, col, tileId);
+
+      const asset = this.drawer.getBackgroundTileInfo(row, col);
       if (asset) {
         // add assset on top of blank tile if it exists
         // asset is in format {name: 'sample name', sheet: x, row: y, column: z}
@@ -54,7 +54,7 @@ module.exports = class Neighborhood extends Subtype {
           [asset.column, asset.row], 
           row, 
           col, 
-          tileId, 
+          `${tileId}-asset`, 
           assetHref,
           sheetWidth, 
           sheetHeight, 
