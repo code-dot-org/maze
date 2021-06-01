@@ -392,6 +392,25 @@ module.exports = class AnimationsController {
     });
   }
 
+  /**
+   * Schedule the animations for a turn from the current direction
+   * @param {number} endDirection The direction we're turning to  
+   * @param {string} pegmanId Optional id of pegman. If no id is provided,
+   *   will schedule turn for default pegman.
+   */
+  simpleTurn(endDirection, pegmanId) {
+    var numFrames = 2;
+    utils.range(1, numFrames).forEach((frame) => {
+      timeoutList.setTimeout(() => {
+        this.displayPegman(
+          this.maze.getPegmanX(pegmanId),
+          this.maze.getPegmanY(pegmanId),
+          tiles.directionToFrame(endDirection),
+          pegmanId);
+        }, this.maze.stepSpeed * (frame - 1));
+    });    
+  }
+
   crackSurroundingIce(targetX, targetY) {
     // Remove cracked ice, replace surrounding ice with cracked ice.
     this.updateSurroundingTiles_(targetY, targetX, (tileElement, cell) => {

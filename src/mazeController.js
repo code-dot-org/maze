@@ -277,7 +277,7 @@ module.exports = class MazeController {
   }
 
   animatedCardinalTurn(direction, id) {
-    this.animationsController.scheduleTurn(direction, id);
+    this.animationsController.simpleTurn(direction, id);
     this.setPegmanD(direction, id);
   }
 
