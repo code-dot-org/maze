@@ -109,7 +109,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     const cell = this.neighborhood.getCell(row, col);
     // If the tile has an asset id and it is > 0 (0 is a blank tile and will always be added),
     // return the sprite asset. 
-    // Ignore the asset id if this is a start tile or the cell has a value value. 
+    // Ignore the asset id if this is a start tile or the cell has an original value. 
     // Start tiles will handle placing the pegman separately,
     // and tiles with a value are paint cans, which are handled as images instead of background tiles.
     if (cell.getAssetId() != null && cell.getAssetId() > 0 &&
