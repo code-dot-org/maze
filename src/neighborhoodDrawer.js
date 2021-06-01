@@ -195,11 +195,15 @@ module.exports = class NeighborhoodDrawer extends Drawer {
 
   /**
    * @override
-   * This method is used to display the paint, so has to reprocess the entire grid
-   * to get the paint glomming correct
+   * This method is used to display the paint and paint buckets.
+   * It has to reprocess the entire grid to get the paint glomming correct, but
+   * it only updates the bucket at the specified itemRow and itemCol if necessary. 
+   * @param {number} itemRow: row of update
+   * @param {number} itemCol: column of update
+   * @param {boolean} running: if the maze is currently running (not used here, but part of signature of super)
    */
-  updateItemImage(r, co, running) {
-    let cell = this.map_.getCell(r, co);
+  updateItemImage(itemRow, itemCol, running) {
+    let cell = this.map_.getCell(itemRow, itemCol);
 
     // if the cell value has ever been greater than 0, this has been or 
     // is a paint can square. Ensure it is shown/hidden appropriately 
@@ -208,8 +212,8 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       const newValue = cell.getCurrentValue() > 0 ? cell.getCurrentValue() : '';
       // drawImage_ calls getAsset. If currentValue() is 0, getAsset will return
       // undefined and the paint can will be hidden. Otherwise we will get the paint can image.
-      super.drawImage_('', r, co, this.squareSize);
-      super.updateOrCreateText_('counter', r, co, newValue, this.squareSize, 1, 1, 'karel-counter-text paint');
+      super.drawImage_('', itemRow, itemCol, this.squareSize);
+      super.updateOrCreateText_('counter', itemRow, itemCol, newValue, this.squareSize, 1, 1, 'karel-counter-text paint');
     }
 
     // Because this processes a grid of cells at a time, we start at -1 to allow for
