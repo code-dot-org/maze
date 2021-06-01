@@ -393,7 +393,8 @@ module.exports = class AnimationsController {
   }
 
   /**
-   * Schedule the animations for a turn to the given direction.
+   * Schedule the animations for a turn to the given direction, without
+   * animating any of the intermediate frames.
    * @param {number} endDirection The direction we're turning to  
    * @param {string} pegmanId Optional id of pegman. If no id is provided,
    *   will schedule turn for default pegman.
