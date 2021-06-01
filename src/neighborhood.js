@@ -41,10 +41,10 @@ module.exports = class Neighborhood extends Subtype {
     // Compute and draw the tile for each square.
     let tileId = 0;
     this.maze_.map.forEachCell((cell, row, col) => {
-      const asset = this.drawer.getAsset('', row, col);
-
       // draw blank tile
       this.drawTile(svg, [0, 0], row, col, tileId);
+
+      const asset = this.drawer.getBackgroundTileInfo(row, col);
       if (asset) {
         // add assset on top of blank tile if it exists
         // asset is in format {name: 'sample name', sheet: x, row: y, column: z}
@@ -55,13 +55,14 @@ module.exports = class Neighborhood extends Subtype {
           [asset.column, asset.row], 
           row, 
           col, 
-          tileId, 
+          `${tileId}-asset`, 
           assetHref,
           sheetWidth, 
           sheetHeight, 
           this.squareSize
         );
       }
+      this.drawer.updateItemImage(row, col, false);
       tileId++;
     });
   }
@@ -124,6 +125,15 @@ module.exports = class Neighborhood extends Subtype {
         break;
     }
     this.maze_.animatedTurn(newDirection, pegmanId);
+  }
+  
+  takePaint(pegmanId) {
+    const col = this.maze_.getPegmanX(pegmanId);
+    const row = this.maze_.getPegmanY(pegmanId);
+
+    const cell = this.getCell(row, col);
+    cell.setCurrentValue(cell.getCurrentValue() - 1);
+    this.drawer.updateItemImage(row, col, true);
   }
 
   // Sprite map maps asset ids to sprites within a spritesheet.
