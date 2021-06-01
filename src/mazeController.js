@@ -276,6 +276,12 @@ module.exports = class MazeController {
     this.setPegmanD(tiles.constrainDirection4(newDirection), id);
   }
 
+  /**
+   * A version of animated turn that bypasses the mod in animatedTurn
+   * and moves straight to the direction given.
+   * @param direction 
+   * @param id 
+   */
   animatedCardinalTurn(direction, id) {
     this.animationsController.simpleTurn(direction, id);
     this.setPegmanD(direction, id);
