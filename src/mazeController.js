@@ -276,6 +276,11 @@ module.exports = class MazeController {
     this.setPegmanD(tiles.constrainDirection4(newDirection), id);
   }
 
+  animatedCardinalTurn(direction, id) {
+    this.animationsController.scheduleTurn(direction, id);
+    this.setPegmanD(direction, id);
+  }
+
   animatedFail(forward, id) {
     var dxDy = tiles.directionToDxDy(this.getPegmanD(id));
     var deltaX = dxDy.dx;

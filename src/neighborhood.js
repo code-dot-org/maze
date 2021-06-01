@@ -124,9 +124,9 @@ module.exports = class Neighborhood extends Subtype {
         newDirection = Direction.SOUTH;
         break;
     }
-    this.maze_.animatedTurn(newDirection, pegmanId);
+    this.maze_.animatedCardinalTurn(newDirection, pegmanId);
   }
-  
+
   takePaint(pegmanId) {
     const col = this.maze_.getPegmanX(pegmanId);
     const row = this.maze_.getPegmanY(pegmanId);
