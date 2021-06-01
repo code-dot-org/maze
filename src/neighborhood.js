@@ -40,7 +40,7 @@ module.exports = class Neighborhood extends Subtype {
     // Compute and draw the tile for each square.
     let tileId = 0;
     this.maze_.map.forEachCell((cell, row, col) => {
-      const asset = this.drawer.getAsset('', row, col);
+      const asset = this.drawer.getBackgroundTileInfo(row, col);
 
       // draw blank tile
       this.drawTile(svg, [0, 0], row, col, tileId);
@@ -61,6 +61,7 @@ module.exports = class Neighborhood extends Subtype {
           this.squareSize
         );
       }
+      this.drawer.updateItemImage(row, col, false);
       tileId++;
     });
   }
@@ -99,6 +100,15 @@ module.exports = class Neighborhood extends Subtype {
     const cell = this.getCell(row, col);
     cell.setColor(null);
     this.drawer.resetTile(row, col);
+    this.drawer.updateItemImage(row, col, true);
+  }
+
+  takePaint(pegmanId) {
+    const col = this.maze_.getPegmanX(pegmanId);
+    const row = this.maze_.getPegmanY(pegmanId);
+
+    const cell = this.getCell(row, col);
+    cell.setCurrentValue(cell.getCurrentValue() - 1);
     this.drawer.updateItemImage(row, col, true);
   }
 

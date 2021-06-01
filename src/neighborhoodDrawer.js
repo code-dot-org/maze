@@ -1,4 +1,4 @@
-const { SQUARE_SIZE, SVG_NS } = require("./drawer");
+const { SVG_NS } = require("./drawer");
 const Drawer = require('./drawer')
 const tiles = require('./tiles');
 
@@ -62,15 +62,6 @@ function cutout(size) {
   return `m0 0v${halfSize}c0-${quarterSize} ${quarterSize}-${halfSize} ${halfSize}-${halfSize}z`
 }
 
-// For creating the groups for each grid location
-function makeGrid(row, col, svg) {
-  let id = "g" + row + "." + col;
-  return svgElement("g", {
-    transform: `translate(${col * SQUARE_SIZE + SQUARE_SIZE}, 
-      ${row * SQUARE_SIZE + SQUARE_SIZE})`
-  }, svg, id);
-}
-
 /**
  * This drawer hosts all paint glomming logic. 
  * A note on layering paint: If paint is applied on top of existing paint 
@@ -81,10 +72,11 @@ function makeGrid(row, col, svg) {
  */
 module.exports = class NeighborhoodDrawer extends Drawer {
 
-  constructor(map, asset, svg, squareSize, neighborhood) {
-    super(map, asset, svg);
+  constructor(map, skin, svg, squareSize, neighborhood) {
+    super(map, '', svg);
     this.squareSize = squareSize;
-    this.neighborhood = neighborhood
+    this.neighborhood = neighborhood;
+    this.skin_ = skin;
   }
 
   resetTile(row, col) {
@@ -107,11 +99,25 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    */
   getAsset(prefix, row, col) {
     const cell = this.neighborhood.getCell(row, col);
-    // If the tile has an asset id, return the sprite asset. Ignore the asset id
-    // if this is a start tile, as start tiles will handle placing the pegman separately.
-    if (cell.getAssetId() != null && cell.getTile() !== tiles.SquareType.START) {
-      return this.neighborhood.getSpriteMap()[cell.getAssetId()];
+    // only cells with a value are handled by getAsset.
+    if (cell.getCurrentValue()) {
+      return this.skin_.paintCan;
     }
+  }
+
+  getBackgroundTileInfo(row, col) {
+    const cell = this.neighborhood.getCell(row, col);
+    // If the tile has an asset id, return the sprite asset. Ignore the asset id
+    // if this is a start tile or the cell has a value value. 
+    // Start tiles will handle placing the pegman separately,
+    // and tiles with a value are paint cans, which are handled as images instead of background tiles.
+    if (cell.getAssetId() != null && cell.getTile() !== tiles.SquareType.START && !cell.getOriginalValue()) {
+      return this.getSpriteData(cell);
+    }
+  }
+
+  getSpriteData(cell) {
+    return this.neighborhood.getSpriteMap()[cell.getAssetId()];
   }
 
   resetTiles() {}
@@ -126,8 +132,8 @@ module.exports = class NeighborhoodDrawer extends Drawer {
 
   // Helper method for determining color and path based on neighbors
   pathCalculator(subjectCell, adjacent1, adjacent2, diagonal, transform, grid, id) {
-    let pie = quarterCircle(SQUARE_SIZE);
-    let cutOut = cutout(SQUARE_SIZE);
+    let pie = quarterCircle(this.squareSize);
+    let cutOut = cutout(this.squareSize);
     let tag = "path";
 
     // Add a quarter circle to the top left corner of the block if there is 
@@ -156,6 +162,14 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     }
   }
 
+  makeGrid(row, col, svg) {
+    let id = "g" + row + "." + col;
+    return svgElement("g", {
+      transform: `translate(${col * this.squareSize + this.squareSize}, 
+        ${row * this.squareSize + this.squareSize})`
+    }, svg, id);
+  }
+
   /**
    * @override
    * Draw the given tile at row, col
@@ -181,10 +195,26 @@ module.exports = class NeighborhoodDrawer extends Drawer {
 
   /**
    * @override
-   * This method is used to display the paint, so has to reprocess the entire grid
-   * to get the paint glomming correct
+   * This method is used to display the paint and paint buckets.
+   * It has to reprocess the entire grid to get the paint glomming correct, but
+   * it only updates the bucket at the specified itemRow and itemCol if necessary. 
+   * @param {number} itemRow: row of update
+   * @param {number} itemCol: column of update
+   * @param {boolean} running: if the maze is currently running (not used here, but part of signature of super)
    */
-  updateItemImage(r, co, running) {
+  updateItemImage(itemRow, itemCol, running) {
+    let cell = this.map_.getCell(itemRow, itemCol);
+
+    // if the cell value has ever been greater than 0, this has been or 
+    // is a paint can square. Ensure it is shown/hidden appropriately 
+    // and with the correct value.
+    if (cell.getOriginalValue() > 0) {
+      const newValue = cell.getCurrentValue() > 0 ? cell.getCurrentValue() : '';
+      // drawImage_ calls getAsset. If currentValue() is 0, getAsset will return
+      // undefined and the paint can will be hidden. Otherwise we will get the paint can image.
+      super.drawImage_('', itemRow, itemCol, this.squareSize);
+      super.updateOrCreateText_('counter', itemRow, itemCol, newValue, this.squareSize, 1, 1, 'karel-counter-text paint');
+    }
 
     // Because this processes a grid of cells at a time, we start at -1 to allow for
     // a 'padding' row and column with no color.
@@ -209,7 +239,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
 
         if (cells[0] || cells[1] || cells[2] || cells[3]) {
           // Create grid block group
-          let grid = makeGrid(row, col, this.svg_);
+          let grid = this.makeGrid(row, col, this.svg_);
           let id0 = row + "." + col + "." + ROTATE180;
           let id1 = row + "." + col + "." + ROTATENEG90;
           let id2 = row + "." + col + "." + ROTATE90;
