@@ -122,7 +122,18 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     return this.neighborhood.getSpriteMap()[cell.getAssetId()];
   }
 
-  resetTiles() {}
+  /**
+   * Clears the paint from each tile.
+   */
+  resetTiles() {
+    for (let row = 0; row < this.map_.ROWS; row++) {
+      for (let col = 0; col < this.map_.COLS; col++) {
+        const cell = this.neighborhood.getCell(row, col);
+        cell.setColor(null);
+        this.resetTile(row, col);
+      }
+    }
+  }
 
   // Quick helper to retrieve the color stored in this cell
   // Ensures 'padding cells' (row/col < 0) have no color

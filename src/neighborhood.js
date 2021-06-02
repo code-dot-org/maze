@@ -136,6 +136,10 @@ module.exports = class Neighborhood extends Subtype {
     this.drawer.updateItemImage(row, col, true);
   }
 
+  reset() {
+    this.drawer.resetTiles();
+  }
+
   // Sprite map maps asset ids to sprites within a spritesheet.
   getSpriteMap() {
     return this.spriteMap;
