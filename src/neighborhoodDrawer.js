@@ -79,6 +79,13 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     this.skin_ = skin;
   }
 
+  /**
+   * Set the color of this tile back to null, and remove any svg elements
+   * (colors) that currently exist on this tile and its neighbors. 
+   * 
+   * @param row 
+   * @param col 
+   */
   resetTile(row, col) {
     let neighbors = [
       "g" + row + "." + col,
@@ -86,6 +93,8 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       "g" + row + "." + (col - 1),
       "g" + (row - 1) + "." + col
     ];
+    const cell = this.neighborhood.getCell(row, col);
+    cell.setColor(null);
     for (const neighbor of neighbors) {
       var node = document.getElementById(neighbor);
       if (node) {
@@ -123,13 +132,11 @@ module.exports = class NeighborhoodDrawer extends Drawer {
   }
 
   /**
-   * Clears the paint from each tile.
+   * Calls resetTile for each tile in the grid, clearing all paint.
    */
   resetTiles() {
     for (let row = 0; row < this.map_.ROWS; row++) {
       for (let col = 0; col < this.map_.COLS; col++) {
-        const cell = this.neighborhood.getCell(row, col);
-        cell.setColor(null);
         this.resetTile(row, col);
       }
     }
