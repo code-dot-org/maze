@@ -90,16 +90,13 @@ module.exports = class Neighborhood extends Subtype {
   }
 
   /**
-   * Remove paint from the location of the pegman with id pegmanId, if there
-   * is any paint.
+   * Remove paint from the location of the pegman with id pegmanId.
    * @param {String} pegmanId
   **/ 
  removePaint(pegmanId) {
     const col = this.maze_.getPegmanX(pegmanId);
     const row = this.maze_.getPegmanY(pegmanId);
 
-    const cell = this.getCell(row, col);
-    cell.setColor(null);
     this.drawer.resetTile(row, col);
     this.drawer.updateItemImage(row, col, true);
   }
@@ -134,6 +131,10 @@ module.exports = class Neighborhood extends Subtype {
     const cell = this.getCell(row, col);
     cell.setCurrentValue(cell.getCurrentValue() - 1);
     this.drawer.updateItemImage(row, col, true);
+  }
+
+  reset() {
+    this.drawer.resetTiles();
   }
 
   // Sprite map maps asset ids to sprites within a spritesheet.
