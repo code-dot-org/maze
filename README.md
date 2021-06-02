@@ -23,3 +23,33 @@ Now you should be able to run all the tests:
 And spin up a development build of your new project:
 
     yarn build
+
+### Publishing a new version
+
+1. In /maze: yarn login with an authorized npm account. If necessary, create one under your own email, login with dev account and add your new account to the org. After yarn login, you may need to also authorize your machine with npm adduser (follow the propmt given).
+
+2. In /maze: 
+
+    git checkout main
+
+3. Verify yarn build and yarn test run as expected.
+
+4. Update the version:
+
+    npm version [major|minor|patch|premajor|preminor|prepatch].
+
+5. Publish the new version:
+
+    npm publish
+
+6. Verify there is a new commit on main with the updated version number. 
+
+7. in @code-dot-org/: 
+
+    git checkout -b [maze-updates-we-are-incorporating]
+    cd apps
+    yarn add @code-dot-org/maze@my.new.version (ex: yarn add @code-dot-org/maze@2.7.0)
+ 
+8. Verify yarn.lock and package.json have been updated.
+
+9. Commit and push changes, and open and merge a PR.
