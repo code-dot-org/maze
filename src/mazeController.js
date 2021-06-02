@@ -54,6 +54,8 @@ module.exports = class MazeController {
     this.PEGMAN_X_OFFSET = null;
     this.PEGMAN_Y_OFFSET = null;
     this.SQUARE_SIZE = null;
+    this.SVG_WIDTH = null;
+    this.SVG_HEIGHT = null;
 
     if (options.methods) {
       this.rebindMethods(options.methods);
@@ -80,9 +82,18 @@ module.exports = class MazeController {
   }
 
   initWithSvg(svg) {
-    // Adjust outer element size.
-    svg.setAttribute('width', this.MAZE_WIDTH);
-    svg.setAttribute('height', this.MAZE_HEIGHT);
+    // Adjust outer element size to desired size of overall SVG.
+    // This may be equal to the 'actual' maze size 
+    // (square size * num_columns x square size * num_rows)
+    // if no svg size was provided by the skin.
+    svg.setAttribute('width', this.SVG_WIDTH);
+    svg.setAttribute('height', this.SVG_HEIGHT);
+    // Adjust view box. View box width and height are the 'actual' maze dimensions.
+    // This attribute combined with the width and height will scale the svg to our
+    // desired size. We want to maintain the top corner location, so the min-x 
+    // and min-y values are set to 0.
+    // See view box explanation here: https://css-tricks.com/scale-svg/
+    svg.setAttribute('viewBox', `0 0 ${this.MAZE_WIDTH} ${this.MAZE_HEIGHT}`);
 
     drawMap(svg, this.skin, this.subtype, this.map, this.SQUARE_SIZE);
     this.animationsController = new AnimationsController(this, svg);
@@ -123,7 +134,7 @@ module.exports = class MazeController {
     }
 
     // Pixel height and width of each maze square (i.e. tile).
-    this.SQUARE_SIZE = 50;
+    this.SQUARE_SIZE = this.skin.squareSize  || 50;
     this.PEGMAN_HEIGHT = this.skin.pegmanHeight;
     this.PEGMAN_WIDTH = this.skin.pegmanWidth;
     this.PEGMAN_X_OFFSET = this.skin.pegmanXOffset || 0;
@@ -131,6 +142,9 @@ module.exports = class MazeController {
 
     this.MAZE_WIDTH = this.SQUARE_SIZE * this.map.COLS;
     this.MAZE_HEIGHT = this.SQUARE_SIZE * this.map.ROWS;
+    this.SVG_WIDTH = this.skin.svgWidth || this.MAZE_WIDTH;
+    this.SVG_HEIGHT = this.skin.svgHeight || this.MAZE_HEIGHT;
+
     this.PATH_WIDTH = this.SQUARE_SIZE / 3;
   }
 
@@ -165,20 +179,32 @@ module.exports = class MazeController {
   /**
    * Reset the maze to the start position and kill any pending animation tasks.
    * @param {boolean} first True if an opening animation is to be played.
+   * @param {boolean} showDefault True if the default pegman should be shown. Only applies
+   * to subtypes that allow multiple pegman
    */
-  reset(first) {
+  reset(first, showDefault = true) {
     this.subtype.reset();
 
     // Kill all tasks.
     timeoutList.clearTimeouts();
-    // Move Pegman into position.
-    if (!this.subtype.initializeWithPlaceholderPegman()) {
+
+    if (this.subtype.start) {
+      // Move default Pegman into position.
       this.setPegmanX(this.subtype.start.x);
       this.setPegmanY(this.subtype.start.y);
       this.setPegmanD(this.startDirection);
-    } else {
-      // TODO: remove all pegmen except the default
     }
+
+    if (this.subtype.allowMultiplePegmen()) {
+      // hide all pegman except the default. Show the default if it exists and
+      // showDefault is true
+      const pegmanIds = this.pegmanController.getAllPegmanIds();
+      pegmanIds.forEach(pegmanId => {
+        this.pegmanController.isDefaultPegman(pegmanId) && showDefault 
+          ? this.animationsController.showPegman(pegmanId) 
+          : this.animationsController.hidePegman(pegmanId);
+      });
+    } 
     this.animationsController.reset(first);
 
     // Move the init dirt marker icons into position.
@@ -248,6 +274,17 @@ module.exports = class MazeController {
     var newDirection = this.getPegmanD(id) + direction;
     this.animationsController.scheduleTurn(newDirection, id);
     this.setPegmanD(tiles.constrainDirection4(newDirection), id);
+  }
+
+  /**
+   * A version of animated turn that bypasses the mod in animatedTurn
+   * and moves straight to the direction given.
+   * @param direction 
+   * @param id 
+   */
+  animatedCardinalTurn(direction, id) {
+    this.animationsController.simpleTurn(direction, id);
+    this.setPegmanD(direction, id);
   }
 
   animatedFail(forward, id) {
@@ -395,7 +432,39 @@ module.exports = class MazeController {
   }
 
   addPegman(id, x, y, d) {
+    // if pegman with id <id> already exists, reset 
+    // its location and direction. Otherwise, create a
+    // new pegman and add it to the maze.
+    if (this.pegmanController.getPegman(id)) {
+      this.animationsController.hidePegman(id);
+      const pegman = this.pegmanController.getPegman(id);
+        pegman.setX(x);
+        pegman.setY(y);
+        pegman.setDirection(d);
+      
+      var frame = tiles.directionToFrame(d);
+      this.animationsController.displayPegman(
+        x,
+        y,
+        frame,
+        id
+      );
+      this.animationsController.showPegman(id);
+    } else {
+      this.createAndDisplayPegman(id, x, y, d);
+    }
+  }
+
+  createAndDisplayPegman(id, x, y, d) {
     const pegman = new Pegman(id, x, y, d);
     this.pegmanController.addPegman(pegman);
+    this.animationsController.addNewPegman(id, x, y, d);
+  }
+
+  hideDefaultPegman() {
+    // if default pegman exists, hide it
+    if (this.pegmanController.getPegman()) {
+      this.animationsController.hidePegman();
+    }
   }
 };

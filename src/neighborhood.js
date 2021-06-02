@@ -1,6 +1,7 @@
 import Subtype from './subtype';
 import NeighborhoodCell from './neighborhoodCell';
 import NeighborhoodDrawer from './neighborhoodDrawer';
+import { Direction } from './tiles';
 
 module.exports = class Neighborhood extends Subtype {
   constructor(maze, config = {}) {
@@ -8,9 +9,7 @@ module.exports = class Neighborhood extends Subtype {
     this.spriteMap = this.skin_.spriteMap;
     this.sheetRows = this.skin_.sheetRows;
 
-    // TODO: these should be defined by the level
-    this.initializeWithPlaceholder = true;
-    this.squareSize = 50;
+    this.squareSize = this.skin_.squareSize;
   }
 
   /**
@@ -25,13 +24,6 @@ module.exports = class Neighborhood extends Subtype {
    */
   allowMultiplePegmen() {
     return true;
-  }
-
-   /**
-   * @override
-   */
-  initializeWithPlaceholderPegman() {
-    return this.initializeWithPlaceholder;
   }
 
   /**
@@ -49,10 +41,10 @@ module.exports = class Neighborhood extends Subtype {
     // Compute and draw the tile for each square.
     let tileId = 0;
     this.maze_.map.forEachCell((cell, row, col) => {
-      const asset = this.drawer.getAsset('', row, col);
-
       // draw blank tile
       this.drawTile(svg, [0, 0], row, col, tileId);
+
+      const asset = this.drawer.getBackgroundTileInfo(row, col);
       if (asset) {
         // add assset on top of blank tile if it exists
         // asset is in format {name: 'sample name', sheet: x, row: y, column: z}
@@ -63,13 +55,14 @@ module.exports = class Neighborhood extends Subtype {
           [asset.column, asset.row], 
           row, 
           col, 
-          tileId, 
+          `${tileId}-asset`, 
           assetHref,
           sheetWidth, 
           sheetHeight, 
           this.squareSize
         );
       }
+      this.drawer.updateItemImage(row, col, false);
       tileId++;
     });
   }
@@ -88,8 +81,8 @@ module.exports = class Neighborhood extends Subtype {
    *                       Must be hex code or html color.
   **/ 
   addPaint(pegmanId, color) {
-    const col = this.maze_.getPegmanX();
-    const row = this.maze_.getPegmanY();
+    const col = this.maze_.getPegmanX(pegmanId);
+    const row = this.maze_.getPegmanY(pegmanId);
 
     const cell = this.getCell(row, col);
     cell.setColor(color);
@@ -102,11 +95,44 @@ module.exports = class Neighborhood extends Subtype {
    * @param {String} pegmanId
   **/ 
  removePaint(pegmanId) {
-    const col = this.maze_.getPegmanX();
-    const row = this.maze_.getPegmanY();
+    const col = this.maze_.getPegmanX(pegmanId);
+    const row = this.maze_.getPegmanY(pegmanId);
 
     const cell = this.getCell(row, col);
     cell.setColor(null);
+    this.drawer.resetTile(row, col);
+    this.drawer.updateItemImage(row, col, true);
+  }
+
+  /**
+   * Turns the painter left by one direction.
+   * @param {String} pegmanId
+   */
+  turnLeft(pegmanId) {
+    let newDirection = null;
+    switch (this.maze_.getPegmanD(pegmanId)) {
+      case Direction.NORTH:
+        newDirection = Direction.WEST;
+        break;
+      case Direction.EAST:
+        newDirection = Direction.NORTH;
+        break;
+      case Direction.SOUTH:
+        newDirection = Direction.EAST;
+        break;
+      case Direction.WEST:
+        newDirection = Direction.SOUTH;
+        break;
+    }
+    this.maze_.animatedCardinalTurn(newDirection, pegmanId);
+  }
+
+  takePaint(pegmanId) {
+    const col = this.maze_.getPegmanX(pegmanId);
+    const row = this.maze_.getPegmanY(pegmanId);
+
+    const cell = this.getCell(row, col);
+    cell.setCurrentValue(cell.getCurrentValue() - 1);
     this.drawer.updateItemImage(row, col, true);
   }
 
