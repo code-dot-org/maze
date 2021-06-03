@@ -36,7 +36,10 @@ And spin up a development build of your new project:
     git checkout main
     git pull
 
-3. Verify yarn build and yarn test run as expected.
+3. Verify the existing code doesn't have errors or failing tests.
+
+    yarn build
+    yarn test
 
 4. Update the version (which also publishes to npm):
 
