@@ -26,28 +26,28 @@ And spin up a development build of your new project:
 
 ### Publishing a new version
 
-In /maze: npm login with an authorized npm account. If necessary, create one under your own email, login with our shared dev account and add your new account to the org. After logging in, you may need to authorize your machine (follow the prompt given).
+In /maze: npm login with an authorized npm account. If necessary, create one under your own email, login with our shared dev account and add your new account to the org. After logging in, you may need to authorize your machine (follow the prompt given):
 
     npm login
     npm adduser (if necessary)
 
-In /maze: 
+Still in /maze: checkout main, and ensure it is up-to-date:
 
     git checkout main
     git pull
 
-Verify the existing code doesn't have errors or failing tests.
+Verify the existing code doesn't have errors or failing tests:
 
     yarn build
     yarn test
 
-Update the version (which also publishes to npm):
+Then, update the version (which also publishes to npm):
 
     npm version [major|minor|patch|premajor|preminor|prepatch].
 
 Verify there is a new commit on /maze/main with the updated version number. 
 
-in @code-dot-org/: 
+In the @code-dot-org repo, incorporate the new version of maze: 
 
     git checkout -b [maze-updates-we-are-incorporating]
     cd apps
