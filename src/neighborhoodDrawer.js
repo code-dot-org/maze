@@ -277,14 +277,14 @@ module.exports = class NeighborhoodDrawer extends Drawer {
   // Iterates through all neighborhood assets and inserts them after the pegman
   drawAssets() {
     let assetList = this.neighborhood.getAssetList();
-    assetList.forEach(function (asset) {
+    var i;
+    for (i = 0; i < assetList.length; i++) {
+      let asset = assetList[i];
       let node = document.getElementById(asset);
-      console.log(node);
-      console.log(this);
       let pegmanElement =
         this.svg_.getElementsByClassName("pegman-location")[0];
       this.svg_.insertBefore(node, pegmanElement);
-    });
+    }
   }
 
   /**

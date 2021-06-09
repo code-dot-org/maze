@@ -48,7 +48,7 @@ module.exports = class Neighborhood extends Subtype {
       const asset = this.drawer.getBackgroundTileInfo(row, col);
       if (asset) {
         // add asset id to the assetList
-        this.assetList.push(`${tileId}-asset`);
+        this.assetList.push("tileElement" + `${tileId}-asset`);
         // add assset on top of blank tile if it exists
         // asset is in format {name: 'sample name', sheet: x, row: y, column: z}
         const assetHref = this.skin_.assetUrl(asset.sheet);
