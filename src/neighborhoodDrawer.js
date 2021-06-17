@@ -2,65 +2,6 @@ const { SVG_NS } = require("./drawer");
 const Drawer = require("./drawer");
 const tiles = require("./tiles");
 
-const ROTATE180 = "rotate(180)";
-const ROTATENEG90 = "rotate(-90)";
-const ROTATE90 = "rotate(90)";
-const ROTATE0 = "rotate(0)";
-const CUT = "cut";
-const PIE = "pie";
-
-/**
- * This is a helper for creating SVG Elements.
- * Groups are created by grid tile, under which paths are nested. These groups
- * begin with "g" in the id. By checking for this when determining its position
- * within the hierarchy, we can nest these groups just before the pegman,
- * ensuring the pegman will appear on top of the paint.
- *
- * @param tag representing the element type, 'g' for group, 'path' for paths
- * @param props representing the details of the element
- * @param parent the parent it should be nested under
- * @param id the unique identifier, beginning with 'g' if a group element
- * @returns the element itself
- */
-function svgElement(tag, props, parent, id) {
-  var node = document.getElementById(id);
-  if (!node) {
-    node = document.createElementNS(SVG_NS, tag);
-    node.setAttribute("id", id);
-  }
-  Object.keys(props).map(function (key) {
-    node.setAttribute(key, props[key]);
-  });
-  if (parent && id.startsWith("g")) {
-    let pegmanElement = parent.getElementsByClassName("pegman-location")[0];
-    parent.insertBefore(node, pegmanElement);
-  } else if (parent) {
-    parent.appendChild(node);
-  }
-  return node;
-}
-
-// Path drawing a quarter circle
-//    --+
-//  /   |
-//  +---+
-function quarterCircle(size) {
-  let halfSize = size / 2;
-  let quarterSize = size / 4;
-  return `m${halfSize} ${halfSize}h-${halfSize}c0-${quarterSize} ${quarterSize}-${halfSize} ${halfSize}-${halfSize}z`;
-}
-
-// Path of the the slice of a square remaining once a quarter circle is
-// removed from it
-// +----+
-// | /
-// +
-function cutout(size) {
-  let halfSize = size / 2;
-  let quarterSize = size / 4;
-  return `m0 0v${halfSize}c0-${quarterSize} ${quarterSize}-${halfSize} ${halfSize}-${halfSize}z`;
-}
-
 /**
  * This drawer hosts all paint glomming logic.
  * A note on layering paint: If paint is applied on top of existing paint
@@ -152,105 +93,6 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     return this.map_.getCell(row, col).getColor() || null;
   }
 
-  // Helper method for determining color and path based on neighbors
-  pathCalculator(
-    subjectCell,
-    adjacent1,
-    adjacent2,
-    diagonal,
-    transform,
-    grid,
-    id
-  ) {
-    let pie = quarterCircle(this.squareSize);
-    let cutOut = cutout(this.squareSize);
-    let tag = "path";
-
-    // Add a quarter circle to the top left corner of the block if there is
-    // a color value there
-    if (subjectCell) {
-      svgElement(
-        tag,
-        {
-          d: pie,
-          stroke: subjectCell,
-          transform: transform,
-          fill: subjectCell,
-        },
-        grid,
-        `${id}-${PIE}`
-      );
-    }
-    // Add the cutout if the top left corner has a color and an adjacent cell
-    // shares that color, filling in the top left quadrant of the block entirely
-    if (
-      subjectCell &&
-      (subjectCell === adjacent1 || subjectCell === adjacent2)
-    ) {
-      svgElement(
-        tag,
-        {
-          d: cutOut,
-          stroke: subjectCell,
-          transform: transform,
-          fill: subjectCell,
-        },
-        grid,
-        `${id}-${CUT}`
-      );
-    }
-    // Otherwise, if the two adjacent corners have the same color, add the
-    // cutout shape with that color
-    else if (
-      adjacent1 &&
-      adjacent1 === adjacent2 &&
-      (!diagonal || !subjectCell || subjectCell !== diagonal)
-    ) {
-      svgElement(
-        tag,
-        { d: cutOut, stroke: adjacent1, transform: transform, fill: adjacent1 },
-        grid,
-        `${id}-${CUT}`
-      );
-    }
-    // Fill in center corner only if an adjacent cell has the same color, or if
-    // the diagonal cell is same color and either adjacent is empty
-    // Note: this handles the "clover case", where we want each
-    // cell to "pop" out with its own color if diagonals are matching
-    else if (
-      subjectCell &&
-      (adjacent1 === subjectCell ||
-        adjacent2 === subjectCell ||
-        (diagonal === subjectCell &&
-          (!adjacent1 || !adjacent2 || adjacent1 !== adjacent2)))
-    ) {
-      svgElement(
-        tag,
-        {
-          d: cutOut,
-          stroke: subjectCell,
-          transform: transform,
-          fill: subjectCell,
-        },
-        grid,
-        `${id}-${CUT}`
-      );
-    }
-  }
-
-  makeGrid(row, col, svg) {
-    let id = "g" + row + "." + col;
-    return svgElement(
-      "g",
-      {
-        transform: `translate(${col * this.squareSize + this.squareSize}, 
-        ${row * this.squareSize + this.squareSize})`,
-      },
-      svg,
-      id
-    );
-  }
-
   /**
    * @override
    * Draw the given tile at row, col
@@ -319,73 +161,136 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       );
     }
 
-    // Because this processes a grid of cells at a time, we start at -1 to allow for
-    // a 'padding' row and column with no color.
-    for (let row = -1; row < this.map_.ROWS; row++) {
-      for (let col = -1; col < this.map_.COLS; col++) {
-        /**
-         * In a grid of four cells: top left, top right, bottom left, bottom right
-         * So if we are painting cell 0, adjacent cells are 1 & 2, diagonal is 3
-         * +-------+
-         * | 0 | 1 |
-         * --------
-         * | 2 | 3 |
-         * +-------+
-         */
-        let cells = [
-          this.cellColor(row, col),
-          this.cellColor(row, col + 1),
-          this.cellColor(row + 1, col),
-          this.cellColor(row + 1, col + 1),
-        ];
+    // If necessary, create padded rows with no color
+    /* 
+        0 1 2
+        3 4 5
+        6 7 8
+        */
+    let colors = [
+      this.cellColor(row - 1, col - 1), // Top left
+      this.cellColor(row, col - 1), // Top
+      this.cellColor(row + 1, col - 1), // Top right
+      this.cellColor(row - 1, col), // Middle left
+      this.cellColor(row, col), // Middle
+      this.cellColor(row + 1, col), // Middle right
+      this.cellColor(row - 1, col + 1), // Bottom left
+      this.cellColor(row, col + 1), // Bottom
+      this.cellColor(row + 1, col + 1), // Bottom right
+    ];
 
-        if (cells[0] || cells[1] || cells[2] || cells[3]) {
-          // Create grid block group
-          let grid = this.makeGrid(row, col, this.svg_);
-          let id0 = row + "." + col + "." + ROTATE180;
-          let id1 = row + "." + col + "." + ROTATENEG90;
-          let id2 = row + "." + col + "." + ROTATE90;
-          let id3 = row + "." + col + "." + ROTATE0;
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
 
-          // Calculate all the svg paths based on neighboring cell colors
-          this.pathCalculator(
-            cells[0],
-            cells[1],
-            cells[2],
-            cells[3],
-            ROTATE180,
-            grid,
-            id0
-          );
-          this.pathCalculator(
-            cells[1],
-            cells[0],
-            cells[3],
-            cells[2],
-            ROTATENEG90,
-            grid,
-            id1
-          );
-          this.pathCalculator(
-            cells[2],
-            cells[0],
-            cells[3],
-            cells[1],
-            ROTATE90,
-            grid,
-            id2
-          );
-          this.pathCalculator(
-            cells[3],
-            cells[1],
-            cells[2],
-            cells[0],
-            ROTATE0,
-            grid,
-            id3
-          );
-        }
+    if (colors[1] && colors[1] == colors[3]) {
+      context.beginPath();
+      context.fillStyle = colors[1];
+      context.moveTo(x * SIZE, y * SIZE);
+      if (colors[0] == colors[3]) {
+        context.lineTo((x + 0.4) * SIZE, y * SIZE);
+        context.lineTo(x * SIZE, (y + 0.4) * SIZE);
+      } else {
+        context.lineTo((x + 1) * SIZE, y * SIZE);
+        context.lineTo(x * SIZE, (y + 1) * SIZE);
       }
+      context.fill();
     }
+
+    if (colors[1] && colors[1] == colors[5]) {
+      context.beginPath();
+      context.fillStyle = colors[1];
+      context.moveTo((x + 1) * SIZE, y * SIZE);
+      if (colors[2] == colors[1]) {
+        context.lineTo((x + 0.6) * SIZE, y * SIZE);
+        context.lineTo((x + 1) * SIZE, (y + 0.4) * SIZE);
+      } else {
+        context.lineTo(x * SIZE, y * SIZE);
+        context.lineTo((x + 1) * SIZE, (y + 1) * SIZE);
+      }
+      context.fill();
+    }
+
+    if (colors[7] && colors[7] == colors[3]) {
+      context.beginPath();
+      context.fillStyle = colors[7];
+      context.moveTo(x * SIZE, (y + 1) * SIZE);
+      if (colors[6] == colors[7]) {
+        context.lineTo((x + 0.4) * SIZE, (y + 1) * SIZE);
+        context.lineTo(x * SIZE, (y + 0.6) * SIZE);
+      } else {
+        context.lineTo(x * SIZE, y * SIZE);
+        context.lineTo((x + 1) * SIZE, (y + 1) * SIZE);
+      }
+      context.fill();
+    }
+
+    if (colors[7] && colors[7] == colors[5]) {
+      context.beginPath();
+      context.fillStyle = colors[7];
+      context.moveTo((x + 1) * SIZE, (y + 1) * SIZE);
+      if (colors[8] == colors[7]) {
+        context.lineTo((x + 1) * SIZE, (y + 0.6) * SIZE);
+        context.lineTo((x + 0.6) * SIZE, (y + 1) * SIZE);
+      } else {
+        context.lineTo((x + 1) * SIZE, y * SIZE);
+        context.lineTo(x * SIZE, (y + 1) * SIZE);
+      }
+      context.fill();
+    }
+
+    if (colors[4]) {
+      context.beginPath();
+      context.fillStyle = colors[4];
+      if (
+        colors[4] == colors[5] &&
+        colors[4] == colors[7] &&
+        colors[4] != colors[1] &&
+        colors[4] != colors[3]
+      ) {
+        context.moveTo(x * SIZE, (y + 0.4) * SIZE);
+        context.lineTo((x + 0.4) * SIZE, y * SIZE);
+      } else {
+        context.moveTo(x * SIZE, y * SIZE);
+      }
+
+      if (
+        colors[4] == colors[3] &&
+        colors[4] == colors[7] &&
+        colors[4] != colors[1] &&
+        colors[4] != colors[5]
+      ) {
+        context.lineTo((x + 0.6) * SIZE, y * SIZE);
+        context.lineTo((x + 1) * SIZE, (y + 0.4) * SIZE);
+      } else {
+        context.lineTo((x + 1) * SIZE, y * SIZE);
+      }
+
+      if (
+        colors[4] == colors[1] &&
+        colors[4] == colors[3] &&
+        colors[4] != colors[5] &&
+        colors[4] != colors[7]
+      ) {
+        context.lineTo((x + 1) * SIZE, (y + 0.6) * SIZE);
+        context.lineTo((x + 0.6) * SIZE, (y + 1) * SIZE);
+      } else {
+        context.lineTo((x + 1) * SIZE, (y + 1) * SIZE);
+      }
+
+      if (
+        colors[4] == colors[1] &&
+        colors[4] == colors[5] &&
+        colors[4] != colors[3] &&
+        colors[4] != colors[7]
+      ) {
+        context.lineTo((x + 0.4) * SIZE, (y + 1) * SIZE);
+        context.lineTo(x * SIZE, (y + 0.6) * SIZE);
+      } else {
+        context.lineTo(x * SIZE, (y + 1) * SIZE);
+      }
+
+      context.fill();
+    }
+    return canvas;
   }
 };
