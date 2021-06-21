@@ -6,8 +6,8 @@ const ROTATE180 = "rotate(180)";
 const ROTATENEG90 = "rotate(-90)";
 const ROTATE90 = "rotate(90)";
 const ROTATE0 = "rotate(0)";
-const CUT = "cut";
-const PIE = "pie";
+const TRIANGLE = "triangle";
+const CENTER = "center";
 
 /**
  * This is a helper for creating SVG Elements.
@@ -183,7 +183,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
         fill: center,
       },
       grid,
-      `${id}-${PIE}`
+      `${id}-${CENTER}`
     );
   }
 
@@ -197,78 +197,34 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     grid,
     id
   ) {
-    let pie = quarterCircle(this.squareSize);
-    let cutOut = cutout(this.squareSize);
+    let triangle = trianglePathString();
     let tag = "path";
 
     // Add a quarter circle to the top left corner of the block if there is
     // a color value there
-    if (subjectCell) {
+    if (subjectCell && adjacent1 === adjacent2 && adjacent1 === diagonal) {
       svgElement(
         tag,
         {
-          d: pie,
+          d: triangle,
           stroke: subjectCell,
           transform: transform,
           fill: subjectCell,
         },
         grid,
-        `${id}-${PIE}`
+        `${id}-${TRIANGLE}`
       );
-    }
-    // Add the cutout if the top left corner has a color and an adjacent cell
-    // shares that color, filling in the top left quadrant of the block entirely
-    if (
-      subjectCell &&
-      (subjectCell === adjacent1 || subjectCell === adjacent2)
-    ) {
+    } else if (subjectCell && adjacent1 === adjacent2) {
       svgElement(
         tag,
         {
-          d: cutOut,
+          d: triangle,
           stroke: subjectCell,
           transform: transform,
           fill: subjectCell,
         },
         grid,
-        `${id}-${CUT}`
-      );
-    }
-    // Otherwise, if the two adjacent corners have the same color, add the
-    // cutout shape with that color
-    else if (
-      adjacent1 &&
-      adjacent1 === adjacent2 &&
-      (!diagonal || !subjectCell || subjectCell !== diagonal)
-    ) {
-      svgElement(
-        tag,
-        { d: cutOut, stroke: adjacent1, transform: transform, fill: adjacent1 },
-        grid,
-        `${id}-${CUT}`
-      );
-    }
-    // Fill in center corner only if an adjacent cell has the same color, or if
-    // the diagonal cell is same color and either adjacent is empty
-    // Note: this handles the "clover case", where we want each
-    // cell to "pop" out with its own color if diagonals are matching
-    else if (
-      subjectCell &&
-      (adjacent1 === subjectCell ||
-        adjacent2 === subjectCell ||
-        (diagonal === subjectCell &&
-          (!adjacent1 || !adjacent2 || adjacent1 !== adjacent2)))
-    ) {
-      svgElement(
-        tag,
-        {
-          d: cutOut,
-          stroke: subjectCell,
-          transform: transform,
-          fill: subjectCell,
-        },
-        grid,
-        `${id}-${CUT}`
+        `${id}-${TRIANGLE}`
       );
     }
   }
@@ -382,7 +338,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     let id1 = row + "." + col + "." + ROTATENEG90;
     let id2 = row + "." + col + "." + ROTATE90;
     let id3 = row + "." + col + "." + ROTATE0;
-    let id4 = row + "." + col + "." + "CENTER";
+    let id4 = row + "." + col + "." + CENTER;
 
     // Calculate all the svg paths based on neighboring cell colors
     this.pathCalculator(
