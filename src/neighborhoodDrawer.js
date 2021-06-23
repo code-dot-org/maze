@@ -2,11 +2,8 @@ const { SVG_NS } = require("./drawer");
 const Drawer = require("./drawer");
 const tiles = require("./tiles");
 
-const ROTATE180 = "rotate(180)";
-const ROTATENEG90 = "rotate(-90)";
-const ROTATE90 = "rotate(90)";
-const ROTATE0 = "rotate(0)";
 const TRIANGLE = "triangle";
+const SMALLTRI = "smallCorner";
 const CENTER = "center";
 
 /**
@@ -40,21 +37,44 @@ function svgElement(tag, props, parent, id) {
   return node;
 }
 
-/// Methods assume that the upper lefthand corner is 0,0. These paths can be rotated to make all four corner possibilities
-function smallCornerPathString(size) {
+function smallCornerTopLeft(size) {
   return `m0,0 L${0.4 * size},0 L0,${0.4 * size} Z`;
 }
 
-function trianglePathString(size) {
+function smallCornerBottomLeft(size) {
+  return `m${size},0 L${0.6 * size},0 L${size},${0.4 * size} Z`;
+}
+
+function smallCornerTopRight(size) {
+  return `m0,${size} L${0.4 * size},${size} L0,${0.6 * size} Z`;
+}
+
+function smallCornerBottomRight(size) {
+  return `m${size},${size} L${0.6 * size},${size} L${size},${0.6 * size} Z`;
+}
+
+function trianglePathTopLeft(size) {
   return `m0,0 L${size},0 L0,${size} Z`;
+}
+
+function trianglePathBottomLeft(size) {
+  return `m${size},0 L${size},${size} L0,0 Z`;
+}
+
+function trianglePathTopRight(size) {
+  return `m0,${size} L${size},${size} L0,0 Z`;
+}
+
+function trianglePathBottomRight(size) {
+  return `m${size},${size} L${size},0 L0,${size} Z`;
 }
 
 function generateTruncatedSquareString(
   size,
   topLeftIsTruncated,
-  topRightIsTruncated,
+  bottomLeftIsTruncated,
   bottomRightIsTruncated,
-  bottomLeftIsTruncated
+  topRightIsTruncated
 ) {
   const topLeftCorner = topLeftIsTruncated
     ? `m0,${size * 0.4} L${size * 0.4},0`
@@ -162,7 +182,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     return this.map_.getCell(row, col).getColor() || null;
   }
 
-  centerFill(center, top, right, bottom, left, transform, grid, id) {
+  centerFill(center, top, right, bottom, left, grid, id) {
     var path;
     if (center == top && center == right && center != bottom && center != left)
       path = generateTruncatedSquareString(
@@ -180,9 +200,9 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     )
       path = generateTruncatedSquareString(
         this.squareSize,
-        false,
-        false,
         true,
+        false,
+        false,
         false
       );
     else if (
@@ -206,9 +226,9 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     )
       path = generateTruncatedSquareString(
         this.squareSize,
+        false,
+        false,
         true,
-        false,
-        false,
         false
       );
     else {
@@ -225,7 +245,6 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       {
         d: path,
         stroke: center,
-        transform: transform,
         fill: center,
       },
       grid,
@@ -234,50 +253,164 @@ module.exports = class NeighborhoodDrawer extends Drawer {
   }
 
   // Helper method for determining color and path based on neighbors
-  pathCalculator(
-    subjectCell,
-    adjacent1,
-    adjacent2,
-    diagonal,
-    transform,
-    grid,
-    id
-  ) {
-    let smallTriangle = smallCornerPathString(this.squareSize);
-    let triangle = trianglePathString(this.squareSize);
+  pathCalculator(cellList, grid, id) {
     let tag = "path";
 
-    // Add a quarter circle to the top left corner of the block if there is
-    // a color value there
-    if (
-      subjectCell &&
-      subjectCell === adjacent1 &&
-      adjacent1 === adjacent2 &&
-      adjacent1 !== diagonal
-    ) {
+    // 0 1 2
+    // 3 4 5
+    // 6 7 8
+
+    let center = cellList[4];
+    let top = cellList[1];
+    let right = cellList[5];
+    let bottom = cellList[7];
+    let left = cellList[3];
+
+    // if the center cell has paint, calculate its fill and corners
+    if (cellList[4]) {
+      this.centerFill(center, top, right, bottom, left, grid, id);
+    } else if (top && left && bottom && right) {
       svgElement(
         tag,
         {
-          d: triangle,
-          stroke: subjectCell,
-          transform: transform,
-          fill: subjectCell,
+          d: smallCornerTopRight(this.squareSize),
+          stroke: top,
+          fill: top,
         },
         grid,
-        `${id}-${TRIANGLE}`
+        `${id}-${SMALLTRI}-tr`
       );
-    } else if (subjectCell && subjectCell === diagonal) {
       svgElement(
         tag,
         {
-          d: triangle,
-          stroke: subjectCell,
-          transform: transform,
-          fill: subjectCell,
+          d: smallCornerTopLeft(this.squareSize),
+          stroke: top,
+          fill: top,
         },
         grid,
-        `${id}-${TRIANGLE}`
+        `${id}-${SMALLTRI}-tl`
       );
+      svgElement(
+        tag,
+        {
+          d: smallCornerBottomLeft(this.squareSize),
+          stroke: top,
+          fill: top,
+        },
+        grid,
+        `${id}-${SMALLTRI}-bl`
+      );
+      svgElement(
+        tag,
+        {
+          d: smallCornerBottomRight(this.squareSize),
+          stroke: top,
+          fill: top,
+        },
+        grid,
+        `${id}-${SMALLTRI}-br`
+      );
+    } else {
+      if (top && right) {
+        if (cellList[2]) {
+          svgElement(
+            tag,
+            {
+              d: smallCornerTopRight(this.squareSize),
+              stroke: top,
+              fill: top,
+            },
+            grid,
+            `${id}-${SMALLTRI}-tr`
+          );
+        } else {
+          svgElement(
+            tag,
+            {
+              d: trianglePathTopRight(this.squareSize),
+              stroke: top,
+              fill: top,
+            },
+            grid,
+            `${id}-${TRIANGLE}-tr`
+          );
+        }
+      }
+      if (right && bottom) {
+        if (cellList[8]) {
+          svgElement(
+            tag,
+            {
+              d: smallCornerBottomRight(this.squareSize),
+              stroke: right,
+              fill: right,
+            },
+            grid,
+            `${id}-${SMALLTRI}-br`
+          );
+        } else {
+          svgElement(
+            tag,
+            {
+              d: trianglePathBottomRight(this.squareSize),
+              stroke: right,
+              fill: right,
+            },
+            grid,
+            `${id}-${TRIANGLE}-br`
+          );
+        }
+      }
+      if (bottom && left) {
+        if (cellList[6]) {
+          svgElement(
+            tag,
+            {
+              d: smallCornerBottomLeft(this.squareSize),
+              stroke: bottom,
+              fill: bottom,
+            },
+            grid,
+            `${id}-${SMALLTRI}-bl`
+          );
+        } else {
+          svgElement(
+            tag,
+            {
+              d: trianglePathBottomLeft(this.squareSize),
+              stroke: bottom,
+              fill: bottom,
+            },
+            grid,
+            `${id}-${TRIANGLE}-bl`
+          );
+        }
+      }
+      if (left && top) {
+        if (cellList[0]) {
+          svgElement(
+            tag,
+            {
+              d: smallCornerTopLeft(this.squareSize),
+              stroke: left,
+              fill: left,
+            },
+            grid,
+            `${id}-${SMALLTRI}-tl`
+          );
+        } else {
+          svgElement(
+            tag,
+            {
+              d: trianglePathTopLeft(this.squareSize),
+              stroke: left,
+              fill: left,
+            },
+            grid,
+            `${id}-${TRIANGLE}-tl`
+          );
+        }
+      }
     }
   }
 
@@ -286,8 +419,8 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     return svgElement(
       "g",
       {
-        transform: `translate(${col * this.squareSize + this.squareSize}, 
-        ${row * this.squareSize + this.squareSize})`,
+        transform: `translate(${col * this.squareSize}, 
+        ${row * this.squareSize})`,
       },
       svg,
       id
@@ -339,8 +472,8 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * @param {number} col: column of update
    * @param {boolean} running: if the maze is currently running (not used here, but part of signature of super)
    */
-  updateItemImage(tileRow, tileCol, running) {
-    let cell = this.map_.getCell(tileRow, tileCol);
+  updateItemImage(row, col, running) {
+    let cell = this.map_.getCell(row, col);
 
     // if the cell value has ever been greater than 0, this has been or
     // is a paint can square. Ensure it is shown/hidden appropriately
@@ -349,11 +482,11 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       const newValue = cell.getCurrentValue() > 0 ? cell.getCurrentValue() : "";
       // drawImage_ calls getAsset. If currentValue() is 0, getAsset will return
       // undefined and the paint can will be hidden. Otherwise we will get the paint can image.
-      super.drawImage_("", tileRow, tileCol, this.squareSize);
+      super.drawImage_("", row, col, this.squareSize);
       super.updateOrCreateText_(
         "counter",
-        tileRow,
-        tileCol,
+        row,
+        col,
         newValue,
         this.squareSize,
         1,
@@ -362,84 +495,28 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       );
     }
 
-    /*
-    We process each tile based on the 8 surrounding, and cellColor() will
-    simply return null if the neighboring cells are out of bounds
+    for (let r = row - 1; r < row + 2; r++) {
+      for (let c = col - 1; c < col + 2; c++) {
+        let id = r + "." + c + ".";
 
-    0 1 2
-    3 4 5
-    6 7 8
+        let cells = [
+          this.cellColor(r - 1, c - 1), // Top left
+          this.cellColor(r, c - 1), // Top
+          this.cellColor(r + 1, c - 1), // Top right
+          this.cellColor(r - 1, c), // Middle left
+          this.cellColor(r, c), // Target cell
+          this.cellColor(r + 1, c), // Middle right
+          this.cellColor(r - 1, c + 1), // Bottom left
+          this.cellColor(r, c + 1), // Bottom
+          this.cellColor(r + 1, c + 1), // Bottom right
+        ];
 
-    */
+        // Create grid block group for this center focus cell
+        let grid = this.makeGrid(r, c, this.svg_);
 
-    let cells = [
-      this.cellColor(row - 1, col - 1), // Top left
-      this.cellColor(row, col - 1), // Top
-      this.cellColor(row + 1, col - 1), // Top right
-      this.cellColor(row - 1, col), // Middle left
-      this.cellColor(row, col), // Target cell
-      this.cellColor(row + 1, col), // Middle right
-      this.cellColor(row - 1, col + 1), // Bottom left
-      this.cellColor(row, col + 1), // Bottom
-      this.cellColor(row + 1, col + 1), // Bottom right
-    ];
-
-    // Create grid block group
-    let grid = this.makeGrid(row, col, this.svg_);
-    let id0 = row + "." + col + "." + ROTATE180;
-    let id1 = row + "." + col + "." + ROTATENEG90;
-    let id2 = row + "." + col + "." + ROTATE90;
-    let id3 = row + "." + col + "." + ROTATE0;
-    let id4 = row + "." + col + "." + CENTER;
-
-    // Calculate all the svg paths based on neighboring cell colors
-    this.pathCalculator(
-      cells[0],
-      cells[1],
-      cells[3],
-      cells[4],
-      ROTATE180,
-      grid,
-      id0
-    );
-    this.pathCalculator(
-      cells[1],
-      cells[0],
-      cells[4],
-      cells[3],
-      ROTATENEG90,
-      grid,
-      id1
-    );
-    this.pathCalculator(
-      cells[4],
-      cells[3],
-      cells[1],
-      cells[0],
-      ROTATE0,
-      grid,
-      id2
-    );
-    this.pathCalculator(
-      cells[3],
-      cells[4],
-      cells[0],
-      cells[1],
-      ROTATE90,
-      grid,
-      id3
-    );
-    if (cells[4]) {
-      this.centerFill(
-        cells[4],
-        cells[1],
-        cells[5],
-        cells[7],
-        cells[3],
-        ROTATE180,
-        grid,
-        id4
-      );
+        // Calculate all the svg paths based on neighboring cell colors
+        this.pathCalculator(cells, grid, id);
+      }
     }
   }
 };
