@@ -41,34 +41,33 @@ function svgElement(tag, props, parent, id) {
 }
 
 /// Methods assume that the upper lefthand corner is 0,0. These paths can be rotated to make all four corner possibilities
-function smallCornerPathString() {
-  return `M0,0 L${0.2 * this.squareSize},0 L0,${0.2 * this.squareSize} Z`;
+function smallCornerPathString(size) {
+  return `m0,0 L${0.4 * size},0 L0,${0.4 * size} Z`;
 }
 
-function trianglePathString() {
-  return `M0,0 L${this.squareSize},0 L0,${this.squareSize} Z`;
+function trianglePathString(size) {
+  return `m0,0 L${size},0 L0,${size} Z`;
 }
 
 function generateTruncatedSquareString(
+  size,
   topLeftIsTruncated,
   topRightIsTruncated,
   bottomRightIsTruncated,
   bottomLeftIsTruncated
 ) {
   const topLeftCorner = topLeftIsTruncated
-    ? `M0,${this.squareSize * 0.2} L${this.squareSize * 0.2},0`
-    : `M0,0`;
+    ? `m0,${size * 0.4} L${size * 0.4},0`
+    : `m0,0`;
   const topRightCorner = topRightIsTruncated
-    ? `L${this.squareSize * 0.3},0 L${this.squareSize},${this.squareSize * 0.2}`
-    : `L${this.squareSize},0`;
+    ? `L${size * 0.6},0 L${size},${size * 0.4}`
+    : `L${size},0`;
   const bottomRightCorner = bottomRightIsTruncated
-    ? `L${this.squareSize},${this.squareSize * 0.3} L${this.squareSize * 0.3},${
-        this.squareSize
-      }`
-    : `L${this.squareSize},${this.squareSize}`;
+    ? `L${size},${size * 0.6} L${size * 0.6},${size}`
+    : `L${size},${size}`;
   const bottomLeftCorner = bottomLeftIsTruncated
-    ? `L${this.squareSize * 0.2},${this.squareSize} L0,${this.squareSize * 0.3}`
-    : `L0,${this.squareSize}`;
+    ? `L${size * 0.4},${size} L0,${size * 0.6}`
+    : `L0,${size}`;
   return `${topLeftCorner} ${topRightCorner} ${bottomRightCorner} ${bottomLeftCorner} Z`;
 }
 
@@ -166,14 +165,61 @@ module.exports = class NeighborhoodDrawer extends Drawer {
   centerFill(center, top, right, bottom, left, transform, grid, id) {
     var path;
     if (center == top && center == right && center != bottom && center != left)
-      path = generateTruncatedSquareString(false, false, false, true);
-    if (center == right && center == bottom && center != left && center != top)
-      path = generateTruncatedSquareString(true, false, false, false);
-    if (center == bottom && center == left && center != top && center != right)
-      path = generateTruncatedSquareString(false, true, false, false);
-    if (center == left && center == top && center != right && center != bottom)
-      path = generateTruncatedSquareString(false, false, true, false);
-
+      path = generateTruncatedSquareString(
+        this.squareSize,
+        false,
+        false,
+        false,
+        true
+      );
+    else if (
+      center == right &&
+      center == bottom &&
+      center != left &&
+      center != top
+    )
+      path = generateTruncatedSquareString(
+        this.squareSize,
+        false,
+        false,
+        true,
+        false
+      );
+    else if (
+      center == bottom &&
+      center == left &&
+      center != top &&
+      center != right
+    )
+      path = generateTruncatedSquareString(
+        this.squareSize,
+        false,
+        true,
+        false,
+        false
+      );
+    else if (
+      center == left &&
+      center == top &&
+      center != right &&
+      center != bottom
+    )
+      path = generateTruncatedSquareString(
+        this.squareSize,
+        true,
+        false,
+        false,
+        false
+      );
+    else {
+      path = generateTruncatedSquareString(
+        this.squareSize,
+        false,
+        false,
+        false,
+        false
+      );
+    }
     svgElement(
       "path",
       {
@@ -197,12 +243,18 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     grid,
     id
   ) {
-    let triangle = trianglePathString();
+    let smallTriangle = smallCornerPathString(this.squareSize);
+    let triangle = trianglePathString(this.squareSize);
     let tag = "path";
 
     // Add a quarter circle to the top left corner of the block if there is
     // a color value there
-    if (subjectCell && adjacent1 === adjacent2 && adjacent1 === diagonal) {
+    if (
+      subjectCell &&
+      subjectCell === adjacent1 &&
+      adjacent1 === adjacent2 &&
+      adjacent1 !== diagonal
+    ) {
       svgElement(
         tag,
         {
@@ -214,7 +266,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
         grid,
         `${id}-${TRIANGLE}`
       );
-    } else if (subjectCell && adjacent1 === adjacent2) {
+    } else if (subjectCell && subjectCell === diagonal) {
       svgElement(
         tag,
         {
@@ -282,13 +334,13 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * @override
    * This method is used to display the paint and paint buckets.
    * It has to reprocess the entire grid to get the paint glomming correct, but
-   * it only updates the bucket at the specified itemRow and itemCol if necessary.
-   * @param {number} itemRow: row of update
-   * @param {number} itemCol: column of update
+   * it only updates the bucket at the specified row and col if necessary.
+   * @param {number} row: row of update
+   * @param {number} col: column of update
    * @param {boolean} running: if the maze is currently running (not used here, but part of signature of super)
    */
-  updateItemImage(itemRow, itemCol, running) {
-    let cell = this.map_.getCell(itemRow, itemCol);
+  updateItemImage(tileRow, tileCol, running) {
+    let cell = this.map_.getCell(tileRow, tileCol);
 
     // if the cell value has ever been greater than 0, this has been or
     // is a paint can square. Ensure it is shown/hidden appropriately
@@ -297,11 +349,11 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       const newValue = cell.getCurrentValue() > 0 ? cell.getCurrentValue() : "";
       // drawImage_ calls getAsset. If currentValue() is 0, getAsset will return
       // undefined and the paint can will be hidden. Otherwise we will get the paint can image.
-      super.drawImage_("", itemRow, itemCol, this.squareSize);
+      super.drawImage_("", tileRow, tileCol, this.squareSize);
       super.updateOrCreateText_(
         "counter",
-        itemRow,
-        itemCol,
+        tileRow,
+        tileCol,
         newValue,
         this.squareSize,
         1,
@@ -342,50 +394,52 @@ module.exports = class NeighborhoodDrawer extends Drawer {
 
     // Calculate all the svg paths based on neighboring cell colors
     this.pathCalculator(
-      cells[4],
+      cells[0],
       cells[1],
       cells[3],
-      cells[0],
+      cells[4],
       ROTATE180,
       grid,
       id0
     );
     this.pathCalculator(
-      cells[4],
       cells[1],
-      cells[5],
-      cells[2],
+      cells[0],
+      cells[4],
+      cells[3],
       ROTATENEG90,
       grid,
       id1
     );
     this.pathCalculator(
       cells[4],
-      cells[5],
-      cells[7],
-      cells[8],
-      ROTATE90,
+      cells[3],
+      cells[1],
+      cells[0],
+      ROTATE0,
       grid,
       id2
     );
     this.pathCalculator(
-      cells[4],
-      cells[7],
       cells[3],
-      cells[6],
-      ROTATE0,
+      cells[4],
+      cells[0],
+      cells[1],
+      ROTATE90,
       grid,
       id3
     );
-    this.centerFill(
-      cells[4],
-      cells[1],
-      cells[5],
-      cells[7],
-      cells[3],
-      ROTATE0,
-      grid,
-      id4
-    );
+    if (cells[4]) {
+      this.centerFill(
+        cells[4],
+        cells[1],
+        cells[5],
+        cells[7],
+        cells[3],
+        ROTATE180,
+        grid,
+        id4
+      );
+    }
   }
 };
