@@ -7,6 +7,11 @@ const SMALLTRI = "smallCorner";
 const CENTER = "center";
 const PATH = "path";
 
+// These multipliers control how far across the grid the corners are cut
+// To keep the corners "even", they should add up to 1
+const SMALLMULT = 0.3;
+const LARGEMULT = 0.7;
+
 const Corner = Object.freeze({
   topLeft: "topLeft",
   topRight: "topRight",
@@ -59,16 +64,18 @@ function smallCornerSvg(color, grid, id, size, corner) {
   let shape;
   if (corner === Corner.topLeft) {
     finalId = `${id}-${SMALLTRI}-tl`;
-    shape = `m0,0 L${0.3 * size},0 L0,${0.3 * size} Z`;
+    shape = `m0,0 L${SMALLMULT * size},0 L0,${SMALLMULT * size} Z`;
   } else if (corner === Corner.topRight) {
     finalId = `${id}-${SMALLTRI}-tr`;
-    shape = `m${size},0 L${0.7 * size},0 L${size},${0.3 * size} Z`;
+    shape = `m${size},0 L${LARGEMULT * size},0 L${size},${SMALLMULT * size} Z`;
   } else if (corner === Corner.bottomLeft) {
     finalId = `${id}-${SMALLTRI}-bl`;
-    shape = `m0,${size} L0,${0.7 * size} L${0.3 * size},${size} Z`;
+    shape = `m0,${size} L0,${LARGEMULT * size} L${SMALLMULT * size},${size} Z`;
   } else if (corner === Corner.bottomRight) {
     finalId = `${id}-${SMALLTRI}-br`;
-    shape = `m${size},${size} L${0.7 * size},${size} L${size},${0.7 * size} Z`;
+    shape = `m${size},${size} L${LARGEMULT * size},${size} L${size},${
+      LARGEMULT * size
+    } Z`;
   }
   svgElement(
     PATH,
@@ -128,16 +135,16 @@ function generateCenterPath(
   bottomLeftIsTruncated
 ) {
   const topLeftCorner = topLeftIsTruncated
-    ? `m0,${size * 0.3} L${size * 0.3},0`
+    ? `m0,${size * SMALLMULT} L${size * SMALLMULT},0`
     : `m0,0`;
   const topRightCorner = topRightIsTruncated
-    ? `L${size * 0.7},0 L${size},${size * 0.3}`
+    ? `L${size * LARGEMULT},0 L${size},${size * SMALLMULT}`
     : `L${size},0`;
   const bottomRightCorner = bottomRightIsTruncated
-    ? `L${size},${size * 0.7} L${size * 0.7},${size}`
+    ? `L${size},${size * LARGEMULT} L${size * LARGEMULT},${size}`
     : `L${size},${size}`;
   const bottomLeftCorner = bottomLeftIsTruncated
-    ? `L${size * 0.3},${size} L0,${size * 0.7}`
+    ? `L${size * SMALLMULT},${size} L0,${size * LARGEMULT}`
     : `L0,${size}`;
   return `${topLeftCorner} ${topRightCorner} ${bottomRightCorner} ${bottomLeftCorner} Z`;
 }
@@ -311,6 +318,12 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       left === bottom &&
       bottom === right
     ) {
+      // We know half triangles have already been drawn: remove them
+      let gridId = "g" + id;
+      var node = document.getElementById(gridId);
+      if (node) {
+        node.querySelectorAll("*").forEach((n) => n.remove());
+      }
       smallCornerSvg(top, grid, id, size, Corner.topLeft);
       smallCornerSvg(top, grid, id, size, Corner.topRight);
       smallCornerSvg(bottom, grid, id, size, Corner.bottomLeft);
@@ -329,21 +342,21 @@ module.exports = class NeighborhoodDrawer extends Drawer {
         if (cellList[8] && cellList[8] === right) {
           smallCornerSvg(right, grid, id, size, Corner.bottomRight);
         } else {
-          triangleSvg(top, grid, id, size, Corner.bottomRight);
+          triangleSvg(right, grid, id, size, Corner.bottomRight);
         }
       }
       if (bottom && left && bottom === left) {
         if (cellList[6] && cellList[6] === bottom) {
           smallCornerSvg(bottom, grid, id, size, Corner.bottomLeft);
         } else {
-          triangleSvg(top, grid, id, size, Corner.bottomLeft);
+          triangleSvg(bottom, grid, id, size, Corner.bottomLeft);
         }
       }
       if (left && top && left === top) {
         if (cellList[0] && cellList[0] === left) {
           smallCornerSvg(left, grid, id, size, Corner.topLeft);
         } else {
-          triangleSvg(top, grid, id, size, Corner.topLeft);
+          triangleSvg(left, grid, id, size, Corner.topLeft);
         }
       }
     }
@@ -435,7 +448,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     if (this.cellColor(row, col)) {
       for (let r = row - 1; r < row + 2; r++) {
         for (let c = col - 1; c < col + 2; c++) {
-          let id = r + "." + c + ".";
+          let id = r + "." + c;
 
           let cells = [
             this.cellColor(r - 1, c - 1), // Top left
