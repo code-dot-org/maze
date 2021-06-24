@@ -7,7 +7,7 @@ const SMALLTRI = "smallCorner";
 const CENTER = "center";
 const PATH = "path";
 
-const SmallCorner = Object.freeze({
+const Corner = Object.freeze({
   topLeft: "topLeft",
   topRight: "topRight",
   bottomLeft: "bottomLeft",
@@ -57,18 +57,18 @@ function svgElement(tag, props, parent, id) {
 function smallCornerSvg(color, grid, id, size, corner) {
   let finalId;
   let shape;
-  if (corner === SmallCorner.topLeft) {
+  if (corner === Corner.topLeft) {
     finalId = `${id}-${SMALLTRI}-tl`;
-    shape = `m0,0 L${0.4 * size},0 L0,${0.4 * size} Z`;
-  } else if (corner === SmallCorner.topRight) {
+    shape = `m0,0 L${0.3 * size},0 L0,${0.3 * size} Z`;
+  } else if (corner === Corner.topRight) {
     finalId = `${id}-${SMALLTRI}-tr`;
-    shape = `m${size},0 L${0.6 * size},0 L${size},${0.4 * size} Z`;
-  } else if (corner === SmallCorner.bottomLeft) {
+    shape = `m${size},0 L${0.7 * size},0 L${size},${0.3 * size} Z`;
+  } else if (corner === Corner.bottomLeft) {
     finalId = `${id}-${SMALLTRI}-bl`;
-    shape = `m0,${size} L0,${0.6 * size} L${0.4 * size},${size} Z`;
-  } else if (corner === SmallCorner.bottomRight) {
+    shape = `m0,${size} L0,${0.7 * size} L${0.3 * size},${size} Z`;
+  } else if (corner === Corner.bottomRight) {
     finalId = `${id}-${SMALLTRI}-br`;
-    shape = `m${size},${size} L${0.6 * size},${size} L${size},${0.6 * size} Z`;
+    shape = `m${size},${size} L${0.7 * size},${size} L${size},${0.7 * size} Z`;
   }
   svgElement(
     PATH,
@@ -83,26 +83,41 @@ function smallCornerSvg(color, grid, id, size, corner) {
 }
 
 /**
- * The following four functions return the path elements for each potential
- * triangle position that takes up half the grid size.
+ * Returns the svg element for the half-grid triangle depending on which
+ * corner is the source.
  *
- * @param size for square size
- * @returns the string representing the svg path
+ * @param color the stroke and fill colors
+ * @param grid the parent element
+ * @param id the id label
+ * @param size the square size
+ * @param corner the enum stating which corner to draw
  */
-function trianglePathTopLeft(size) {
-  return `m0,0 L${size},0 L0,${size} Z`;
-}
-
-function trianglePathBottomLeft(size) {
-  return `m0,${size} L${size},${size} L0,0 Z`;
-}
-
-function trianglePathTopRight(size) {
-  return `m${size},0 L${size},${size} L0,0 Z`;
-}
-
-function trianglePathBottomRight(size) {
-  return `m${size},${size} L${size},0 L0,${size} Z`;
+function triangleSvg(color, grid, id, size, corner) {
+  let finalId;
+  let shape;
+  if (corner === Corner.topLeft) {
+    finalId = `${id}-${TRIANGLE}-tl`;
+    shape = `m0,0 L${size},0 L0,${size} Z`;
+  } else if (corner === Corner.topRight) {
+    finalId = `${id}-${TRIANGLE}-tr`;
+    shape = `m${size},0 L${size},${size} L0,0 Z`;
+  } else if (corner === Corner.bottomLeft) {
+    finalId = `${id}-${TRIANGLE}-bl`;
+    shape = `m0,${size} L${size},${size} L0,0 Z`;
+  } else if (corner === Corner.bottomRight) {
+    finalId = `${id}-${TRIANGLE}-br`;
+    shape = `m${size},${size} L${size},0 L0,${size} Z`;
+  }
+  svgElement(
+    PATH,
+    {
+      d: shape,
+      stroke: color,
+      fill: color,
+    },
+    grid,
+    finalId
+  );
 }
 
 function generateCenterPath(
@@ -113,16 +128,16 @@ function generateCenterPath(
   bottomLeftIsTruncated
 ) {
   const topLeftCorner = topLeftIsTruncated
-    ? `m0,${size * 0.4} L${size * 0.4},0`
+    ? `m0,${size * 0.3} L${size * 0.3},0`
     : `m0,0`;
   const topRightCorner = topRightIsTruncated
-    ? `L${size * 0.6},0 L${size},${size * 0.4}`
+    ? `L${size * 0.7},0 L${size},${size * 0.3}`
     : `L${size},0`;
   const bottomRightCorner = bottomRightIsTruncated
-    ? `L${size},${size * 0.6} L${size * 0.6},${size}`
+    ? `L${size},${size * 0.7} L${size * 0.7},${size}`
     : `L${size},${size}`;
   const bottomLeftCorner = bottomLeftIsTruncated
-    ? `L${size * 0.4},${size} L0,${size * 0.6}`
+    ? `L${size * 0.3},${size} L0,${size * 0.7}`
     : `L0,${size}`;
   return `${topLeftCorner} ${topRightCorner} ${bottomRightCorner} ${bottomLeftCorner} Z`;
 }
@@ -262,15 +277,20 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     );
   }
 
-  // Helper method for determining color and path based on neighbors
+  /**
+   * Holds the bulk of the logic of coloring based on neighbor cells. The order
+   * of cells in the input list is as follows:
+   *
+   * 0 1 2
+   * 3 4 5
+   * 6 7 8
+   *
+   * @param cellList representing the center (4) and its 8 surrounding
+   * @param grid the parent element we will add svg elements to
+   * @param id the row and column we're on in id form
+   */
   pathCalculator(cellList, grid, id) {
-    let tag = "path";
     let size = this.squareSize;
-
-    // 0 1 2
-    // 3 4 5
-    // 6 7 8
-
     let center = cellList[4];
     let top = cellList[1];
     let right = cellList[5];
@@ -278,80 +298,53 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     let left = cellList[3];
 
     // if the center cell has paint, calculate its fill and corners
-    if (cellList[4]) {
+    if (center) {
       this.centerFill(center, top, right, bottom, left, grid, id);
+    }
+    // the circle case: ensure the center cell only has small corners
+    else if (
+      top &&
+      left &&
+      bottom &&
+      right &&
+      top === left &&
+      left === bottom &&
+      bottom === right
+    ) {
+      smallCornerSvg(top, grid, id, size, Corner.topLeft);
+      smallCornerSvg(top, grid, id, size, Corner.topRight);
+      smallCornerSvg(bottom, grid, id, size, Corner.bottomLeft);
+      smallCornerSvg(bottom, grid, id, size, Corner.bottomRight);
     } else {
-      // Check each set of adjacent neighbors and diagonal to determine if small
-      // corners or triangle half-grids should be drawn
+      // Check each set of adjacent neighbors and corner cell to determine if
+      // small corners or triangle half-grids should be drawn
       if (top && right && top === right) {
         if (cellList[2] && cellList[2] === top) {
-          smallCornerSvg(top, grid, id, size, SmallCorner.topRight);
+          smallCornerSvg(top, grid, id, size, Corner.topRight);
         } else {
-          svgElement(
-            tag,
-            {
-              d: trianglePathTopRight(this.squareSize),
-              stroke: top,
-              fill: top,
-            },
-            grid,
-            `${id}-${TRIANGLE}-tr`
-          );
+          triangleSvg(top, grid, id, size, Corner.topRight);
         }
       }
       if (right && bottom && right === bottom) {
         if (cellList[8] && cellList[8] === right) {
-          smallCornerSvg(right, grid, id, size, SmallCorner.bottomRight);
+          smallCornerSvg(right, grid, id, size, Corner.bottomRight);
         } else {
-          svgElement(
-            tag,
-            {
-              d: trianglePathBottomRight(this.squareSize),
-              stroke: right,
-              fill: right,
-            },
-            grid,
-            `${id}-${TRIANGLE}-br`
-          );
+          triangleSvg(top, grid, id, size, Corner.bottomRight);
         }
       }
       if (bottom && left && bottom === left) {
         if (cellList[6] && cellList[6] === bottom) {
-          smallCornerSvg(bottom, grid, id, size, SmallCorner.bottomLeft);
+          smallCornerSvg(bottom, grid, id, size, Corner.bottomLeft);
         } else {
-          svgElement(
-            tag,
-            {
-              d: trianglePathBottomLeft(this.squareSize),
-              stroke: bottom,
-              fill: bottom,
-            },
-            grid,
-            `${id}-${TRIANGLE}-bl`
-          );
+          triangleSvg(top, grid, id, size, Corner.bottomLeft);
         }
       }
       if (left && top && left === top) {
         if (cellList[0] && cellList[0] === left) {
-          smallCornerSvg(left, grid, id, size, SmallCorner.topLeft);
+          smallCornerSvg(left, grid, id, size, Corner.topLeft);
         } else {
-          svgElement(
-            tag,
-            {
-              d: trianglePathTopLeft(this.squareSize),
-              stroke: left,
-              fill: left,
-            },
-            grid,
-            `${id}-${TRIANGLE}-tl`
-          );
+          triangleSvg(top, grid, id, size, Corner.topLeft);
         }
-      }
-      if (top && left && bottom && right) {
-        smallCornerSvg(top, grid, id, size, SmallCorner.topLeft);
-        smallCornerSvg(top, grid, id, size, SmallCorner.topRight);
-        smallCornerSvg(bottom, grid, id, size, SmallCorner.bottomLeft);
-        smallCornerSvg(bottom, grid, id, size, SmallCorner.bottomRight);
       }
     }
   }
