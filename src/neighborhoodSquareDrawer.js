@@ -5,6 +5,14 @@ const tiles = require("./tiles");
 const TRIANGLE = "triangle";
 const SMALLTRI = "smallCorner";
 const CENTER = "center";
+const PATH = "path";
+
+const SmallCorner = Object.freeze({
+  topLeft: "topLeft",
+  topRight: "topRight",
+  bottomLeft: "bottomLeft",
+  bottomRight: "bottomRight",
+});
 
 /**
  * This is a helper for creating SVG Elements.
@@ -40,61 +48,37 @@ function svgElement(tag, props, parent, id) {
 /**
  * The following functions create SVGs for the small corner cutouts
  *
- * @param tag the kind of SVG
  * @param color the stroke and fill colors
  * @param grid the parent element
  * @param id the id label
  * @param size the square size
+ * @param corner the enum stating which corner to draw
  */
-function smallCornerTopLeftSvg(tag, color, grid, id, size) {
+function smallCornerSvg(color, grid, id, size, corner) {
+  let finalId;
+  let shape;
+  if (corner === SmallCorner.topLeft) {
+    finalId = `${id}-${SMALLTRI}-tl`;
+    shape = `m0,0 L${0.4 * size},0 L0,${0.4 * size} Z`;
+  } else if (corner === SmallCorner.topRight) {
+    finalId = `${id}-${SMALLTRI}-tr`;
+    shape = `m${size},0 L${0.6 * size},0 L${size},${0.4 * size} Z`;
+  } else if (corner === SmallCorner.bottomLeft) {
+    finalId = `${id}-${SMALLTRI}-bl`;
+    shape = `m0,${size} L0,${0.6 * size} L${0.4 * size},${size} Z`;
+  } else if (corner === SmallCorner.bottomRight) {
+    finalId = `${id}-${SMALLTRI}-br`;
+    shape = `m${size},${size} L${0.6 * size},${size} L${size},${0.6 * size} Z`;
+  }
   svgElement(
-    tag,
+    PATH,
     {
-      d: `m0,0 L${0.4 * size},0 L0,${0.4 * size} Z`,
+      d: shape,
       stroke: color,
       fill: color,
     },
     grid,
-    id
-  );
-}
-
-function smallCornerBottomLeftSvg(tag, color, grid, id, size) {
-  svgElement(
-    tag,
-    {
-      d: `m0,${size} L0,${0.6 * size} L${0.4 * size},${size} Z`,
-      stroke: color,
-      fill: color,
-    },
-    grid,
-    id
-  );
-}
-
-function smallCornerTopRightSvg(tag, color, grid, id, size) {
-  svgElement(
-    tag,
-    {
-      d: `m${size},0 L${0.6 * size},0 L${size},${0.4 * size} Z`,
-      stroke: color,
-      fill: color,
-    },
-    grid,
-    id
-  );
-}
-
-function smallCornerBottomRightSvg(tag, color, grid, id, size) {
-  svgElement(
-    tag,
-    {
-      d: `m${size},${size} L${0.6 * size},${size} L${size},${0.6 * size} Z`,
-      stroke: color,
-      fill: color,
-    },
-    grid,
-    id
+    finalId
   );
 }
 
@@ -281,6 +265,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
   // Helper method for determining color and path based on neighbors
   pathCalculator(cellList, grid, id) {
     let tag = "path";
+    let size = this.squareSize;
 
     // 0 1 2
     // 3 4 5
@@ -298,15 +283,9 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     } else {
       // Check each set of adjacent neighbors and diagonal to determine if small
       // corners or triangle half-grids should be drawn
-      if (top && right) {
-        if (cellList[2]) {
-          smallCornerTopRightSvg(
-            tag,
-            top,
-            grid,
-            `${id}-${SMALLTRI}-tr`,
-            this.squareSize
-          );
+      if (top && right && top === right) {
+        if (cellList[2] && cellList[2] === top) {
+          smallCornerSvg(top, grid, id, size, SmallCorner.topRight);
         } else {
           svgElement(
             tag,
@@ -320,15 +299,9 @@ module.exports = class NeighborhoodDrawer extends Drawer {
           );
         }
       }
-      if (right && bottom) {
-        if (cellList[8]) {
-          smallCornerBottomRightSvg(
-            tag,
-            right,
-            grid,
-            `${id}-${SMALLTRI}-br`,
-            this.squareSize
-          );
+      if (right && bottom && right === bottom) {
+        if (cellList[8] && cellList[8] === right) {
+          smallCornerSvg(right, grid, id, size, SmallCorner.bottomRight);
         } else {
           svgElement(
             tag,
@@ -342,15 +315,9 @@ module.exports = class NeighborhoodDrawer extends Drawer {
           );
         }
       }
-      if (bottom && left) {
-        if (cellList[6]) {
-          smallCornerBottomLeftSvg(
-            tag,
-            bottom,
-            grid,
-            `${id}-${SMALLTRI}-bl`,
-            this.squareSize
-          );
+      if (bottom && left && bottom === left) {
+        if (cellList[6] && cellList[6] === bottom) {
+          smallCornerSvg(bottom, grid, id, size, SmallCorner.bottomLeft);
         } else {
           svgElement(
             tag,
@@ -364,15 +331,9 @@ module.exports = class NeighborhoodDrawer extends Drawer {
           );
         }
       }
-      if (left && top) {
-        if (cellList[0]) {
-          smallCornerTopLeftSvg(
-            tag,
-            left,
-            grid,
-            `${id}-${SMALLTRI}-tl`,
-            this.squareSize
-          );
+      if (left && top && left === top) {
+        if (cellList[0] && cellList[0] === left) {
+          smallCornerSvg(left, grid, id, size, SmallCorner.topLeft);
         } else {
           svgElement(
             tag,
@@ -387,34 +348,10 @@ module.exports = class NeighborhoodDrawer extends Drawer {
         }
       }
       if (top && left && bottom && right) {
-        smallCornerTopRightSvg(
-          tag,
-          top,
-          grid,
-          `${id}-${SMALLTRI}-tr`,
-          this.squareSize
-        );
-        smallCornerTopLeftSvg(
-          tag,
-          top,
-          grid,
-          `${id}-${SMALLTRI}-tl`,
-          this.squareSize
-        );
-        smallCornerBottomLeftSvg(
-          tag,
-          bottom,
-          grid,
-          `${id}-${SMALLTRI}-bl`,
-          this.squareSize
-        );
-        smallCornerBottomRightSvg(
-          tag,
-          bottom,
-          grid,
-          `${id}-${SMALLTRI}-br`,
-          this.squareSize
-        );
+        smallCornerSvg(top, grid, id, size, SmallCorner.topLeft);
+        smallCornerSvg(top, grid, id, size, SmallCorner.topRight);
+        smallCornerSvg(bottom, grid, id, size, SmallCorner.bottomLeft);
+        smallCornerSvg(bottom, grid, id, size, SmallCorner.bottomRight);
       }
     }
   }

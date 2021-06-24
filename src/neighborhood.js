@@ -78,7 +78,6 @@ module.exports = class Neighborhood extends Subtype {
    **/
   createDrawer(svg, drawer = "square") {
     if (drawer === "square") {
-      console.log("this got called");
       this.drawer = new NeighborhoodSquareDrawer(
         this.maze_.map,
         this.skin_,
