@@ -37,44 +37,96 @@ function svgElement(tag, props, parent, id) {
   return node;
 }
 
-function smallCornerTopLeft(size) {
-  return `m0,0 L${0.4 * size},0 L0,${0.4 * size} Z`;
+/**
+ * The following functions create SVGs for the small corner cutouts
+ *
+ * @param tag the kind of SVG
+ * @param color the stroke and fill colors
+ * @param grid the parent element
+ * @param id the id label
+ * @param size the square size
+ */
+function smallCornerTopLeftSvg(tag, color, grid, id, size) {
+  svgElement(
+    tag,
+    {
+      d: `m0,0 L${0.4 * size},0 L0,${0.4 * size} Z`,
+      stroke: color,
+      fill: color,
+    },
+    grid,
+    id
+  );
 }
 
-function smallCornerBottomLeft(size) {
-  return `m${size},0 L${0.6 * size},0 L${size},${0.4 * size} Z`;
+function smallCornerBottomLeftSvg(tag, color, grid, id, size) {
+  svgElement(
+    tag,
+    {
+      d: `m0,${size} L0,${0.6 * size} L${0.4 * size},${size} Z`,
+      stroke: color,
+      fill: color,
+    },
+    grid,
+    id
+  );
 }
 
-function smallCornerTopRight(size) {
-  return `m0,${size} L${0.4 * size},${size} L0,${0.6 * size} Z`;
+function smallCornerTopRightSvg(tag, color, grid, id, size) {
+  svgElement(
+    tag,
+    {
+      d: `m${size},0 L${0.6 * size},0 L${size},${0.4 * size} Z`,
+      stroke: color,
+      fill: color,
+    },
+    grid,
+    id
+  );
 }
 
-function smallCornerBottomRight(size) {
-  return `m${size},${size} L${0.6 * size},${size} L${size},${0.6 * size} Z`;
+function smallCornerBottomRightSvg(tag, color, grid, id, size) {
+  svgElement(
+    tag,
+    {
+      d: `m${size},${size} L${0.6 * size},${size} L${size},${0.6 * size} Z`,
+      stroke: color,
+      fill: color,
+    },
+    grid,
+    id
+  );
 }
 
+/**
+ * The following four functions return the path elements for each potential
+ * triangle position that takes up half the grid size.
+ *
+ * @param size for square size
+ * @returns the string representing the svg path
+ */
 function trianglePathTopLeft(size) {
   return `m0,0 L${size},0 L0,${size} Z`;
 }
 
 function trianglePathBottomLeft(size) {
-  return `m${size},0 L${size},${size} L0,0 Z`;
+  return `m0,${size} L${size},${size} L0,0 Z`;
 }
 
 function trianglePathTopRight(size) {
-  return `m0,${size} L${size},${size} L0,0 Z`;
+  return `m${size},0 L${size},${size} L0,0 Z`;
 }
 
 function trianglePathBottomRight(size) {
   return `m${size},${size} L${size},0 L0,${size} Z`;
 }
 
-function generateTruncatedSquareString(
+function generateCenterPath(
   size,
   topLeftIsTruncated,
-  bottomLeftIsTruncated,
+  topRightIsTruncated,
   bottomRightIsTruncated,
-  topRightIsTruncated
+  bottomLeftIsTruncated
 ) {
   const topLeftCorner = topLeftIsTruncated
     ? `m0,${size * 0.4} L${size * 0.4},0`
@@ -182,63 +234,37 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     return this.map_.getCell(row, col).getColor() || null;
   }
 
+  /**
+   * Determines how much of this tile should be colored in based on the colors
+   * of the adjacent neighbors.
+   */
   centerFill(center, top, right, bottom, left, grid, id) {
     var path;
     if (center == top && center == right && center != bottom && center != left)
-      path = generateTruncatedSquareString(
-        this.squareSize,
-        false,
-        false,
-        false,
-        true
-      );
+      path = generateCenterPath(this.squareSize, false, false, false, true);
     else if (
       center == right &&
       center == bottom &&
       center != left &&
       center != top
     )
-      path = generateTruncatedSquareString(
-        this.squareSize,
-        true,
-        false,
-        false,
-        false
-      );
+      path = generateCenterPath(this.squareSize, true, false, false, false);
     else if (
       center == bottom &&
       center == left &&
       center != top &&
       center != right
     )
-      path = generateTruncatedSquareString(
-        this.squareSize,
-        false,
-        true,
-        false,
-        false
-      );
+      path = generateCenterPath(this.squareSize, false, true, false, false);
     else if (
       center == left &&
       center == top &&
       center != right &&
       center != bottom
     )
-      path = generateTruncatedSquareString(
-        this.squareSize,
-        false,
-        false,
-        true,
-        false
-      );
+      path = generateCenterPath(this.squareSize, false, false, true, false);
     else {
-      path = generateTruncatedSquareString(
-        this.squareSize,
-        false,
-        false,
-        false,
-        false
-      );
+      path = generateCenterPath(this.squareSize, false, false, false, false);
     }
     svgElement(
       "path",
@@ -269,59 +295,17 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     // if the center cell has paint, calculate its fill and corners
     if (cellList[4]) {
       this.centerFill(center, top, right, bottom, left, grid, id);
-    } else if (top && left && bottom && right) {
-      svgElement(
-        tag,
-        {
-          d: smallCornerTopRight(this.squareSize),
-          stroke: top,
-          fill: top,
-        },
-        grid,
-        `${id}-${SMALLTRI}-tr`
-      );
-      svgElement(
-        tag,
-        {
-          d: smallCornerTopLeft(this.squareSize),
-          stroke: top,
-          fill: top,
-        },
-        grid,
-        `${id}-${SMALLTRI}-tl`
-      );
-      svgElement(
-        tag,
-        {
-          d: smallCornerBottomLeft(this.squareSize),
-          stroke: top,
-          fill: top,
-        },
-        grid,
-        `${id}-${SMALLTRI}-bl`
-      );
-      svgElement(
-        tag,
-        {
-          d: smallCornerBottomRight(this.squareSize),
-          stroke: top,
-          fill: top,
-        },
-        grid,
-        `${id}-${SMALLTRI}-br`
-      );
     } else {
+      // Check each set of adjacent neighbors and diagonal to determine if small
+      // corners or triangle half-grids should be drawn
       if (top && right) {
         if (cellList[2]) {
-          svgElement(
+          smallCornerTopRightSvg(
             tag,
-            {
-              d: smallCornerTopRight(this.squareSize),
-              stroke: top,
-              fill: top,
-            },
+            top,
             grid,
-            `${id}-${SMALLTRI}-tr`
+            `${id}-${SMALLTRI}-tr`,
+            this.squareSize
           );
         } else {
           svgElement(
@@ -338,15 +322,12 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       }
       if (right && bottom) {
         if (cellList[8]) {
-          svgElement(
+          smallCornerBottomRightSvg(
             tag,
-            {
-              d: smallCornerBottomRight(this.squareSize),
-              stroke: right,
-              fill: right,
-            },
+            right,
             grid,
-            `${id}-${SMALLTRI}-br`
+            `${id}-${SMALLTRI}-br`,
+            this.squareSize
           );
         } else {
           svgElement(
@@ -363,15 +344,12 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       }
       if (bottom && left) {
         if (cellList[6]) {
-          svgElement(
+          smallCornerBottomLeftSvg(
             tag,
-            {
-              d: smallCornerBottomLeft(this.squareSize),
-              stroke: bottom,
-              fill: bottom,
-            },
+            bottom,
             grid,
-            `${id}-${SMALLTRI}-bl`
+            `${id}-${SMALLTRI}-bl`,
+            this.squareSize
           );
         } else {
           svgElement(
@@ -388,15 +366,12 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       }
       if (left && top) {
         if (cellList[0]) {
-          svgElement(
+          smallCornerTopLeftSvg(
             tag,
-            {
-              d: smallCornerTopLeft(this.squareSize),
-              stroke: left,
-              fill: left,
-            },
+            left,
             grid,
-            `${id}-${SMALLTRI}-tl`
+            `${id}-${SMALLTRI}-tl`,
+            this.squareSize
           );
         } else {
           svgElement(
@@ -411,9 +386,40 @@ module.exports = class NeighborhoodDrawer extends Drawer {
           );
         }
       }
+      if (top && left && bottom && right) {
+        smallCornerTopRightSvg(
+          tag,
+          top,
+          grid,
+          `${id}-${SMALLTRI}-tr`,
+          this.squareSize
+        );
+        smallCornerTopLeftSvg(
+          tag,
+          top,
+          grid,
+          `${id}-${SMALLTRI}-tl`,
+          this.squareSize
+        );
+        smallCornerBottomLeftSvg(
+          tag,
+          bottom,
+          grid,
+          `${id}-${SMALLTRI}-bl`,
+          this.squareSize
+        );
+        smallCornerBottomRightSvg(
+          tag,
+          bottom,
+          grid,
+          `${id}-${SMALLTRI}-br`,
+          this.squareSize
+        );
+      }
     }
   }
 
+  // Creates the parent svg for this grid tile
   makeGrid(row, col, svg) {
     let id = "g" + row + "." + col;
     return svgElement(
@@ -495,27 +501,30 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       );
     }
 
-    for (let r = row - 1; r < row + 2; r++) {
-      for (let c = col - 1; c < col + 2; c++) {
-        let id = r + "." + c + ".";
+    // Only calculate colors for all neighbors if this cell has a color
+    if (this.cellColor(row, col)) {
+      for (let r = row - 1; r < row + 2; r++) {
+        for (let c = col - 1; c < col + 2; c++) {
+          let id = r + "." + c + ".";
 
-        let cells = [
-          this.cellColor(r - 1, c - 1), // Top left
-          this.cellColor(r, c - 1), // Top
-          this.cellColor(r + 1, c - 1), // Top right
-          this.cellColor(r - 1, c), // Middle left
-          this.cellColor(r, c), // Target cell
-          this.cellColor(r + 1, c), // Middle right
-          this.cellColor(r - 1, c + 1), // Bottom left
-          this.cellColor(r, c + 1), // Bottom
-          this.cellColor(r + 1, c + 1), // Bottom right
-        ];
+          let cells = [
+            this.cellColor(r - 1, c - 1), // Top left
+            this.cellColor(r - 1, c), // Top
+            this.cellColor(r - 1, c + 1), // Top right
+            this.cellColor(r, c - 1), // Middle left
+            this.cellColor(r, c), // Target cell
+            this.cellColor(r, c + 1), // Middle right
+            this.cellColor(r + 1, c - 1), // Bottom left
+            this.cellColor(r + 1, c), // Bottom
+            this.cellColor(r + 1, c + 1), // Bottom right
+          ];
 
-        // Create grid block group for this center focus cell
-        let grid = this.makeGrid(r, c, this.svg_);
+          // Create grid block group for this center focus cell
+          let grid = this.makeGrid(r, c, this.svg_);
 
-        // Calculate all the svg paths based on neighboring cell colors
-        this.pathCalculator(cells, grid, id);
+          // Calculate all the svg paths based on neighboring cell colors
+          this.pathCalculator(cells, grid, id);
+        }
       }
     }
   }
