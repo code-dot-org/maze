@@ -12,6 +12,7 @@ const PATH = "path";
 const SMALLMULT = 0.3;
 const LARGEMULT = 0.7;
 
+// This creates the js equivalent of an Enum for the corner names
 const Corner = Object.freeze({
   topLeft: "topLeft",
   topRight: "topRight",
@@ -91,7 +92,11 @@ function smallCornerSvg(color, grid, id, size, corner) {
 
 /**
  * Returns the svg element for the half-grid triangle depending on which
- * corner is the source.
+ * corner is the source. For example, the following two are Corner.bottomLeft
+ * and Corner.bottomRight:
+ * .          .
+ * | \      / |
+ * |___\  /___|
  *
  * @param color the stroke and fill colors
  * @param grid the parent element
@@ -127,6 +132,14 @@ function triangleSvg(color, grid, id, size, corner) {
   );
 }
 
+/**
+ * Creates a path for a square with any number of corners 0-4 "cut out".
+ * For example, if only topRightIsTruncated = true:
+ *  _____
+ * |     \
+ * |      |
+ * |______|
+ */
 function generateCenterPath(
   size,
   topLeftIsTruncated,
@@ -151,11 +164,6 @@ function generateCenterPath(
 
 /**
  * This drawer hosts all paint glomming logic.
- * A note on layering paint: If paint is applied on top of existing paint
- * (that has not been removed/scraped), portions of the cell might still
- * display the first layer of paint. Example: [blue][blue] in layer 1 will
- * create a "pill" visual. If the second cell is then painted [yellow], the
- * yellow circle will appear on top, with the blue cutouts still visible below.
  */
 module.exports = class NeighborhoodDrawer extends Drawer {
   constructor(map, skin, svg, squareSize, neighborhood) {
@@ -276,23 +284,28 @@ module.exports = class NeighborhoodDrawer extends Drawer {
 
   /**
    * Holds the bulk of the logic of coloring based on neighbor cells. The order
-   * of cells in the input list is as follows:
+   * of cells in the input list is as follows, and are labeled accordingly:
    *
    * 0 1 2
    * 3 4 5
    * 6 7 8
    *
-   * @param cellColorList representing the center (4) and its 8 surrounding
+   * @param cellColorList representing the colors of a grid of 9 cells
    * @param grid the parent element we will add svg elements to
    * @param id the row and column we're on in id form
    */
   pathCalculator(cellColorList, grid, id) {
     let size = this.squareSize;
-    let center = cellColorList[4];
+
+    let topLeft = cellColorList[0];
     let top = cellColorList[1];
-    let right = cellColorList[5];
-    let bottom = cellColorList[7];
+    let topRight = cellColorList[2];
     let left = cellColorList[3];
+    let center = cellColorList[4];
+    let right = cellColorList[5];
+    let bottomLeft = cellColorList[6];
+    let bottom = cellColorList[7];
+    let bottomRight = cellColorList[8];
 
     // If anything has been drawn in this cell already, remove it
     let gridId = "g" + id;
@@ -305,7 +318,8 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     if (center) {
       this.centerFill(cellColorList, grid, id);
     }
-    // the circle case: ensure the center cell only has small corners
+    // the circle case: ensure the center cell only has small corners if
+    // all surrounding cells are matching (this prevents a filled-in center)
     else if (
       top &&
       left &&
@@ -320,33 +334,35 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       smallCornerSvg(bottom, grid, id, size, Corner.bottomLeft);
       smallCornerSvg(bottom, grid, id, size, Corner.bottomRight);
     } else {
-      // Check each set of adjacent neighbors and corner cell to determine if
-      // small corners or triangle half-grids should be drawn
+      // Check each set of adjacent neighbors and the corresponding corner cell
+      // to determine if small corners or triangle half-grids should be added.
+      // Only add the triangle half-grids if there is no color in the outside
+      // corner.
       if (top && right && top === right) {
-        if (cellColorList[2] && cellColorList[2] === top) {
+        if (topRight && topRight === top) {
           smallCornerSvg(top, grid, id, size, Corner.topRight);
-        } else {
+        } else if (!topRight) {
           triangleSvg(top, grid, id, size, Corner.topRight);
         }
       }
       if (right && bottom && right === bottom) {
-        if (cellColorList[8] && cellColorList[8] === right) {
+        if (bottomRight && bottomRight === right) {
           smallCornerSvg(right, grid, id, size, Corner.bottomRight);
-        } else {
+        } else if (!bottomRight) {
           triangleSvg(right, grid, id, size, Corner.bottomRight);
         }
       }
       if (bottom && left && bottom === left) {
-        if (cellColorList[6] && cellColorList[6] === bottom) {
+        if (bottomLeft && bottomLeft === bottom) {
           smallCornerSvg(bottom, grid, id, size, Corner.bottomLeft);
-        } else {
+        } else if (!bottomLeft) {
           triangleSvg(bottom, grid, id, size, Corner.bottomLeft);
         }
       }
       if (left && top && left === top) {
-        if (cellColorList[0] && cellColorList[0] === left) {
+        if (topLeft && topLeft === left) {
           smallCornerSvg(left, grid, id, size, Corner.topLeft);
-        } else {
+        } else if (!topLeft) {
           triangleSvg(left, grid, id, size, Corner.topLeft);
         }
       }
@@ -406,8 +422,8 @@ module.exports = class NeighborhoodDrawer extends Drawer {
   /**
    * @override
    * This method is used to display the paint and paint buckets.
-   * It has to reprocess the entire grid to get the paint glomming correct, but
-   * it only updates the bucket at the specified row and col if necessary.
+   * It only updates the bucket at the specified row and col if necessary, and
+   * only updates the paint on the neighborhing cells.
    * @param {number} row: row of update
    * @param {number} col: column of update
    * @param {boolean} running: if the maze is currently running (not used here, but part of signature of super)
