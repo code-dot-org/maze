@@ -244,30 +244,20 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * Determines how much of this tile should be colored in based on the colors
    * of the adjacent neighbors.
    */
-  centerFill(center, top, right, bottom, left, grid, id) {
+  centerFill(cellColorList, grid, id) {
+    let center = cellColorList[4];
+    let top = cellColorList[1];
+    let right = cellColorList[5];
+    let bottom = cellColorList[7];
+    let left = cellColorList[3];
     var path;
-    if (center == top && center == right && center != bottom && center != left)
+    if (center == top && center == right && !bottom && !left)
       path = generateCenterPath(this.squareSize, false, false, false, true);
-    else if (
-      center == right &&
-      center == bottom &&
-      center != left &&
-      center != top
-    )
+    else if (center == right && center == bottom && !left && !top)
       path = generateCenterPath(this.squareSize, true, false, false, false);
-    else if (
-      center == bottom &&
-      center == left &&
-      center != top &&
-      center != right
-    )
+    else if (center == bottom && center == left && !top && !right)
       path = generateCenterPath(this.squareSize, false, true, false, false);
-    else if (
-      center == left &&
-      center == top &&
-      center != right &&
-      center != bottom
-    )
+    else if (center == left && center == top && !right && !bottom)
       path = generateCenterPath(this.squareSize, false, false, true, false);
     else {
       path = generateCenterPath(this.squareSize, false, false, false, false);
@@ -292,21 +282,28 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * 3 4 5
    * 6 7 8
    *
-   * @param cellList representing the center (4) and its 8 surrounding
+   * @param cellColorList representing the center (4) and its 8 surrounding
    * @param grid the parent element we will add svg elements to
    * @param id the row and column we're on in id form
    */
-  pathCalculator(cellList, grid, id) {
+  pathCalculator(cellColorList, grid, id) {
     let size = this.squareSize;
-    let center = cellList[4];
-    let top = cellList[1];
-    let right = cellList[5];
-    let bottom = cellList[7];
-    let left = cellList[3];
+    let center = cellColorList[4];
+    let top = cellColorList[1];
+    let right = cellColorList[5];
+    let bottom = cellColorList[7];
+    let left = cellColorList[3];
+
+    // If anything has been drawn in this cell already, remove it
+    let gridId = "g" + id;
+    var node = document.getElementById(gridId);
+    if (node) {
+      node.querySelectorAll("*").forEach((n) => n.remove());
+    }
 
     // if the center cell has paint, calculate its fill and corners
     if (center) {
-      this.centerFill(center, top, right, bottom, left, grid, id);
+      this.centerFill(cellColorList, grid, id);
     }
     // the circle case: ensure the center cell only has small corners
     else if (
@@ -318,12 +315,6 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       left === bottom &&
       bottom === right
     ) {
-      // We know half triangles have already been drawn: remove them
-      let gridId = "g" + id;
-      var node = document.getElementById(gridId);
-      if (node) {
-        node.querySelectorAll("*").forEach((n) => n.remove());
-      }
       smallCornerSvg(top, grid, id, size, Corner.topLeft);
       smallCornerSvg(top, grid, id, size, Corner.topRight);
       smallCornerSvg(bottom, grid, id, size, Corner.bottomLeft);
@@ -332,28 +323,28 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       // Check each set of adjacent neighbors and corner cell to determine if
       // small corners or triangle half-grids should be drawn
       if (top && right && top === right) {
-        if (cellList[2] && cellList[2] === top) {
+        if (cellColorList[2] && cellColorList[2] === top) {
           smallCornerSvg(top, grid, id, size, Corner.topRight);
         } else {
           triangleSvg(top, grid, id, size, Corner.topRight);
         }
       }
       if (right && bottom && right === bottom) {
-        if (cellList[8] && cellList[8] === right) {
+        if (cellColorList[8] && cellColorList[8] === right) {
           smallCornerSvg(right, grid, id, size, Corner.bottomRight);
         } else {
           triangleSvg(right, grid, id, size, Corner.bottomRight);
         }
       }
       if (bottom && left && bottom === left) {
-        if (cellList[6] && cellList[6] === bottom) {
+        if (cellColorList[6] && cellColorList[6] === bottom) {
           smallCornerSvg(bottom, grid, id, size, Corner.bottomLeft);
         } else {
           triangleSvg(bottom, grid, id, size, Corner.bottomLeft);
         }
       }
       if (left && top && left === top) {
-        if (cellList[0] && cellList[0] === left) {
+        if (cellColorList[0] && cellColorList[0] === left) {
           smallCornerSvg(left, grid, id, size, Corner.topLeft);
         } else {
           triangleSvg(left, grid, id, size, Corner.topLeft);
