@@ -163,6 +163,19 @@ function generateCenterPath(
 }
 
 /**
+ * Determines whether we should create a small corner SVG or a grid half triangle SVG,
+ * if either. Add the corner cutout if the corner is the same color as the adjacent cells.
+ * Only add the triangle half-grids if there is no color in the outside corner.
+ */
+function cornerFill(grid, id, size, adjacentColor, cornerColor, corner) {
+  if (cornerColor && cornerColor === adjacentColor) {
+    smallCornerSvg(adjacentColor, grid, id, size, corner);
+  } else if (!cornerColor) {
+    triangleSvg(adjacentColor, grid, id, size, corner);
+  }
+}
+
+/**
  * This drawer hosts all paint glomming logic.
  */
 module.exports = class NeighborhoodDrawer extends Drawer {
@@ -336,35 +349,17 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     } else {
       // Check each set of adjacent neighbors and the corresponding corner cell
       // to determine if small corners or triangle half-grids should be added.
-      // Only add the triangle half-grids if there is no color in the outside
-      // corner.
       if (top && right && top === right) {
-        if (topRight && topRight === top) {
-          smallCornerSvg(top, grid, id, size, Corner.topRight);
-        } else if (!topRight) {
-          triangleSvg(top, grid, id, size, Corner.topRight);
-        }
+        cornerFill(grid, id, size, top, topRight, Corner.topRight);
       }
       if (right && bottom && right === bottom) {
-        if (bottomRight && bottomRight === right) {
-          smallCornerSvg(right, grid, id, size, Corner.bottomRight);
-        } else if (!bottomRight) {
-          triangleSvg(right, grid, id, size, Corner.bottomRight);
-        }
+        cornerFill(grid, id, size, right, bottomRight, Corner.bottomRight);
       }
       if (bottom && left && bottom === left) {
-        if (bottomLeft && bottomLeft === bottom) {
-          smallCornerSvg(bottom, grid, id, size, Corner.bottomLeft);
-        } else if (!bottomLeft) {
-          triangleSvg(bottom, grid, id, size, Corner.bottomLeft);
-        }
+        cornerFill(grid, id, size, bottom, bottomLeft, Corner.bottomLeft);
       }
       if (left && top && left === top) {
-        if (topLeft && topLeft === left) {
-          smallCornerSvg(left, grid, id, size, Corner.topLeft);
-        } else if (!topLeft) {
-          triangleSvg(left, grid, id, size, Corner.topLeft);
-        }
+        cornerFill(grid, id, size, left, topLeft, Corner.topLeft);
       }
     }
   }
