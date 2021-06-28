@@ -307,7 +307,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * @param grid the parent element we will add svg elements to
    * @param id the row and column we're on in id form
    */
-  pathCalculator(cellColorList, grid, id) {
+  colorCells(cellColorList, grid, id) {
     let size = this.squareSize;
 
     let topLeft = cellColorList[0];
@@ -468,7 +468,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
           let grid = this.makeGrid(r, c, this.svg_);
 
           // Calculate all the svg paths based on neighboring cell colors
-          this.pathCalculator(cells, grid, id);
+          this.colorCells(cells, grid, id);
         }
       }
     }
