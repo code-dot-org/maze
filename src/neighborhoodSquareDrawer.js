@@ -6,6 +6,7 @@ const TRIANGLE = "triangle";
 const SMALLTRI = "smallCorner";
 const CENTER = "center";
 const PATH = "path";
+const GAP = 0.25;
 
 // These multipliers control how far across the grid the corners are cut
 // To keep the corners "even", they should add up to 1
@@ -148,17 +149,23 @@ function generateCenterPath(
   bottomLeftIsTruncated
 ) {
   const topLeftCorner = topLeftIsTruncated
-    ? `m0,${size * SMALLMULT} L${size * SMALLMULT},0`
-    : `m0,0`;
+    ? `m${0 - GAP},${size * SMALLMULT + GAP} L${size * SMALLMULT + GAP},${
+        0 - GAP
+      }`
+    : `m${0 - GAP},${0 - GAP}`;
   const topRightCorner = topRightIsTruncated
-    ? `L${size * LARGEMULT},0 L${size},${size * SMALLMULT}`
-    : `L${size},0`;
+    ? `L${size * LARGEMULT + GAP},${0 - GAP} L${size + GAP},${
+        size * SMALLMULT + GAP
+      }`
+    : `L${size + GAP},${0 - GAP}`;
   const bottomRightCorner = bottomRightIsTruncated
-    ? `L${size},${size * LARGEMULT} L${size * LARGEMULT},${size}`
-    : `L${size},${size}`;
+    ? `L${size + GAP},${size * LARGEMULT + GAP} L${size * LARGEMULT + GAP},${
+        size + GAP
+      }`
+    : `L${size + GAP},${size + GAP}`;
   const bottomLeftCorner = bottomLeftIsTruncated
-    ? `L${size * SMALLMULT},${size} L0,${size * LARGEMULT}`
-    : `L0,${size}`;
+    ? `L${size * SMALLMULT},${size + GAP} L${0 - GAP},${size * LARGEMULT + GAP}`
+    : `L${0 - GAP},${size + GAP}`;
   return `${topLeftCorner} ${topRightCorner} ${bottomRightCorner} ${bottomLeftCorner} Z`;
 }
 
@@ -287,7 +294,9 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       "path",
       {
         d: path,
-        stroke: center,
+        //stroke: center,
+        //strokeWidth: "0.5px",
+        shapeRendering: "crispEdges",
         fill: center,
       },
       grid,
