@@ -294,9 +294,6 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       "path",
       {
         d: path,
-        //stroke: center,
-        //strokeWidth: "0.5px",
-        shapeRendering: "crispEdges",
         fill: center,
       },
       grid,
