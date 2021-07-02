@@ -367,7 +367,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
   // Creates the parent svg for this grid tile
   makeGrid(row, col, svg) {
     let id = "g" + row + "." + col;
-    return svgElement(
+    svgElement(
       "g",
       {
         transform: `translate(${col * this.squareSize}, 
@@ -376,6 +376,12 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       svg,
       id
     );
+  }
+
+  // Returns the group grid element given a row and column
+  getGrid(row, col) {
+    let id = "g" + row + "." + col;
+    return document.getElementById(id);
   }
 
   /**
@@ -446,6 +452,9 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       );
     }
 
+    // Create grid block group for this center focus cell
+    this.makeGrid(row, col, this.svg_);
+
     // Only calculate colors for all neighbors if this cell has a color
     if (this.cellColor(row, col)) {
       for (let r = row - 1; r < row + 2; r++) {
@@ -464,8 +473,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
             this.cellColor(r + 1, c + 1), // Bottom right
           ];
 
-          // Create grid block group for this center focus cell
-          let grid = this.makeGrid(r, c, this.svg_);
+          let grid = this.getGrid(r, c);
 
           // Calculate all the svg paths based on neighboring cell colors
           this.colorCells(cells, grid, id);
