@@ -6,7 +6,6 @@ const TRIANGLE = "triangle";
 const SMALLTRI = "smallCorner";
 const CENTER = "center";
 const PATH = "path";
-const GAP = 0.25;
 
 // These multipliers control how far across the grid the corners are cut
 // To keep the corners "even", they should add up to 1
@@ -149,23 +148,17 @@ function generateCenterPath(
   bottomLeftIsTruncated
 ) {
   const topLeftCorner = topLeftIsTruncated
-    ? `m${0 - GAP},${size * SMALLMULT + GAP} L${size * SMALLMULT + GAP},${
-        0 - GAP
-      }`
-    : `m${0 - GAP},${0 - GAP}`;
+    ? `m0,${size * SMALLMULT} L${size * SMALLMULT},0`
+    : `m0,0`;
   const topRightCorner = topRightIsTruncated
-    ? `L${size * LARGEMULT + GAP},${0 - GAP} L${size + GAP},${
-        size * SMALLMULT + GAP
-      }`
-    : `L${size + GAP},${0 - GAP}`;
+    ? `L${size * LARGEMULT},0 L${size},${size * SMALLMULT}`
+    : `L${size},0`;
   const bottomRightCorner = bottomRightIsTruncated
-    ? `L${size + GAP},${size * LARGEMULT + GAP} L${size * LARGEMULT + GAP},${
-        size + GAP
-      }`
-    : `L${size + GAP},${size + GAP}`;
+    ? `L${size},${size * LARGEMULT} L${size * LARGEMULT},${size}`
+    : `L${size},${size}`;
   const bottomLeftCorner = bottomLeftIsTruncated
-    ? `L${size * SMALLMULT},${size + GAP} L${0 - GAP},${size * LARGEMULT + GAP}`
-    : `L${0 - GAP},${size + GAP}`;
+    ? `L${size * SMALLMULT},${size} L0,${size * LARGEMULT}`
+    : `L0,${size}`;
   return `${topLeftCorner} ${topRightCorner} ${bottomRightCorner} ${bottomLeftCorner} Z`;
 }
 
@@ -294,6 +287,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       "path",
       {
         d: path,
+        stroke: center,
         fill: center,
       },
       grid,
@@ -373,7 +367,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
   // Creates the parent svg for this grid tile
   makeGrid(row, col, svg) {
     let id = "g" + row + "." + col;
-    return svgElement(
+    svgElement(
       "g",
       {
         transform: `translate(${col * this.squareSize}, 
@@ -382,6 +376,12 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       svg,
       id
     );
+  }
+
+  // Returns the group grid element given a row and column
+  getGrid(row, col) {
+    let id = "g" + row + "." + col;
+    return document.getElementById(id);
   }
 
   /**
@@ -452,6 +452,9 @@ module.exports = class NeighborhoodDrawer extends Drawer {
       );
     }
 
+    // Create grid block group for this center focus cell
+    this.makeGrid(row, col, this.svg_);
+
     // Only calculate colors for all neighbors if this cell has a color
     if (this.cellColor(row, col)) {
       for (let r = row - 1; r < row + 2; r++) {
@@ -470,8 +473,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
             this.cellColor(r + 1, c + 1), // Bottom right
           ];
 
-          // Create grid block group for this center focus cell
-          let grid = this.makeGrid(r, c, this.svg_);
+          let grid = this.getGrid(r, c);
 
           // Calculate all the svg paths based on neighboring cell colors
           this.colorCells(cells, grid, id);
