@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const { SVG_NS } = require("./drawer");
 const Drawer = require("./drawer");
 const tiles = require("./tiles");
@@ -167,8 +168,8 @@ function generateCenterPath(
  * if either. Add the corner cutout if the corner is the same color as the adjacent cells.
  * Only add the triangle half-grids if there is no color in the outside corner.
  */
-function cornerFill(grid, id, size, adjacentColor, cornerColor, corner) {
-  if (cornerColor && cornerColor === adjacentColor) {
+function cornerFill(grid, id, size, adjacentColor, cornerColor, farCorner1, farCorner2, corner) {
+  if (cornerColor && cornerColor === adjacentColor && (cornerColor === farCorner1 || cornerColor === farCorner2)) {
     smallCornerSvg(adjacentColor, grid, id, size, corner);
   } else if (!cornerColor) {
     triangleSvg(adjacentColor, grid, id, size, corner);
@@ -308,6 +309,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * @param id the row and column we're on in id form
    */
   colorCells(cellColorList, grid, id) {
+    console.log("coloring");
     let size = this.squareSize;
 
     let topLeft = cellColorList[0];
@@ -326,40 +328,26 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     if (node) {
       node.querySelectorAll("*").forEach((n) => n.remove());
     }
-
     // if the center cell has paint, calculate its fill and corners
     if (center) {
+      console.log("we have color in the middle");
       this.centerFill(cellColorList, grid, id);
     }
-    // the circle case: ensure the center cell only has small corners if
-    // all surrounding cells are matching (this prevents a filled-in center)
-    else if (
-      top &&
-      left &&
-      bottom &&
-      right &&
-      top === left &&
-      left === bottom &&
-      bottom === right
-    ) {
-      smallCornerSvg(top, grid, id, size, Corner.topLeft);
-      smallCornerSvg(top, grid, id, size, Corner.topRight);
-      smallCornerSvg(bottom, grid, id, size, Corner.bottomLeft);
-      smallCornerSvg(bottom, grid, id, size, Corner.bottomRight);
-    } else {
+    else {
+      console.log("made it inside the else");
       // Check each set of adjacent neighbors and the corresponding corner cell
       // to determine if small corners or triangle half-grids should be added.
       if (top && right && top === right) {
-        cornerFill(grid, id, size, top, topRight, Corner.topRight);
+        cornerFill(grid, id, size, top, topRight, topLeft, bottomRight, Corner.topRight);
       }
       if (right && bottom && right === bottom) {
-        cornerFill(grid, id, size, right, bottomRight, Corner.bottomRight);
+        cornerFill(grid, id, size, right, bottomRight, topRight, bottomLeft, Corner.bottomRight);
       }
       if (bottom && left && bottom === left) {
-        cornerFill(grid, id, size, bottom, bottomLeft, Corner.bottomLeft);
+        cornerFill(grid, id, size, bottom, bottomLeft, bottomRight, topLeft, Corner.bottomLeft);
       }
       if (left && top && left === top) {
-        cornerFill(grid, id, size, left, topLeft, Corner.topLeft);
+        cornerFill(grid, id, size, left, topLeft, bottomLeft, topRight, Corner.topLeft);
       }
     }
   }
@@ -457,6 +445,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
 
     // Only calculate colors for all neighbors if this cell has a color
     if (this.cellColor(row, col)) {
+      console.log("starting to draw things here");
       for (let r = row - 1; r < row + 2; r++) {
         for (let c = col - 1; c < col + 2; c++) {
           let id = r + "." + c;
