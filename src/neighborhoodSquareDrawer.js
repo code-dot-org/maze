@@ -171,7 +171,7 @@ function generateCenterPath(
 function cornerFill(grid, id, size, adjacentColor, cornerColor, farCorner1, farCorner2, corner) {
   if (cornerColor && cornerColor === adjacentColor && (cornerColor === farCorner1 || cornerColor === farCorner2)) {
     smallCornerSvg(adjacentColor, grid, id, size, corner);
-  } else if (!cornerColor) {
+  } else if (!cornerColor || cornerColor === adjacentColor) {
     triangleSvg(adjacentColor, grid, id, size, corner);
   }
 }
@@ -267,19 +267,23 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * of the adjacent neighbors.
    */
   centerFill(cellColorList, grid, id) {
-    let center = cellColorList[4];
+    let topLeft = cellColorList[0];
     let top = cellColorList[1];
-    let right = cellColorList[5];
-    let bottom = cellColorList[7];
+    let topRight = cellColorList[2];
     let left = cellColorList[3];
+    let center = cellColorList[4];
+    let right = cellColorList[5];
+    let bottomLeft = cellColorList[6];
+    let bottom = cellColorList[7];
+    let bottomRight = cellColorList[8];
     var path;
-    if (center == top && center == right && !bottom && !left)
+    if (center == top && center == right && !bottom && !left && !topLeft && !bottomRight)
       path = generateCenterPath(this.squareSize, false, false, false, true);
-    else if (center == right && center == bottom && !left && !top)
+    else if (center == right && center == bottom && !left && !top && !topRight && !bottomLeft)
       path = generateCenterPath(this.squareSize, true, false, false, false);
-    else if (center == bottom && center == left && !top && !right)
+    else if (center == bottom && center == left && !top && !right && !bottomRight && !topLeft)
       path = generateCenterPath(this.squareSize, false, true, false, false);
-    else if (center == left && center == top && !right && !bottom)
+    else if (center == left && center == top && !right && !bottom && !bottomLeft && !topRight)
       path = generateCenterPath(this.squareSize, false, false, true, false);
     else {
       path = generateCenterPath(this.squareSize, false, false, false, false);
@@ -309,7 +313,6 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * @param id the row and column we're on in id form
    */
   colorCells(cellColorList, grid, id) {
-    console.log("coloring");
     let size = this.squareSize;
 
     let topLeft = cellColorList[0];
@@ -330,11 +333,9 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     }
     // if the center cell has paint, calculate its fill and corners
     if (center) {
-      console.log("we have color in the middle");
       this.centerFill(cellColorList, grid, id);
     }
     else {
-      console.log("made it inside the else");
       // Check each set of adjacent neighbors and the corresponding corner cell
       // to determine if small corners or triangle half-grids should be added.
       if (top && right && top === right) {
@@ -445,7 +446,6 @@ module.exports = class NeighborhoodDrawer extends Drawer {
 
     // Only calculate colors for all neighbors if this cell has a color
     if (this.cellColor(row, col)) {
-      console.log("starting to draw things here");
       for (let r = row - 1; r < row + 2; r++) {
         for (let c = col - 1; c < col + 2; c++) {
           let id = r + "." + c;
