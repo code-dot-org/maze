@@ -168,8 +168,21 @@ function generateCenterPath(
  * if either. Add the corner cutout if the corner is the same color as the adjacent cells.
  * Only add the triangle half-grids if there is no color in the outside corner.
  */
-function cornerFill(grid, id, size, adjacentColor, cornerColor, farCorner1, farCorner2, corner) {
-  if (cornerColor && cornerColor === adjacentColor && (cornerColor === farCorner1 || cornerColor === farCorner2)) {
+function cornerFill(
+  grid,
+  id,
+  size,
+  adjacentColor,
+  cornerColor,
+  farCorner1,
+  farCorner2,
+  corner
+) {
+  if (
+    cornerColor &&
+    cornerColor === adjacentColor &&
+    (cornerColor === farCorner1 || cornerColor === farCorner2)
+  ) {
     smallCornerSvg(adjacentColor, grid, id, size, corner);
   } else if (!cornerColor || cornerColor === adjacentColor) {
     triangleSvg(adjacentColor, grid, id, size, corner);
@@ -277,13 +290,41 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     let bottom = cellColorList[7];
     let bottomRight = cellColorList[8];
     var path;
-    if (center == top && center == right && !bottom && !left && !topLeft && !bottomRight)
+    if (
+      center == top &&
+      center == right &&
+      !bottom &&
+      !left &&
+      !topLeft &&
+      !bottomRight
+    )
       path = generateCenterPath(this.squareSize, false, false, false, true);
-    else if (center == right && center == bottom && !left && !top && !topRight && !bottomLeft)
+    else if (
+      center == right &&
+      center == bottom &&
+      !left &&
+      !top &&
+      !topRight &&
+      !bottomLeft
+    )
       path = generateCenterPath(this.squareSize, true, false, false, false);
-    else if (center == bottom && center == left && !top && !right && !bottomRight && !topLeft)
+    else if (
+      center == bottom &&
+      center == left &&
+      !top &&
+      !right &&
+      !bottomRight &&
+      !topLeft
+    )
       path = generateCenterPath(this.squareSize, false, true, false, false);
-    else if (center == left && center == top && !right && !bottom && !bottomLeft && !topRight)
+    else if (
+      center == left &&
+      center == top &&
+      !right &&
+      !bottom &&
+      !bottomLeft &&
+      !topRight
+    )
       path = generateCenterPath(this.squareSize, false, false, true, false);
     else {
       path = generateCenterPath(this.squareSize, false, false, false, false);
@@ -334,21 +375,56 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     // if the center cell has paint, calculate its fill and corners
     if (center) {
       this.centerFill(cellColorList, grid, id);
-    }
-    else {
+    } else {
       // Check each set of adjacent neighbors and the corresponding corner cell
       // to determine if small corners or triangle half-grids should be added.
       if (top && right && top === right) {
-        cornerFill(grid, id, size, top, topRight, topLeft, bottomRight, Corner.topRight);
+        cornerFill(
+          grid,
+          id,
+          size,
+          top,
+          topRight,
+          topLeft,
+          bottomRight,
+          Corner.topRight
+        );
       }
       if (right && bottom && right === bottom) {
-        cornerFill(grid, id, size, right, bottomRight, topRight, bottomLeft, Corner.bottomRight);
+        cornerFill(
+          grid,
+          id,
+          size,
+          right,
+          bottomRight,
+          topRight,
+          bottomLeft,
+          Corner.bottomRight
+        );
       }
       if (bottom && left && bottom === left) {
-        cornerFill(grid, id, size, bottom, bottomLeft, bottomRight, topLeft, Corner.bottomLeft);
+        cornerFill(
+          grid,
+          id,
+          size,
+          bottom,
+          bottomLeft,
+          bottomRight,
+          topLeft,
+          Corner.bottomLeft
+        );
       }
       if (left && top && left === top) {
-        cornerFill(grid, id, size, left, topLeft, bottomLeft, topRight, Corner.topLeft);
+        cornerFill(
+          grid,
+          id,
+          size,
+          left,
+          topLeft,
+          bottomLeft,
+          topRight,
+          Corner.topLeft
+        );
       }
     }
   }
