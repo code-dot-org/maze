@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const { SVG_NS } = require("./drawer");
 const Drawer = require("./drawer");
 const tiles = require("./tiles");
@@ -165,8 +164,10 @@ function generateCenterPath(
 
 /**
  * Determines whether we should create a small corner SVG or a grid half triangle SVG,
- * if either. Add the corner cutout if the corner is the same color as the adjacent cells.
- * Only add the triangle half-grids if there is no color in the outside corner.
+ * if either. Add the corner cutout if the corner is the same color as the adjacent
+ * cells, and at least one of the two corners on the other sides of the adjacent cells
+ * with that same color. Add the triangle half-grids if the corner is the same color as
+ * the adjacent cells, or has no color at all.
  */
 function cornerFill(
   grid,
