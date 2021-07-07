@@ -164,13 +164,28 @@ function generateCenterPath(
 
 /**
  * Determines whether we should create a small corner SVG or a grid half triangle SVG,
- * if either. Add the corner cutout if the corner is the same color as the adjacent cells.
- * Only add the triangle half-grids if there is no color in the outside corner.
+ * if either. Add the corner cutout if the corner is the same color as the adjacent
+ * cells, and at least one of the two corners on the other sides of the adjacent cells
+ * with that same color. Add the triangle half-grids if the corner is the same color as
+ * the adjacent cells, or has no color at all.
  */
-function cornerFill(grid, id, size, adjacentColor, cornerColor, corner) {
-  if (cornerColor && cornerColor === adjacentColor) {
+function cornerFill(
+  grid,
+  id,
+  size,
+  adjacentColor,
+  cornerColor,
+  farCorner1,
+  farCorner2,
+  corner
+) {
+  if (
+    cornerColor &&
+    cornerColor === adjacentColor &&
+    (cornerColor === farCorner1 || cornerColor === farCorner2)
+  ) {
     smallCornerSvg(adjacentColor, grid, id, size, corner);
-  } else if (!cornerColor) {
+  } else if (!cornerColor || cornerColor === adjacentColor) {
     triangleSvg(adjacentColor, grid, id, size, corner);
   }
 }
@@ -266,19 +281,51 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * of the adjacent neighbors.
    */
   centerFill(cellColorList, grid, id) {
-    let center = cellColorList[4];
+    let topLeft = cellColorList[0];
     let top = cellColorList[1];
-    let right = cellColorList[5];
-    let bottom = cellColorList[7];
+    let topRight = cellColorList[2];
     let left = cellColorList[3];
+    let center = cellColorList[4];
+    let right = cellColorList[5];
+    let bottomLeft = cellColorList[6];
+    let bottom = cellColorList[7];
+    let bottomRight = cellColorList[8];
     var path;
-    if (center == top && center == right && !bottom && !left)
+    if (
+      center == top &&
+      center == right &&
+      !bottom &&
+      !left &&
+      !topLeft &&
+      !bottomRight
+    )
       path = generateCenterPath(this.squareSize, false, false, false, true);
-    else if (center == right && center == bottom && !left && !top)
+    else if (
+      center == right &&
+      center == bottom &&
+      !left &&
+      !top &&
+      !topRight &&
+      !bottomLeft
+    )
       path = generateCenterPath(this.squareSize, true, false, false, false);
-    else if (center == bottom && center == left && !top && !right)
+    else if (
+      center == bottom &&
+      center == left &&
+      !top &&
+      !right &&
+      !bottomRight &&
+      !topLeft
+    )
       path = generateCenterPath(this.squareSize, false, true, false, false);
-    else if (center == left && center == top && !right && !bottom)
+    else if (
+      center == left &&
+      center == top &&
+      !right &&
+      !bottom &&
+      !bottomLeft &&
+      !topRight
+    )
       path = generateCenterPath(this.squareSize, false, false, true, false);
     else {
       path = generateCenterPath(this.squareSize, false, false, false, false);
@@ -326,40 +373,59 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     if (node) {
       node.querySelectorAll("*").forEach((n) => n.remove());
     }
-
     // if the center cell has paint, calculate its fill and corners
     if (center) {
       this.centerFill(cellColorList, grid, id);
-    }
-    // the circle case: ensure the center cell only has small corners if
-    // all surrounding cells are matching (this prevents a filled-in center)
-    else if (
-      top &&
-      left &&
-      bottom &&
-      right &&
-      top === left &&
-      left === bottom &&
-      bottom === right
-    ) {
-      smallCornerSvg(top, grid, id, size, Corner.topLeft);
-      smallCornerSvg(top, grid, id, size, Corner.topRight);
-      smallCornerSvg(bottom, grid, id, size, Corner.bottomLeft);
-      smallCornerSvg(bottom, grid, id, size, Corner.bottomRight);
     } else {
       // Check each set of adjacent neighbors and the corresponding corner cell
       // to determine if small corners or triangle half-grids should be added.
       if (top && right && top === right) {
-        cornerFill(grid, id, size, top, topRight, Corner.topRight);
+        cornerFill(
+          grid,
+          id,
+          size,
+          top,
+          topRight,
+          topLeft,
+          bottomRight,
+          Corner.topRight
+        );
       }
       if (right && bottom && right === bottom) {
-        cornerFill(grid, id, size, right, bottomRight, Corner.bottomRight);
+        cornerFill(
+          grid,
+          id,
+          size,
+          right,
+          bottomRight,
+          topRight,
+          bottomLeft,
+          Corner.bottomRight
+        );
       }
       if (bottom && left && bottom === left) {
-        cornerFill(grid, id, size, bottom, bottomLeft, Corner.bottomLeft);
+        cornerFill(
+          grid,
+          id,
+          size,
+          bottom,
+          bottomLeft,
+          bottomRight,
+          topLeft,
+          Corner.bottomLeft
+        );
       }
       if (left && top && left === top) {
-        cornerFill(grid, id, size, left, topLeft, Corner.topLeft);
+        cornerFill(
+          grid,
+          id,
+          size,
+          left,
+          topLeft,
+          bottomLeft,
+          topRight,
+          Corner.topLeft
+        );
       }
     }
   }
