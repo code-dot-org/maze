@@ -1,7 +1,6 @@
 import Subtype from "./subtype";
 import NeighborhoodCell from "./neighborhoodCell";
-import NeighborhoodSquareDrawer from "./neighborhoodSquareDrawer";
-import NeighborhoodCircleDrawer from "./neighborhoodCircleDrawer";
+import NeighborhoodDrawer from "./neighborhoodDrawer";
 import { Direction } from "./tiles";
 
 module.exports = class Neighborhood extends Subtype {
@@ -76,24 +75,14 @@ module.exports = class Neighborhood extends Subtype {
   /**
    * @override
    **/
-  createDrawer(svg, drawer = "square") {
-    if (drawer === "square") {
-      this.drawer = new NeighborhoodSquareDrawer(
-        this.maze_.map,
-        this.skin_,
-        svg,
-        this.squareSize,
-        this
-      );
-    } else {
-      this.drawer = new NeighborhoodCircleDrawer(
-        this.maze_.map,
-        this.skin_,
-        svg,
-        this.squareSize,
-        this
-      );
-    }
+  createDrawer(svg) {
+    this.drawer = new NeighborhoodDrawer(
+      this.maze_.map,
+      this.skin_,
+      svg,
+      this.squareSize,
+      this
+    );
   }
 
   /**
