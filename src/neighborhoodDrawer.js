@@ -209,19 +209,12 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * @param col
    */
   resetTile(row, col) {
-    let neighbors = [
-      "g" + row + "." + col,
-      "g" + (row - 1) + "." + (col - 1),
-      "g" + row + "." + (col - 1),
-      "g" + (row - 1) + "." + col,
-    ];
+    let subjectTile = "g" + row + "." + col;
     const cell = this.neighborhood.getCell(row, col);
     cell.setColor(null);
-    for (const neighbor of neighbors) {
-      var node = document.getElementById(neighbor);
-      if (node) {
-        node.querySelectorAll("*").forEach((n) => n.remove());
-      }
+    var node = document.getElementById(subjectTile);
+    if (node) {
+      node.querySelectorAll("*").forEach((n) => n.remove());
     }
   }
 
