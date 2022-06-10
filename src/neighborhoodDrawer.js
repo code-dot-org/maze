@@ -199,6 +199,15 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     this.squareSize = squareSize;
     this.neighborhood = neighborhood;
     this.skin_ = skin;
+    this.showBuckets = true;
+  }
+
+  setBucketVisibility(showBuckets) {
+    this.showBuckets = showBuckets;
+  }
+
+  getBucketVisibility() {
+    return this.showBuckets;
   }
 
   /**
@@ -223,8 +232,9 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    */
   getAsset(prefix, row, col) {
     const cell = this.neighborhood.getCell(row, col);
-    // only cells with a value are handled by getAsset.
-    if (cell.getCurrentValue()) {
+    // If a cell has a value, it is a paint bucket. Return the paintCan asset
+    // if we currently are showing buckets.
+    if (cell.getCurrentValue() && this.showBuckets) {
       return this.skin_.paintCan;
     }
   }
@@ -254,6 +264,7 @@ module.exports = class NeighborhoodDrawer extends Drawer {
    * Calls resetTile for each tile in the grid, clearing all paint.
    */
   resetTiles() {
+    this.showBuckets = true;
     for (let row = 0; row < this.map_.ROWS; row++) {
       for (let col = 0; col < this.map_.COLS; col++) {
         this.resetTile(row, col);
@@ -495,8 +506,10 @@ module.exports = class NeighborhoodDrawer extends Drawer {
     // is a paint can square. Ensure it is shown/hidden appropriately
     // and with the correct value.
     if (cell.getOriginalValue() > 0) {
-      const newValue = cell.getCurrentValue() > 0 ? cell.getCurrentValue() : "";
-      // drawImage_ calls getAsset. If currentValue() is 0, getAsset will return
+      // The new value is the number of paint units to show on the screen. If we have > 0 units and we
+      // are showing buckets, return the value, otherwise return an empty string so we hide the bucket and value.
+      const newValue = cell.getCurrentValue() > 0 && this.showBuckets ? cell.getCurrentValue() : "";
+      // drawImage_ calls getAsset. If currentValue() is 0 or we want to hide buckets, getAsset will return
       // undefined and the paint can will be hidden. Otherwise we will get the paint can image.
       super.drawImage_("", row, col, this.squareSize);
       super.updateOrCreateText_(
