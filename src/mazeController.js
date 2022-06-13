@@ -467,4 +467,12 @@ module.exports = class MazeController {
       this.animationsController.hidePegman();
     }
   }
+
+  showPegman(id) {
+    this.animationsController.showPegman(id);
+  }
+
+  hidePegman(id) {
+    this.animationsController.hidePegman(id);
+  }
 };
