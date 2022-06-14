@@ -146,6 +146,22 @@ module.exports = class Neighborhood extends Subtype {
     this.drawer.updateItemImage(row, col, true);
   }
 
+  setBucketVisibility(showBuckets) {
+    if (this.drawer.getBucketVisibility() != showBuckets) {
+      this.drawer.setBucketVisibility(showBuckets);
+      this.redrawBucketTiles();
+    }
+  }
+
+  redrawBucketTiles() {
+    this.maze_.map.forEachCell((cell, row, col) => {
+      // if the cell has a value > 0, it has a bucket. Only update tiles with a bucket.
+      if (cell.getCurrentValue() > 0) {
+        this.drawer.updateItemImage(row, col, true);
+      }
+    });
+  }
+
   reset() {
     this.drawer.resetTiles();
   }

@@ -24,6 +24,31 @@ And spin up a development build of your new project:
 
     yarn build
 
+### Integrate with local Code Studio
+In this repo:
+
+```
+yarn link
+```
+
+In main repo's `apps/` directory:
+
+```
+yarn link @code-dot-org/maze
+```
+
+This will set up a symlink in main repo's apps/node_modules/ to point at your local changes.
+
+Run
+
+```
+yarn run build
+```
+
+in this repo, and then the main repo's `apps` build should pick the changes up next time it builds.
+
+If you are running `yarn start` for continuous builds in the main repo, it will pick up the changes once the build in this repo has completed.
+
 ### Publishing a new version
 
 In /maze: npm login with an authorized npm account. If necessary, create one under your own email, login with our shared dev account and add your new account to the org. After logging in, you may need to authorize your machine (follow the prompt given):
