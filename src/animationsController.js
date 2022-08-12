@@ -265,9 +265,15 @@ module.exports = class AnimationsController {
     */
   updatePegmanAnimation_(options) {
     var rect = document.getElementById(utils.getPegmanElementId(`${options.type}ClipRect`, options.pegmanId));
+    if (!rect) {
+      return;
+    }
     rect.setAttribute('x', options.col * this.maze.SQUARE_SIZE + 1 + this.maze.PEGMAN_X_OFFSET);
     rect.setAttribute('y', getPegmanYForRow(this.maze.skin, options.row, this.maze.SQUARE_SIZE));
     var img = document.getElementById(utils.getPegmanElementId(options.type, options.pegmanId));
+    if (!img) {
+      return;
+    }
     var x = this.maze.SQUARE_SIZE * options.col -
         options.direction * this.maze.PEGMAN_WIDTH + 1 + this.maze.PEGMAN_X_OFFSET;
     img.setAttribute('x', x);
