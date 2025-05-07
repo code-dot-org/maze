@@ -186,6 +186,7 @@ module.exports = class MazeController {
     this.subtype.reset();
 
     // Kill all tasks.
+    timeoutList.clearIntervals();
     timeoutList.clearTimeouts();
 
     if (this.subtype.start) {
