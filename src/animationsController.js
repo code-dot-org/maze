@@ -39,7 +39,7 @@ module.exports = class AnimationsController {
         var timePerFrame = 600; // timeForAnimation / numFrames;
         var idleAnimationFrame = 0;
 
-        setInterval(() => {
+        timeoutList.setInterval(() => {
           if (idlePegmanIcon.getAttribute('visibility') === 'visible') {
             this.updatePegmanAnimation_({
               type: pegmanElements.IDLE,
@@ -487,7 +487,7 @@ module.exports = class AnimationsController {
             y: deltaY
           }, numFrames, timePerFrame, pegmanElements.WALL,
           tiles.Direction.NORTH, true, pegmanId);
-        setTimeout(function () {
+        timeoutList.setTimeout(function () {
           document.getElementById(
             utils.getPegmanElementId(pegmanElements.WALL, pegmanId)
           ).setAttribute('visibility', 'hidden');
