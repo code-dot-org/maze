@@ -186,7 +186,6 @@ module.exports = class MazeController {
     this.subtype.reset();
 
     // Kill all tasks.
-    timeoutList.clearIntervals();
     timeoutList.clearTimeouts();
 
     if (this.subtype.start) {
@@ -234,6 +233,15 @@ module.exports = class MazeController {
     } else {
       this.resetTiles_();
     }
+  }
+
+  destroy() {
+    // Reset everything
+    this.reset();
+
+    // Destroy ALL tasks
+    timeoutList.clearIntervals();
+    timeoutList.clearTimeouts();
   }
 
   resetTiles_() {
