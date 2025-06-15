@@ -42,7 +42,7 @@ This will set up a symlink in main repo's apps/node_modules/ to point at your lo
 Run
 
 ```
-yarn run build
+yarn build
 ```
 
 in this repo, and then the main repo's `apps` build should pick the changes up next time it builds.

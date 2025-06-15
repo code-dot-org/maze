@@ -1,0 +1,13 @@
+{
+  "files": [],
+  "compilerOptions": {
+    // For things like showOpenFilePicker, etc
+    "types": [ "@types/wicg-file-system-access" ],
+    // Generate d.ts files
+    "declaration": true,
+    "outDir": "dist"
+  },
+  "references": [
+    { "path": "./tsconfig.app.json" }
+  ]
+}
