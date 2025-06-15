@@ -3,6 +3,7 @@ import MazeMap from './MazeMap';
 import * as drawMap from './drawMap';
 import * as tiles from './tiles';
 import * as utils from './utils';
+import * as constants from './constants';
 
 import Cell from './Cell';
 import BeeCell from './BeeCell';
@@ -47,4 +48,5 @@ export {
   subtypes,
   tiles,
   utils,
+  constants,
 }

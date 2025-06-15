@@ -14,6 +14,7 @@
   },
   "scripts": {
     "build": "tsc -b && node ./esbuild.bundle.js",
+    "build:demo": "cd demo && node ./esbuild.bundle.js",
     "lint": "eslint .",
     "postversion": "git push && git push --tags && npm publish",
     "preversion": "npm run test",
@@ -47,6 +48,7 @@
     "typescript-eslint": "^8.19.1"
   },
   "dependencies": {
-    "@types/events": "^3.0.3"
+    "@types/events": "^3.0.3",
+    "events": "^3.3.0"
   }
 }

@@ -9,14 +9,10 @@ for await (const format of ['esm', 'cjs']) {
       '.js': format === 'cjs' ? '.cjs' : '.js',
     },
     entryPoints: [
-      'src/index.ts',
+      'playground.js',
     ],
-    platform: 'node',
+    platform: 'browser',
     bundle: true,
-    plugins: [
-      nodeExternalsPlugin({
-        packagePath: 'package.json',
-      }),
-    ],
+    inject: ['../dist/index.js'],
   });
 }
