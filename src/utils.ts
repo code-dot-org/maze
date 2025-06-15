@@ -12,14 +12,6 @@ import Subtype, {SubtypeConstructor} from './Subtype';
 import WordSearch from './WordSearch';
 
 /**
- * Version of modulo which, unlike javascript's `%` operator,
- * will always return a positive remainder.
- */
-export function mod(number: number, modulus: number): number {
-  return ((number % modulus) + modulus) % modulus;
-}
-
-/**
  * Return a random value from an array
  */
 export function randomValue<T = string | number>(values: T[]): T {

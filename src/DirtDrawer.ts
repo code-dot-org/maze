@@ -17,7 +17,7 @@ class DirtDrawer extends Drawer<Cell> {
   }
 
   /** @override */
-  updateItemImage(row: number, col: number, running: boolean, squareSize: number = SQUARE_SIZE): SVGImageElement | undefined {
+  updateItemImage(row: number, col: number, running: boolean = false, squareSize: number = SQUARE_SIZE): SVGImageElement | undefined {
     const img = super.updateItemImage(row, col, running, squareSize);
 
     if (!img) {

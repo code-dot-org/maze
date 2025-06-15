@@ -40,8 +40,8 @@ class Harvester extends Gatherer<HarvesterCell, HarvesterDrawer> {
   }
 
   hasCrop(crop: number): boolean {
-    const col = this.maze_.getPegmanX() || -1;
-    const row = this.maze_.getPegmanY() || -1;
+    const col = this.maze_.getPegmanX() || 0;
+    const row = this.maze_.getPegmanY() || 0;
 
     const cell = this.getCell(row, col) as HarvesterCell;
     return cell?.featureType() === crop && (cell?.getCurrentValue() || 0) > 0;
@@ -60,8 +60,8 @@ class Harvester extends Gatherer<HarvesterCell, HarvesterDrawer> {
   }
 
   atCrop(crop: number): boolean {
-    const col = this.maze_.getPegmanX() || -1;
-    const row = this.maze_.getPegmanY() || -1;
+    const col = this.maze_.getPegmanX() || 0;
+    const row = this.maze_.getPegmanY() || 0;
 
     const cell = this.getCell(row, col) as HarvesterCell;
 
@@ -96,8 +96,8 @@ class Harvester extends Gatherer<HarvesterCell, HarvesterDrawer> {
    * @fires emptyCrop
    */
   tryGetCrop(crop: number): boolean {
-    const col = this.maze_.getPegmanX() || -1;
-    const row = this.maze_.getPegmanY() || -1;
+    const col = this.maze_.getPegmanX() || 0;
+    const row = this.maze_.getPegmanY() || 0;
 
     const cell = this.getCell(row, col) as HarvesterCell;
 
@@ -139,8 +139,8 @@ class Harvester extends Gatherer<HarvesterCell, HarvesterDrawer> {
    *         available to harvest.
    */
   animateGetCrop(crop: number) {
-    const col = this.maze_.getPegmanX() || -1;
-    const row = this.maze_.getPegmanY() || -1;
+    const col = this.maze_.getPegmanX() || 0;
+    const row = this.maze_.getPegmanY() || 0;
 
     const cell = this.getCell(row, col) as HarvesterCell;
 

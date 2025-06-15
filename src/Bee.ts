@@ -299,8 +299,8 @@ class Bee extends Gatherer<BeeCell, BeeItemDrawer> {
    * @return {boolean} whether or not this attempt was successful
    */
   tryGetNectar() {
-    const col = this.maze_.getPegmanX() || -1;
-    const row = this.maze_.getPegmanY() || -1;
+    const col = this.maze_.getPegmanX() || 0;
+    const row = this.maze_.getPegmanY() || 0;
 
     // Make sure we're at a flower.
     if (!this.isFlower(row, col)) {
@@ -330,8 +330,8 @@ class Bee extends Gatherer<BeeCell, BeeItemDrawer> {
    * @return {boolean} whether or not this attempt was successful
    */
   tryMakeHoney() {
-    const col = this.maze_.getPegmanX() || -1;
-    const row = this.maze_.getPegmanY() || -1;
+    const col = this.maze_.getPegmanX() || 0;
+    const row = this.maze_.getPegmanY() || 0;
 
     if (!this.isHive(row, col)) {
       this.emit('notAtHive');
@@ -347,8 +347,8 @@ class Bee extends Gatherer<BeeCell, BeeItemDrawer> {
   }
 
   nectarRemaining(userCheck: boolean = false): number {
-    const col = this.maze_.getPegmanX() || -1;
-    const row = this.maze_.getPegmanY() || -1;
+    const col = this.maze_.getPegmanX() || 0;
+    const row = this.maze_.getPegmanY() || 0;
 
     if (userCheck) {
       this.userChecks_[row][col].checkedForNectar = true;
@@ -358,8 +358,8 @@ class Bee extends Gatherer<BeeCell, BeeItemDrawer> {
   }
 
   honeyAvailable(): number {
-    const col = this.maze_.getPegmanX() || -1;
-    const row = this.maze_.getPegmanY() || -1;
+    const col = this.maze_.getPegmanX() || 0;
+    const row = this.maze_.getPegmanY() || 0;
 
     return this.hiveRemainingCapacity(row, col) || 0;
   }
@@ -375,8 +375,8 @@ class Bee extends Gatherer<BeeCell, BeeItemDrawer> {
    * @throws Will throw an error if the current cell has no nectar.
    */
   animateGetNectar() {
-    const col = this.maze_.getPegmanX() || -1;
-    const row = this.maze_.getPegmanY() || -1;
+    const col = this.maze_.getPegmanX() || 0;
+    const row = this.maze_.getPegmanY() || 0;
 
     if ((this.getValue(row, col) || 0) <= 0) {
       throw new Error("Shouldn't be able to end up with a nectar animation if " +
@@ -399,8 +399,8 @@ class Bee extends Gatherer<BeeCell, BeeItemDrawer> {
    * @throws Will throw an error if the current cell is not a hive.
    */
   animateMakeHoney() {
-    const col = this.maze_.getPegmanX() || -1;
-    const row = this.maze_.getPegmanY() || -1;
+    const col = this.maze_.getPegmanX() || 0;
+    const row = this.maze_.getPegmanY() || 0;
 
     if (!this.isHive(row, col)) {
       throw new Error("Shouldn't be able to end up with a honey animation if " +

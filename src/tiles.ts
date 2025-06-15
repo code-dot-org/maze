@@ -1,4 +1,10 @@
-import * as utils from './utils';
+/**
+ * Version of modulo which, unlike javascript's `%` operator,
+ * will always return a positive remainder.
+ */
+function mod(number: number, modulus: number): number {
+  return ((number % modulus) + modulus) % modulus;
+}
 
 /**
  * Constants for cardinal directions.  Subsequent code assumes these are
@@ -44,7 +50,7 @@ export function directionToDxDy(direction: number) {
 };
 
 export function directionToFrame(direction4: number) {
-  return utils.mod(direction4 * 4, 16);
+  return mod(direction4 * 4, 16);
 };
 
 /**
@@ -53,5 +59,5 @@ export function directionToFrame(direction4: number) {
  * @returns Legal direction value.
  */
 export function constrainDirection4(d: number): number {
-  return utils.mod(d, 4);
+  return mod(d, 4);
 };

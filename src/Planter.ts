@@ -32,8 +32,8 @@ class Planter extends Subtype<PlanterCell, PlanterDrawer> {
   }
 
   atType(type: number): boolean {
-    const col = this.maze_.getPegmanX() || -1;
-    const row = this.maze_.getPegmanY() || -1;
+    const col = this.maze_.getPegmanX() || 0;
+    const row = this.maze_.getPegmanY() || 0;
 
     const cell = this.getCell(row, col) as PlanterCell;
     return cell?.featureType() === type;
@@ -50,8 +50,8 @@ class Planter extends Subtype<PlanterCell, PlanterDrawer> {
    * @return Whether or not this attempt was successful
    */
   tryPlant(): boolean {
-    const col = this.maze_.getPegmanX() || -1;
-    const row = this.maze_.getPegmanY() || -1;
+    const col = this.maze_.getPegmanX() || 0;
+    const row = this.maze_.getPegmanY() || 0;
 
     const cell = this.getCell(row, col) as PlanterCell;
 
@@ -74,8 +74,8 @@ class Planter extends Subtype<PlanterCell, PlanterDrawer> {
    * @throws Will throw an error if the current cell has no nectar.
    */
   animatePlant() {
-    const col = this.maze_.getPegmanX() || -1;
-    const row = this.maze_.getPegmanY() || -1;
+    const col = this.maze_.getPegmanX() || 0;
+    const row = this.maze_.getPegmanY() || 0;
 
     const cell = this.getCell(row, col) as PlanterCell;
 

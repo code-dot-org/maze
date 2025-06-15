@@ -5,8 +5,8 @@ export interface MazeMapSerialization<U extends CellSerialization> {
 }
 
 class MazeMap<T extends Cell> {
-  private grid_: T[][];
-  private staticGrids: T[][][];
+  grid_: T[][];
+  staticGrids: T[][][];
 
   currentStaticGrid: T[][];
 
@@ -61,7 +61,7 @@ class MazeMap<T extends Cell> {
     return new MazeMap(serializedValues.map(row => row.map((cellClass as typeof Cell).deserialize)));
   }
 
-  static parseFromOldValues(map: (number | string)[][], initialDirt: number[][] | undefined, cellClass: CellConstructor): MazeMap<Cell> {
+  static parseFromOldValues(map: (number | string)[][], initialDirt: (number | string)[][] | undefined, cellClass: CellConstructor): MazeMap<Cell> {
     return new MazeMap(map.map((row, x) => row.map((mapCell, y) => {
       const initialDirtCell = initialDirt?.[x]?.[y];
       return (cellClass as typeof Cell).parseFromOldValues(mapCell, initialDirtCell);

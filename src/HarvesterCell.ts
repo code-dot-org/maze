@@ -7,7 +7,7 @@ import {SquareType} from './tiles';
 
 export interface HarvesterCellSerialization extends CellSerialization {
   possibleFeatures: number[];
-  startsHidden: boolean;
+  startsHidden?: boolean;
 }
 
 export const FeatureType = {
@@ -18,8 +18,8 @@ export const FeatureType = {
 };
 
 class HarvesterCell extends Cell {
-  private possibleFeatures_: number[];
-  private startsHidden_: boolean;
+  possibleFeatures_: number[];
+  startsHidden_: boolean;
 
   static FeatureType = FeatureType;
 

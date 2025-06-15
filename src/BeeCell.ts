@@ -30,11 +30,13 @@ export interface BeeCellSerialization extends CellSerialization {
 }
 
 class BeeCell extends Cell {
-  private featureType_?: number;
-  private flowerColor_?: number;
-  private cloudType_?: number;
+  featureType_?: number;
+  flowerColor_?: number;
+  cloudType_?: number;
 
   static FeatureType = FeatureType;
+  static CloudType = CloudType;
+  static FlowerColor = FlowerColor;
 
   constructor(tileType: number, featureType?: number, value?: number, cloudType?: number, flowerColor?: number, range?: number) {
     // BeeCells require features to have values

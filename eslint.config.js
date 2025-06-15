@@ -8,7 +8,7 @@ import love from "eslint-config-love";
 export default [
   {
     ...love,
-    files: ["src/*.{js,mjs,cjs,ts}"],
+    files: ["src/**/*.{js,mjs,cjs,ts}"],
     rules: {
       "@typescript-eslint/no-unused-vars": [
         "error",
@@ -21,7 +21,7 @@ export default [
     },
   },
   {
-    ignores: ["dist/*", "eslint.config.js", "esbuild.bundle.js"],
+    ignores: ["dist/*", "eslint.config.js", "esbuild.bundle.js", "coverage/*"],
   },
   {
     languageOptions: { globals: globals.browser }
