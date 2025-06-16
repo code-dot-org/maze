@@ -5,7 +5,6 @@ const config: Config = {
   testEnvironment: "jsdom",
   testMatch: ["**/*.test.ts?(x)"],
   transform: {
-    //"^.+\\.tsx?$": ['esbuild-jest', { sourcemap: true }],
     "^.+\\.tsx?$": ['@swc/jest', { sourceMaps: true, }],
   },
   coverageDirectory: "./coverage/",
