@@ -1,5 +1,5 @@
-import Pegman from './Pegman';
 import {DEFAULT_PEGMAN_ID} from './constants';
+import Pegman from './Pegman';
 
 class PegmanController {
   private pegmen: {

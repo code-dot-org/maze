@@ -1,4 +1,4 @@
-import Bee from './Bee';
+import type Bee from './Bee';
 import BeeCell from './BeeCell';
 import {SVG_NS} from './constants';
 import Drawer, {SQUARE_SIZE} from './Drawer';

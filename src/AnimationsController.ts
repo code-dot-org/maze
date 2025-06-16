@@ -1,7 +1,7 @@
 import Cell from './Cell';
 import {SVG_NS, pegmanElements} from './constants';
 import {displayPegman, getPegmanYForRow, addNewPegman} from './drawMap';
-import MazeController from './MazeController';
+import type MazeController from './MazeController';
 import {Point} from './Subtype';
 import * as tiles from './tiles';
 import * as timeoutList from './timeoutList';

@@ -1,5 +1,5 @@
 import Cell, {CellConstructor} from './Cell';
-import MazeController from './MazeController';
+import type MazeController from './MazeController';
 import MazeMap from './MazeMap';
 import NeighborhoodCell from "./NeighborhoodCell";
 import NeighborhoodDrawer from "./NeighborhoodDrawer";

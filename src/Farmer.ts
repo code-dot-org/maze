@@ -1,6 +1,6 @@
 import Cell from './Cell';
-import Subtype from './Subtype';
 import DirtDrawer from './DirtDrawer';
+import Subtype from './Subtype';
 
 class Farmer<T extends Cell> extends Subtype<T, DirtDrawer> {
   /** @override */

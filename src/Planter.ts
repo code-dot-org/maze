@@ -1,6 +1,6 @@
 import {CellConstructor} from './Cell';
 import MazeMap from './MazeMap';
-import PlanterCell from './PlanterCell';
+import PlanterCell, {FeatureType} from './PlanterCell';
 import PlanterDrawer from './PlanterDrawer';
 import Subtype from './Subtype';
 
@@ -24,11 +24,11 @@ class Planter extends Subtype<PlanterCell, PlanterDrawer> {
   }
 
   atSprout(): boolean {
-    return this.atType(PlanterCell.FeatureType.SPROUT);
+    return this.atType(FeatureType.SPROUT);
   }
 
   atSoil(): boolean {
-    return this.atType(PlanterCell.FeatureType.SOIL);
+    return this.atType(FeatureType.SOIL);
   }
 
   atType(type: number): boolean {
@@ -55,12 +55,12 @@ class Planter extends Subtype<PlanterCell, PlanterDrawer> {
 
     const cell = this.getCell(row, col) as PlanterCell;
 
-    if (cell.featureType() !== PlanterCell.FeatureType.SOIL) {
+    if (cell.featureType() !== FeatureType.SOIL) {
       this.emit('plantInNonSoil');
       return false;
     }
 
-    cell.setFeatureType(PlanterCell.FeatureType.SPROUT);
+    cell.setFeatureType(FeatureType.SPROUT);
     return true;
   }
 
@@ -79,11 +79,11 @@ class Planter extends Subtype<PlanterCell, PlanterDrawer> {
 
     const cell = this.getCell(row, col) as PlanterCell;
 
-    if (cell.featureType() !== PlanterCell.FeatureType.SOIL) {
+    if (cell.featureType() !== FeatureType.SOIL) {
       throw new Error("Shouldn't be able to plant in anything but soil");
     }
 
-    cell.setFeatureType(PlanterCell.FeatureType.SPROUT);
+    cell.setFeatureType(FeatureType.SPROUT);
     this.drawer.updateItemImage(row, col, true);
   }
 }

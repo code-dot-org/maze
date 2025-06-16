@@ -2,7 +2,7 @@ import BeeCell from './BeeCell';
 import BeeItemDrawer from './BeeItemDrawer';
 import {CellConstructor} from './Cell';
 import Gatherer from './Gatherer';
-import MazeController from './MazeController';
+import type MazeController from './MazeController';
 import MazeMap from './MazeMap';
 import {Skin} from './skin';
 import {SubtypeConfiguration} from './Subtype';

@@ -1,3 +1,43 @@
+/** Is skin either farmer or farmer_night */
+export function isFarmerSkin(skinId: string): boolean {
+  return (/farmer(_night)?/).test(skinId);
+}
+
+/** Is skin either bee or bee_night */
+export function isBeeSkin(skinId: string): boolean {
+  return (/bee(_night)?/).test(skinId);
+}
+
+/** Is skin either collector or collector_night */
+export function isCollectorSkin(skinId: string): boolean {
+  return (/collector(_night)?/).test(skinId);
+}
+
+/** Is skin scrat */
+export function isScratSkin(skinId: string): boolean {
+  return (/scrat/).test(skinId);
+}
+
+/** Is skin planter */
+export function isPlanterSkin(skinId: string): boolean {
+  return (/planter/).test(skinId);
+}
+
+/** Is skin harvester */
+export function isHarvesterSkin(skinId: string): boolean {
+  return (/harvester/).test(skinId);
+}
+
+/** Is skin wordsearch */
+export function isWordSearchSkin(skinId: string): boolean {
+  return skinId === 'letters';
+}
+
+/** Is skin neighborhood */
+export function isNeighborhoodSkin(skinId: string): boolean {
+  return skinId === 'neighborhood';
+}
+
 export interface SpriteMap {
   [key: string]: {
     name: string;

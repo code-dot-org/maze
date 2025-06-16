@@ -1,8 +1,8 @@
 import {SVG_NS} from './constants';
 import Drawer, {SQUARE_SIZE} from './Drawer';
 import MazeMap from './MazeMap';
-import type NeighborhoodCell from './NeighborhoodCell';
 import type Neighborhood from './Neighborhood';
+import type NeighborhoodCell from './NeighborhoodCell';
 import {Skin} from './skin';
 import {SquareType} from './tiles';
 

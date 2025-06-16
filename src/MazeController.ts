@@ -25,17 +25,26 @@
  */
 
 import AnimationsController from './AnimationsController';
+import Bee from './Bee';
 import Cell from './Cell';
+import Collector from './Collector';
 import DirtDrawer from './DirtDrawer';
+import type Drawer from './Drawer';
 import {drawMap} from './drawMap';
+import Farmer from './Farmer';
+import Harvester from './Harvester';
+import MazeMap from './MazeMap';
+import Neighborhood from './Neighborhood';
 import Pegman from './Pegman';
 import PegmanController from './PegmanController';
-import MazeMap from './MazeMap';
-import {Skin} from './skin';
-import Subtype, {SubtypeConfiguration} from './Subtype';
+import Planter from './Planter';
+import Scrat from './Scrat';
+import {Skin, isFarmerSkin, isBeeSkin, isCollectorSkin, isScratSkin, isPlanterSkin, isHarvesterSkin, isWordSearchSkin, isNeighborhoodSkin} from './skin';
+import Subtype from './Subtype';
+import type {SubtypeConfiguration, SubtypeConstructor} from './Subtype';
 import * as tiles from './tiles';
 import * as timeoutList from './timeoutList';
-import {getSubtypeForSkin} from './utils';
+import WordSearch from './WordSearch';
 
 /** Describes Maze level tile data in serialized mazes */
 export interface SerializedMazeTileData {
@@ -157,9 +166,38 @@ class MazeController {
     this.PEGMAN_Y_OFFSET = 0;
     this.PATH_WIDTH = this.SQUARE_SIZE / 3;
 
-    const Type = getSubtypeForSkin(config.skinId || skin.id || 'unknown');
+    const Type = MazeController.getSubtypeForSkin(config.skinId || skin.id || 'unknown');
     this.subtype = new Type(this, config as SubtypeConfiguration);
     this.loadLevel_();
+  }
+
+  static getSubtypeForSkin<T extends Cell, U extends Drawer<T>>(skinId: string): SubtypeConstructor<T, U> {
+    if (isFarmerSkin(skinId)) {
+      return Farmer as unknown as SubtypeConstructor<T, U>;
+    }
+    if (isBeeSkin(skinId)) {
+      return Bee as unknown as SubtypeConstructor<T, U>;
+    }
+    if (isCollectorSkin(skinId)) {
+      return Collector as unknown as SubtypeConstructor<T, U>;
+    }
+    if (isWordSearchSkin(skinId)) {
+      return WordSearch as unknown as SubtypeConstructor<T, U>;
+    }
+    if (isScratSkin(skinId)) {
+      return Scrat as unknown as SubtypeConstructor<T, U>;
+    }
+    if (isHarvesterSkin(skinId)) {
+      return Harvester as unknown as SubtypeConstructor<T, U>;
+    }
+    if (isPlanterSkin(skinId)) {
+      return Planter as unknown as SubtypeConstructor<T, U>;
+    }
+    if (isNeighborhoodSkin(skinId)) {
+      return Neighborhood as unknown as SubtypeConstructor<T, U>;
+    }
+
+    return Subtype as SubtypeConstructor<T, U>;
   }
 
   rebindMethods(methods: RebindMethods) {

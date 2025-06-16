@@ -1,6 +1,6 @@
 import {CellConstructor} from './Cell';
 import Gatherer from './Gatherer';
-import HarvesterCell from './HarvesterCell';
+import HarvesterCell, {FeatureType} from './HarvesterCell';
 import HarvesterDrawer from './HarvesterDrawer';
 import MazeMap from './MazeMap';
 import {Skin} from './skin';
@@ -28,15 +28,15 @@ class Harvester extends Gatherer<HarvesterCell, HarvesterDrawer> {
   }
 
   hasCorn(): boolean {
-    return this.hasCrop(HarvesterCell.FeatureType.CORN);
+    return this.hasCrop(FeatureType.CORN);
   }
 
   hasPumpkin(): boolean {
-    return this.hasCrop(HarvesterCell.FeatureType.PUMPKIN);
+    return this.hasCrop(FeatureType.PUMPKIN);
   }
 
   hasLettuce(): boolean {
-    return this.hasCrop(HarvesterCell.FeatureType.LETTUCE);
+    return this.hasCrop(FeatureType.LETTUCE);
   }
 
   hasCrop(crop: number): boolean {
@@ -48,15 +48,15 @@ class Harvester extends Gatherer<HarvesterCell, HarvesterDrawer> {
   }
 
   atCorn(): boolean {
-    return this.atCrop(HarvesterCell.FeatureType.CORN);
+    return this.atCrop(FeatureType.CORN);
   }
 
   atPumpkin(): boolean {
-    return this.atCrop(HarvesterCell.FeatureType.PUMPKIN);
+    return this.atCrop(FeatureType.PUMPKIN);
   }
 
   atLettuce(): boolean {
-    return this.atCrop(HarvesterCell.FeatureType.LETTUCE);
+    return this.atCrop(FeatureType.LETTUCE);
   }
 
   atCrop(crop: number): boolean {
@@ -74,15 +74,15 @@ class Harvester extends Gatherer<HarvesterCell, HarvesterDrawer> {
   }
 
   tryGetCorn(): boolean {
-    return this.tryGetCrop(HarvesterCell.FeatureType.CORN);
+    return this.tryGetCrop(FeatureType.CORN);
   }
 
   tryGetPumpkin(): boolean {
-    return this.tryGetCrop(HarvesterCell.FeatureType.PUMPKIN);
+    return this.tryGetCrop(FeatureType.PUMPKIN);
   }
 
   tryGetLettuce(): boolean {
-    return this.tryGetCrop(HarvesterCell.FeatureType.LETTUCE);
+    return this.tryGetCrop(FeatureType.LETTUCE);
   }
 
   /**
@@ -116,15 +116,15 @@ class Harvester extends Gatherer<HarvesterCell, HarvesterDrawer> {
   }
 
   animateGetCorn() {
-    this.animateGetCrop(HarvesterCell.FeatureType.CORN);
+    this.animateGetCrop(FeatureType.CORN);
   }
 
   animateGetPumpkin() {
-    this.animateGetCrop(HarvesterCell.FeatureType.PUMPKIN);
+    this.animateGetCrop(FeatureType.PUMPKIN);
   }
 
   animateGetLettuce() {
-    this.animateGetCrop(HarvesterCell.FeatureType.LETTUCE);
+    this.animateGetCrop(FeatureType.LETTUCE);
   }
 
   /**

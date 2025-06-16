@@ -3,7 +3,7 @@ import {SVG_NS, pegmanElements} from './constants';
 import Drawer from './Drawer';
 import MazeMap from './MazeMap';
 import {Skin} from './skin';
-import Subtype from './Subtype';
+import type Subtype from './Subtype';
 import * as tiles from './tiles';
 import {createUuid, getPegmanElementId} from './utils';
 

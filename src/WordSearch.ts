@@ -1,5 +1,5 @@
 import Cell from './Cell';
-import MazeController from './MazeController';
+import type MazeController from './MazeController';
 import Subtype, {SubtypeConfiguration} from './Subtype';
 import {SquareType} from './tiles';
 import {randomValue} from './utils';

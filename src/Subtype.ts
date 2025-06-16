@@ -1,9 +1,11 @@
 import {EventEmitter} from 'events';
 
+
 import Cell, {CellConstructor} from './Cell';
 import DirtDrawer from './DirtDrawer';
 import Drawer from './Drawer';
-import MazeController, {MazeData} from './MazeController';
+import type MazeController from './MazeController';
+import type {MazeData} from './MazeController';
 import {Skin} from './skin';
 import {SquareType} from './tiles';
 

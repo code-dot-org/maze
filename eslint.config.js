@@ -21,7 +21,7 @@ export default [
     },
   },
   {
-    ignores: ["dist/*", "eslint.config.js", "esbuild.bundle.js", "coverage/*"],
+    ignores: ["dist/*", "demo/*", "eslint.config.js", "esbuild.bundle.js", "coverage/*"],
   },
   {
     languageOptions: { globals: globals.browser }
